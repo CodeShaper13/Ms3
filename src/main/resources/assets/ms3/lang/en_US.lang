@@ -1,0 +1,90 @@
+<<<<<<< HEAD
+=======
+commands.pycraft.rebuildingApi=Rebuilding API...
+commands.pycraft.apiRebuilt=API rebuilt
+commands.pycraft.usage=/pyCraft <rebuildApi|deleteData>
+commands.pycraft.typeYes=Type "/pyCraft deleteData yes" to DELETE all PyCraft data
+
+>>>>>>> c9c49657d51063d2f2180cb37559f58ddc327727
+# Unused /interpreter command
+commands.interpreter.usage=/interpreter <interpreterName> <create|delete|config ...>
+commands.interpreter.usageConfig=/interpreter <interpreterName> config <stdin|stdout|stderr> <console|mcChat>
+commands.interpreter.createdOk=Created interpreter "%s" successfully
+commands.interpreter.createdError=Couldn't create interpreter "%s", it already exists
+commands.interpreter.deletedOk=Deleted interpreter "%s" successfully
+commands.interpreter.deletedError=Couldn't delete interpreter "%s", it doesn't exists
+commands.interpreter.configSuccess=Successfully changed stream "%s" to use "%s"
+commands.interpreter.interpreterNotFound=Couldn't configure interpreter "%s", it doesn't exist
+commands.interpreter.deleteDefaultError=You can not delete the default interpreter %s")
+
+# General script not found message
+commands.scriptNotFound=Script "%s" could not be found!
+
+# Usage for /script
+commands.script.usage=/script <run|edit|new|about|openLocation|help> <scriptName>
+commands.script.usageRun=/script <run|edit|new|about|openLocation|help> <scriptName> [args...]
+commands.script.usageRemoteClient=/script <run|about|help> <scriptName>
+commands.script.usageRunRemoteClient=/script <run|about|help> <scriptName> [args...]
+
+commands.script.ranByInvalidError=This command with the "%s" argument can only be run by a host player
+
+# "about" arg for /script
+commands.script.about0=File name: %s
+commands.script.about1=File path: %s
+commands.script.about2=File size: %s
+commands.script.about3=File creation time: %s
+commands.script.about4=File modified time: %s
+commands.script.aboutError=Couldn't find information about "%s"!
+commands.script.errorEdit=Couldn't lauch application to edit "%s"! Does your OS have an application set?
+commands.script.openLocationError=Unable to open the location for "%s"
+
+# "new" arg for /script
+commands.script.alreadyExists=File "%s" already exists
+commands.script.createFileError=Error creating file: %s
+commands.script.createFileSuccess=Successfully created script
+
+# "run" arg for /script
+commands.script.noExecuteFunction=No function with the name "execute" could be found
+
+# "help" arg for /script
+commands.script.wrongHelpTextType=Help text is not of type string
+commands.script.defaultHelpText=No help available
+
+# /bindscript command:
+commands.bindScript.usage=/bindscript <add|remove|check> [scriptName] [args...]
+commands.bindScript.useStickCheck=Click on an Entity to check it's Bound Scripts
+commands.bindScript.useStickAdd=Script set, Click on an Entity to bind this script to it
+commands.bindScript.useStickRemove=Click on an Entity to remove this script from it.
+
+# Using the Script Binder:
+ms3.stick.useBindscriptFirst=Use /bindscript first
+ms3.stick.cantAddDuplicate=Can not add duplicate scripts to the same Entity
+ms3.stick.successfulBind=Successfully bound script
+ms3.stick.bindingError=Script not Bound, as there was an error binding it
+ms3.stick.noScriptOnEntity=Script not on Entity, can not remove
+
+ms3.stick.noScripts=No Bound Scripts
+ms3.stick.totalScriptCount=%s Bound Script%s found:
+
+pycraft.notImplemented=This is not yet implemented!
+pycraft.scheduledScript.noExecuteFunction=Something scheduled "%s" to run, but no function with the name "execute" could be found in the global scope
+pycraft.scheduledScript.scriptNotFound=Something scheduled a script to run, but script "%s" could not be found
+
+# Warnings for the pop up when you first start the mod:
+ms3.warning.warning=Warning!
+ms3.warning.agree=I Understand The Preceding
+<<<<<<< HEAD
+ms3.warning.line1=Ms3 is capable of running Python code including libraries that deal with
+ms3.warning.line2=your operating system!  YOU are responsible for your own computer's wellbeing!
+ms3.warning.line3=Do not allow players onto your game you do not trust, as they have access to
+ms3.warning.line4=your operating system via the /exec command, allowing file access and deleting.
+ms3.warning.notAgain=You will not see this again.
+=======
+ms3.warning.line1=MS3 is capable of running Python code including libraries that deal with
+ms3.warning.line2=the operating system!  YOU are responsible for your own computer's wellbeing!
+ms3.warning.line3=Do not allow players onto your game you do not trust, as they have access to
+ms3.warning.line4=your operating system via the /exec command, allowing file access and deleting.
+>>>>>>> c9c49657d51063d2f2180cb37559f58ddc327727
+
+# Items:
+item.script_binder.name=Script Binder Stick

@@ -1,0 +1,3 @@
+1. Arguments with the same first letter cause problems.
+
+2. Scheduled scripts are not saved upon exiting the world.
