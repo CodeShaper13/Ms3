@@ -19,6 +19,7 @@ public class Config {
 	 */
 	private String pythonPath;
 	private boolean alwaysRebuild;
+	private boolean hideInitFiles;
 
 	public Config(File configFile) {
 		Configuration config = new Configuration(configFile);
@@ -35,6 +36,8 @@ public class Config {
 
 		this.pythonPath = config.getString("Python path", Configuration.CATEGORY_GENERAL, "",
 				"Path to the installed Python location, for adding the site-packages directory.  Example: \"C:\\Python27\"");
+		this.hideInitFiles = config.getBoolean("Hide __init__ files", Configuration.CATEGORY_GENERAL, true,
+				"When TRUE, __init__.py files will not show up in any auto complete.  When FALSE, they show up.");
 
 		// Not needed, as the API is not dynamically created with third party mods.
 		// this.alwaysRebuild = config.getBoolean("Always Rebuild",
@@ -62,5 +65,9 @@ public class Config {
 
 	public boolean getAlwaysRebuild() {
 		return this.alwaysRebuild;
+	}
+
+	public boolean hideInitFiles() {
+		return hideInitFiles;
 	}
 }

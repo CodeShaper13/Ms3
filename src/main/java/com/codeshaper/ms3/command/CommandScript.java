@@ -8,7 +8,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.annotation.Nullable;
 
@@ -207,6 +209,17 @@ public class CommandScript extends CommandBase {
 	protected String[] getAllScripts() {
 		ArrayList<File> scripts = new ArrayList<File>(
 				FileUtils.listFiles(Ms3.dirManager.getScriptFolder(), new String[] { "py" }, true));
+		
+		// Remove init files if the config says so.
+		if(Ms3.configManager.hideInitFiles()) {
+			Iterator<File> iter = scripts.iterator();
+			while(iter.hasNext()){
+			    if(iter.next().getName().equals("__init__")){
+			        iter.remove();
+			    }
+			}
+		}
+		
 		String[] s = new String[scripts.size()];
 		int j = Ms3.dirManager.getScriptFolder().getAbsolutePath().length() + 1;
 		for (int i = 0; i < scripts.size(); i++) {
