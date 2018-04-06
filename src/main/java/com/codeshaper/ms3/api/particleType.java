@@ -1,15 +1,15 @@
 package com.codeshaper.ms3.api;
 
+import org.python.core.PyObject;
+
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 
-import net.minecraft.util.EnumParticleTypes;
-
 @PythonClass
 @PythonDocString("Constants of all the patricle type names.")
-public class particleType {
+public class particleType extends PyObject {
 
 	private particleType() {
 	}
@@ -125,7 +125,6 @@ public class particleType {
 	@PythonFunction
 	@PythonDocString("Takes in a block id and meta value and returns the code for a particle param.")
 	public static int getParamCode(int blockId, int meta) {
-		EnumParticleTypes t;
 		return blockId + (meta * 4096);
 	}
 }

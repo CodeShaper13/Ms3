@@ -1,22 +1,3 @@
-<<<<<<< HEAD
-=======
-commands.pycraft.rebuildingApi=Rebuilding API...
-commands.pycraft.apiRebuilt=API rebuilt
-commands.pycraft.usage=/pyCraft <rebuildApi|deleteData>
-commands.pycraft.typeYes=Type "/pyCraft deleteData yes" to DELETE all PyCraft data
-
->>>>>>> c9c49657d51063d2f2180cb37559f58ddc327727
-# Unused /interpreter command
-commands.interpreter.usage=/interpreter <interpreterName> <create|delete|config ...>
-commands.interpreter.usageConfig=/interpreter <interpreterName> config <stdin|stdout|stderr> <console|mcChat>
-commands.interpreter.createdOk=Created interpreter "%s" successfully
-commands.interpreter.createdError=Couldn't create interpreter "%s", it already exists
-commands.interpreter.deletedOk=Deleted interpreter "%s" successfully
-commands.interpreter.deletedError=Couldn't delete interpreter "%s", it doesn't exists
-commands.interpreter.configSuccess=Successfully changed stream "%s" to use "%s"
-commands.interpreter.interpreterNotFound=Couldn't configure interpreter "%s", it doesn't exist
-commands.interpreter.deleteDefaultError=You can not delete the default interpreter %s")
-
 # General script not found message
 commands.scriptNotFound=Script "%s" could not be found!
 
@@ -25,8 +6,6 @@ commands.script.usage=/script <run|edit|new|about|openLocation|help> <scriptName
 commands.script.usageRun=/script <run|edit|new|about|openLocation|help> <scriptName> [args...]
 commands.script.usageRemoteClient=/script <run|about|help> <scriptName>
 commands.script.usageRunRemoteClient=/script <run|about|help> <scriptName> [args...]
-
-commands.script.ranByInvalidError=This command with the "%s" argument can only be run by a host player
 
 # "about" arg for /script
 commands.script.about0=File name: %s
@@ -47,8 +26,8 @@ commands.script.createFileSuccess=Successfully created script
 commands.script.noExecuteFunction=No function with the name "execute" could be found
 
 # "help" arg for /script
-commands.script.wrongHelpTextType=Help text is not of type string
-commands.script.defaultHelpText=No help available
+commands.script.noHelpText=No doc string found
+commands.script.helpTextHeader=Doc string:
 
 # /bindscript command:
 commands.bindScript.usage=/bindscript <add|remove|check> [scriptName] [args...]
@@ -70,21 +49,24 @@ pycraft.notImplemented=This is not yet implemented!
 pycraft.scheduledScript.noExecuteFunction=Something scheduled "%s" to run, but no function with the name "execute" could be found in the global scope
 pycraft.scheduledScript.scriptNotFound=Something scheduled a script to run, but script "%s" could not be found
 
-# Warnings for the pop up when you first start the mod:
+# Popup guis when the mod starts:
 ms3.warning.warning=Warning!
 ms3.warning.agree=I Understand The Preceding
-<<<<<<< HEAD
 ms3.warning.line1=Ms3 is capable of running Python code including libraries that deal with
 ms3.warning.line2=your operating system!  YOU are responsible for your own computer's wellbeing!
 ms3.warning.line3=Do not allow players onto your game you do not trust, as they have access to
 ms3.warning.line4=your operating system via the /exec command, allowing file access and deleting.
 ms3.warning.notAgain=You will not see this again.
-=======
 ms3.warning.line1=MS3 is capable of running Python code including libraries that deal with
 ms3.warning.line2=the operating system!  YOU are responsible for your own computer's wellbeing!
 ms3.warning.line3=Do not allow players onto your game you do not trust, as they have access to
 ms3.warning.line4=your operating system via the /exec command, allowing file access and deleting.
->>>>>>> c9c49657d51063d2f2180cb37559f58ddc327727
+
+ms3.update.downloadNow=Download Now
+ms3.update.titleScreen=Title Screen
+ms3.update.notAgain
 
 # Items:
 item.script_binder.name=Script Binder Stick
+
+github.test=Hello

@@ -2,11 +2,6 @@ package com.codeshaper.ms3.api;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
-import net.minecraft.util.ResourceLocation;
 
 @PythonDocString("A list of all the vanilla entities names as strings.")
 public class entityList {

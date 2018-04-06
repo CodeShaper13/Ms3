@@ -49,7 +49,7 @@ public class CommandInterpreter extends CommandBase {
     			if(args.length >= 2) {
     				boolean created = PyInterpreterManager.instance.newInterpreter(args[0]);
     				if(created) {
-            			this.notifyCommandListener(sender, this, "commands.interpreter.createdOk", new Object[] {args[0]});
+    					CommandBase.notifyCommandListener(sender, this, "commands.interpreter.createdOk", new Object[] {args[0]});
             		} else {
             			throw new CommandException("commands.interpreter.createdError", args[0]);
             		}
@@ -61,7 +61,7 @@ public class CommandInterpreter extends CommandBase {
     				}
     				boolean flag = PyInterpreterManager.instance.deleteInterpreter(args[0]);
     				if(flag) {
-    					this.notifyCommandListener(sender, this, "commands.interpreter.deletedOk", new Object[] {args[0]});
+    					CommandBase.notifyCommandListener(sender, this, "commands.interpreter.deletedOk", new Object[] {args[0]});
     				} else {
     					throw new CommandException("commands.interpreter.deletedError", args[0]);
     				}
@@ -80,7 +80,7 @@ public class CommandInterpreter extends CommandBase {
 						} else if(args[2].equals("stderr")) {
 							i.setStdErr(useMcChat);
 						}
-    					this.notifyCommandListener(sender, this, "commands.interpreter.configSuccess", new Object[] {args[0], args[2], args[3]}); //interpreter name, stream set, newValue
+						CommandBase.notifyCommandListener(sender, this, "commands.interpreter.configSuccess", new Object[] {args[0], args[2], args[3]}); //interpreter name, stream set, newValue
 					} else {
 						throw new CommandException("commands.interpreter.interpreterNotFound", args[0]); // name we tried to use.
 					}
@@ -96,7 +96,7 @@ public class CommandInterpreter extends CommandBase {
     }
 
     @Override
-	public List getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
+	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
     	if(args.length == 1) {
     		return CommandBase.getListOfStringsMatchingLastWord(args, PyInterpreterManager.instance.getAllInterpreterNames());
     	}

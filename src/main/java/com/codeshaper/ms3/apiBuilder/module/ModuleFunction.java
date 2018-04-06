@@ -1,10 +1,9 @@
 package com.codeshaper.ms3.apiBuilder.module;
 
 import java.lang.reflect.Executable;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 
+import org.python.core.PyDictionary;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PySequenceList;
@@ -33,41 +32,47 @@ public class ModuleFunction extends ModuleMember {
 		String s;
 		for (int i = 0; i < pCount; i++) {
 			param = parameters[i];
-			if(!param.isAnnotationPresent(PythonExcludeType.class)) {
+			if (!param.isAnnotationPresent(PythonExcludeType.class)) {
 				String className = this.getTypeName(param.getType());
-				s = className.substring(className.lastIndexOf('.') + 1) + "_" + param.getName();	
+				s = className.substring(className.lastIndexOf('.') + 1) + "_" + param.getName();
 			} else {
 				s = param.getName();
 			}
-			
+
 			this.argNames[i] = s;
 		}
 	}
-	
-	private String getTypeName(Class clazz) {
-		if(clazz == boolean.class) {
+
+	/**
+	 * Takes in a class and returns a name to use to represent it in parameter
+	 * names.
+	 */
+	private String getTypeName(Class<?> clazz) {
+		if (clazz == boolean.class) {
 			return "bool";
-		} else if(clazz == double.class || clazz == float.class) {
+		// In there are no floats, only doubles but they are called floats.
+		} else if (clazz == double.class || clazz == float.class) {
 			return "float";
-		} else if(clazz == String.class) {
+		} else if (clazz == String.class) {
 			return "str";
-		} else if(clazz == PyList.class) {
+		} else if (clazz == PyList.class) {
 			return "list";
-		} else if(clazz == Object.class || clazz == PyObject.class) {
+		} else if (clazz == Object.class || clazz == PyObject.class) {
 			return "object";
-		} else if(clazz == PyTuple.class) {
+		} else if (clazz == PyTuple.class) {
 			return "tuple";
-		} else if(clazz == PySequenceList.class) {
+		} else if (clazz == PySequenceList.class) {
 			return "list";
+		} else if(clazz == PyDictionary.class) {
+			return "dict";
 		} else {
 			String className = clazz.getName();
-			String returnName = className;
-			if(className.contains(";")) {
+			if (className.contains(";")) {
 				className = className.replace(";", "") + "_ARRAY";
-			} else if(className.contains("$")) {
+			} else if (className.contains("$")) {
 				className = className.substring(className.lastIndexOf('$') + 1);
 			}
-			
+
 			return className;
 		}
 	}

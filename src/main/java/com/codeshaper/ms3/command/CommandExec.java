@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.codeshaper.ms3.MS3;
+import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.interpreter.PyInterpreter;
 
 import net.minecraft.command.CommandBase;
@@ -14,7 +14,6 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 @Deprecated
 public class CommandExec extends CommandBase {
@@ -45,7 +44,6 @@ public class CommandExec extends CommandBase {
 	 */
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		World world = sender.getEntityWorld();
 		if (args.length < 1) {
 			throw new WrongUsageException("commands.exec.usage");
 		} else {
@@ -54,10 +52,10 @@ public class CommandExec extends CommandBase {
 				sb.append(args[i]);
 				sb.append(" ");
 			}
-			PyInterpreter interpreter = MS3.getInterpreter();
+			PyInterpreter interpreter = Ms3.getInterpreter();
 			boolean noError = interpreter.runSingleLine(sb.toString());
 			if (noError) {
-				this.notifyCommandListener(sender, this, "commands.exec.codeOk");
+				CommandBase.notifyCommandListener(sender, this, "commands.exec.codeOk");
 			}
 		}
 	}

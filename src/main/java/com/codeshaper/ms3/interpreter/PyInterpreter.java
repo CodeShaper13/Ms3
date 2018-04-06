@@ -13,9 +13,10 @@ import org.python.core.PyObject;
 import org.python.core.PySequenceList;
 import org.python.core.PyString;
 import org.python.core.PySystemState;
+import org.python.core.__builtin__;
 import org.python.util.PythonInterpreter;
 
-import com.codeshaper.ms3.MS3;
+import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.api.entity;
 import com.codeshaper.ms3.api.executor;
 import com.codeshaper.ms3.api.world;
@@ -24,13 +25,13 @@ import com.codeshaper.ms3.script.RunnableScript;
 import com.codeshaper.ms3.stream.ChatErrorStream;
 import com.codeshaper.ms3.stream.ChatOutputStream;
 import com.codeshaper.ms3.util.Util;
+import com.codeshaper.ms3.util.textBuilder.TextBuilder;
+import com.codeshaper.ms3.util.textBuilder.TextBuilderTrans;
 
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.WorldServer;
 
@@ -43,9 +44,11 @@ public class PyInterpreter {
 	public static final String DEFAULT_NAME = "default";
 
 	// Save the original streams in case we want to go back to using them.
+	@SuppressWarnings("unused")
 	private PyObject consoleStdIn;
 	private PyObject consoleStdOut;
 	private PyObject consoleStdErr;
+
 	private String interpreterName;
 	private PythonInterpreter pythonInterpreter;
 
@@ -56,33 +59,31 @@ public class PyInterpreter {
 		this.consoleStdOut = this.pythonInterpreter.getSystemState().stdout;
 		this.consoleStdErr = this.pythonInterpreter.getSystemState().stderr;
 
-		if (MS3.configManager.getUseMcForOut()) {
+		if (Ms3.configManager.getUseMcForOut()) {
 			this.setStdOut(true);
 		}
-		if (MS3.configManager.getUseMcForErr()) {
+		if (Ms3.configManager.getUseMcForErr()) {
 			this.setStdErr(true);
 		}
 
 		// Add to the sys.path so we can find stuff.
 		PySystemState pss = Py.getSystemState();
-		pss.path.add(MS3.dirManager.scriptFolder.getAbsolutePath());
+		pss.path.add(Ms3.dirManager.getScriptFolder().getAbsolutePath());
 
 		// Add the path to site-packages, if the path to Python is set in the config.
-		String pythonPath = MS3.configManager.getPythonPath();
+		String pythonPath = Ms3.configManager.getPythonPath();
 		if (StringUtils.isBlank(pythonPath)) {
 			pss.path.add(pythonPath + "\\Lib\\site-packages");
 		}
+	}
 
-		//System.out.println("CREATING INTERPRETER!!!\n!\n!\n!\n!\n!");
+	public String getName() {
+		return this.interpreterName;
 	}
 
 	/**
-	 * @throws CommandException
-	 *             If no execute function is found.
-	 */
-	
-	/**
 	 * Tries to run the execute function in a script.
+	 * 
 	 * @param runnableScript
 	 * @param sender
 	 * @return False if no function can be found, thus it was not run.
@@ -146,9 +147,9 @@ public class PyInterpreter {
 		return null;
 	}
 
-
 	/**
 	 * Calls the onBind function, if there is one.
+	 * 
 	 * @param runnableScript
 	 * @param sender
 	 * @param e
@@ -166,28 +167,25 @@ public class PyInterpreter {
 	}
 
 	public void runHelp(RunnableScript rs, ICommandSender sender) {
-		final String FUNC_NAME = "getHelpText";
-
+		final String NAME = "__doc__";
 		try {
 			this.primeScript(rs);
-			PyObject function = this.pythonInterpreter.get(FUNC_NAME);
-			if (function != null) {
-				PyObject helpText = function.__call__();
-
-				if (helpText instanceof PyString) {
-					sender.sendMessage(Util.withColor(helpText.toString(), TextFormatting.GREEN));
+			PyObject docString = this.pythonInterpreter.get(NAME);
+			if (docString != Py.None) {
+				if (docString instanceof PyString) {
+					sender.sendMessage(new TextBuilderTrans("commands.script.helpTextHeader").bold()
+							.color(TextFormatting.GREEN).get());
+					sender.sendMessage(new TextBuilder(docString.toString()).color(TextFormatting.GREEN).get());
+					this.pythonInterpreter.set(NAME, Py.None);
 				} else {
-					this.showNoHelpText(sender);
+					this.senderErrorMessage(sender, "__doc__ attribute is not of type string!");
 				}
 			} else {
-				this.showNoHelpText(sender);
+				sender.sendMessage(
+						new TextBuilderTrans("commands.script.noHelpText").bold().color(TextFormatting.GREEN).get());
 			}
-
-			if (this.exists(FUNC_NAME)) {
-				this.pythonInterpreter.exec("del " + FUNC_NAME);
-			}
-		} catch (PyException e) {
-			this.senderErrorMessage(sender, "Error calling getHelpText()", e);
+		} catch (PyException exception) {
+			this.senderErrorMessage(sender, "Error getting __doc__ attribute()", exception);
 		}
 	}
 
@@ -211,7 +209,8 @@ public class PyInterpreter {
 	private boolean callFunction(String functionName, PyObject... args) {
 		PyObject function = this.pythonInterpreter.get(functionName);
 		if (function != null) {
-			PyObject helpText = function.__call__(args);
+			@SuppressWarnings("unused")
+			PyObject returnValue = function.__call__(args);
 			return true;
 		} else {
 			return false;
@@ -226,22 +225,18 @@ public class PyInterpreter {
 	public boolean exists(String name) {
 		return this.pythonInterpreter.get(name) != null;
 	}
-	
+
 	public boolean delIfExists(String name) {
-		if(this.exists(name)) {
-			this.pythonInterpreter.exec("del " + name); //TODO make faster.
+		if (this.exists(name)) {
+			this.pythonInterpreter.exec("del " + name); // TODO make faster.
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	/**
-	 * Runs a single line of code.
-	 * 
-	 * @return True if there were no errors.
-	 */
-	//WARNING This hasn't been tested in a while and most likely won't work
+	@Deprecated
+	// WARNING! This hasn't been tested in a while and most likely won't work
 	public boolean runSingleLine(String command) {
 		try {
 			this.pythonInterpreter.exec(command);
@@ -268,12 +263,6 @@ public class PyInterpreter {
 		}
 	}
 
-	private void showNoHelpText(ICommandSender sender) {
-		ITextComponent text = new TextComponentTranslation("commands.script.defaultHelpText");
-		text.getStyle().setColor(TextFormatting.GREEN);
-		sender.sendMessage(text);
-	}
-
 	/**
 	 * Runs a script to load the functions into the namespace.
 	 * 
@@ -285,21 +274,21 @@ public class PyInterpreter {
 		this.delIfExists("execute");
 		this.delIfExists("onClick");
 		this.delIfExists("getArgs");
-		this.delIfExists("getHelpText");
-		
+
 		PyList args = rs.getArgs();
-		args.insert(0, new PyString(rs.getFile().getAbsolutePath()));
 		// Empty strings are added to the end of args sometimes, remove these.
 		args.removeAll(Collections.singleton(""));
 		this.pythonInterpreter.getSystemState().argv = args;
 
 		this.pythonInterpreter.execfile(rs.getFile().getAbsolutePath());
 	}
-	
-	private void senderErrorMessage(ICommandSender sender, String text, PyException e) {
-		ITextComponent itc = Util.withColor(text, TextFormatting.RED);
-		itc.getStyle().setBold(true);
-		sender.sendMessage(itc);
+
+	private void senderErrorMessage(ICommandSender sender, String text) {
+		sender.sendMessage(new TextBuilder(text).color(TextFormatting.RED).bold().get());
+	}
+
+	private void senderErrorMessage(ICommandSender sender, String text, Exception e) {
+		this.senderErrorMessage(sender, text);
 		e.printStackTrace();
 	}
 }

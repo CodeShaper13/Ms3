@@ -18,6 +18,10 @@ public interface IMemberHolder {
 	
 	ArrayList<ModuleFunction> getFunctions();
 	
+	/**
+	 * Adds a inner class to the {@link IMemberHolder}.
+	 * @param clazz The class to add.
+	 */
 	void addClass(ModuleClass clazz);
 	
 	ArrayList<ModuleClass> getClasses();

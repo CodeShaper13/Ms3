@@ -1,12 +1,9 @@
 package com.codeshaper.ms3.apiBuilder.module;
 
-import java.lang.reflect.AccessibleObject;
 import java.util.ArrayList;
 
-import org.apache.commons.lang3.StringUtils;
 import org.python.core.PyObject;
 
-import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 import com.codeshaper.ms3.exception.IllegalModuleFormatException;
 import com.codeshaper.ms3.util.Util;
 
@@ -30,10 +27,10 @@ public class ModuleClass implements IMemberHolder {
 		this.innerClassList = new ArrayList<ModuleClass>();
 	}
 	
-	public ModuleClass(Class clazz) {
+	public ModuleClass(Class<?> clazz) {
 		this();
 		this.name = clazz.getSimpleName();
-		Class superClass = clazz.getSuperclass();
+		Class<?> superClass = clazz.getSuperclass();
 		if(superClass != null && superClass != Object.class && superClass != PyObject.class) {
 			this.superClassName = superClass.getSimpleName();			
 		}

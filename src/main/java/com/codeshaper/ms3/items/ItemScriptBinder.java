@@ -1,14 +1,8 @@
 package com.codeshaper.ms3.items;
 
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.passive.EntitySheep;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -20,8 +14,7 @@ public class ItemScriptBinder extends Item {
 		super();
 
 		this.registryName = name;
-		this.setRegistryName(name); // Is this line needed?
-		Items.ENCHANTED_BOOK.canItemEditBlocks();
+		this.setRegistryName(name);
 		this.setUnlocalizedName(name);
 		this.setCreativeTab(CreativeTabs.TOOLS);
 		this.setMaxStackSize(1);

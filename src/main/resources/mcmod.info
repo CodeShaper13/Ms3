@@ -1,41 +1,17 @@
 [
-{
- 
+{ 
   "modid": "ms3",
-
-<<<<<<< HEAD
   "name": "Ms3",
-=======
-  "name": "MS3",
->>>>>>> c9c49657d51063d2f2180cb37559f58ddc327727
-
   "description": "A mod to run Python scripts via Minecraft.",
-
   "version": "Beta",
-
-<<<<<<< HEAD
   "mcversion": "1.12.2",
-=======
-  "mcversion": "1.12",
->>>>>>> c9c49657d51063d2f2180cb37559f58ddc327727
-
   "url": "",
-
   "updateUrl": "",
-
   "authorList": ["Code Shaper"],
-
-<<<<<<< HEAD
   "credits": "",
-=======
-  "credits": "Anyones whos provided feedback, bug reporting, and support!",
->>>>>>> c9c49657d51063d2f2180cb37559f58ddc327727
-
   "logoFile": "",
-
   "screenshots": [],
 
   "dependencies": []
-
 }
 ]

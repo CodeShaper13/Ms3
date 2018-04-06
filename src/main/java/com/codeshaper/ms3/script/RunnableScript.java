@@ -1,98 +1,86 @@
 package com.codeshaper.ms3.script;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 
 import javax.annotation.Nullable;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.python.core.Py;
-import org.python.core.PyBoolean;
 import org.python.core.PyException;
-import org.python.core.PyFloat;
-import org.python.core.PyInteger;
 import org.python.core.PyList;
-import org.python.core.PyObject;
-import org.python.core.PySequenceList;
 import org.python.core.PyString;
-import org.python.modules._csv.PyDialect.doublequote_descriptor;
 
-import com.codeshaper.ms3.MS3;
+import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.api.exception;
+import com.codeshaper.ms3.util.NbtHelper;
 
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagByte;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagDouble;
-import net.minecraft.nbt.NBTTagFloat;
-import net.minecraft.nbt.NBTTagInt;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
 
 /**
  * Represents a script and it's arguments that can be run at a later time.
  */
 public class RunnableScript {
 
-	protected File scriptFile;
+	private File scriptFile;
 	protected PyList scriptArgs;
 
-	public RunnableScript(String pathToScript, @Nullable String[] args) throws PyException {		
-		this(pathToScript, args != null ? stringArgsToPyType(args) : null);
+	public RunnableScript(String pathToScript, @Nullable String[] args) throws PyException {
+		this(pathToScript, args != null ? RunnableScript.stringArgsToPyType(args) : null);
 	}
-
+	
 	/**
-	 * @param pathToScript is the path from the scripts folder.
+	 * @param pathToScript
+	 *            Path from the scripts folder to the file. If there is no
+	 *            extension, .py is assumed.
+	 * @param args
+	 * @throws PyException If {@code args} contains an invalid data type.
 	 */
 	public RunnableScript(String pathToScript, @Nullable PyList args) throws PyException {
-
-		// Assume the extension.
+		// Assume the extension if it is not there.
 		if (!pathToScript.endsWith(".py")) {
 			pathToScript += ".py";
 		}
 
-		this.scriptFile = new File(MS3.dirManager.scriptFolder, pathToScript);
-		
-		// Validate that the args and throw an exception if they are not of the correct type.
+		this.scriptFile = new File(Ms3.dirManager.getScriptFolder(), pathToScript);
+
+		// Validate that the args and throw an exception if they are not of the correct
+		// type.
 		if (args != null) {
 			Object obj;
 			for (int i = 0; i < args.size(); i++) {
 				obj = args.get(i);
 				System.out.println(obj + " " + obj.getClass());
-				if (!(obj instanceof String || obj instanceof Boolean || obj instanceof Integer || obj instanceof Double)) {
+				if (!(obj instanceof String || obj instanceof Boolean || obj instanceof Integer
+						|| obj instanceof Double)) {
 					throw Py.ValueError("args must all be of type string, boolean, int or float!");
 				}
 			}
 			this.scriptArgs = args;
-
 		} else {
 			this.scriptArgs = new PyList();
 		}
+		
+		// Make the first arg the path to this script.
+		this.scriptArgs.insert(0, new PyString(this.getFile().getAbsolutePath()));
 	}
 
 	public RunnableScript(NBTTagCompound tag) {
-		this.scriptFile = new File(tag.getString("path"));
-
-		NBTTagList list = tag.getTagList("args", 8);
+		this.scriptFile = new File(Ms3.dirManager.getScriptFolder(), tag.getString("path"));
 		this.scriptArgs = new PyList();
-		for (int i = 0; i < list.tagCount(); i++) {
-			NBTBase tagBase = list.get(i);
-			if(tagBase instanceof NBTTagString) {
-				this.scriptArgs.add(i, ((NBTTagString) tagBase).getString());
-			} else if(tagBase instanceof NBTTagByte) {
-				this.scriptArgs.add(i, ((NBTTagByte) tagBase).getByte() == 1);
-			} else if(tagBase instanceof NBTTagInt) {
-				this.scriptArgs.add(i, ((NBTTagInt) tagBase).getInt());
-			} else if(tagBase instanceof NBTTagDouble) {
-				this.scriptArgs.add(i, ((NBTTagDouble) tagBase).getDouble());
+		
+		Integer i = 0;
+		NBTTagCompound compound  = tag.getCompoundTag("args");
+		while (true) {
+			String key = i.toString();
+			if(compound.hasKey(key)) {
+				this.scriptArgs.add(NbtHelper.nbtToObject(compound.getTag(key)));
+				i++;	
 			} else {
-				throw new Error();
-			}
+				break;
+			}			
 		}
 	}
 
@@ -135,16 +123,24 @@ public class RunnableScript {
 	}
 
 	/**
-	 * Returns the script file. Note, the file may not exist.
+	 * Returns the script file.  Note, the file may not exist.
 	 */
 	public File getFile() {
 		return this.scriptFile;
 	}
 
+	/*
+	public String getModuleName() {
+		String s = FilenameUtils.removeExtension(this.scriptFile.getPath()).replace(File.separatorChar, '.');
+		System.out.println(s);
+		return s;
+	}
+	*/
+	
 	public PyList getArgs() {
 		return this.scriptArgs;
 	}
-	
+
 	/**
 	 * Checks if the RunnableScript refers to a real file on the hard drive.
 	 */
@@ -155,47 +151,36 @@ public class RunnableScript {
 	/**
 	 * Checks if the RunnableScript refers to an actual file and is of type .py.
 	 * 
-	 * @throws exception.missingScriptException
+	 * @throws exception.MissingScriptException
 	 *             If the script can't be found in the event of the file being
 	 *             moved/deleted or if the file is not in a valid format.
 	 */
-	public void tryThrowMissingScript() throws exception.missingScriptException {
-		String scriptPath = this.scriptFile.getPath();
+	public void tryThrowMissingScript() throws exception.MissingScriptException {
 		if (!this.exists()) {
-			throw exception.instance.new missingScriptException("Script with name " + this.scriptFile.toString()
-					+ " could not be found!  Was it moved, renamed or deleted?", scriptPath);
+			throw Py.ValueError("Script with name " + this.scriptFile.toString()
+					+ " could not be found!  Was it moved, renamed or deleted?");
 		}
 		String fileName = this.scriptFile.getName();
 
 		String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
 		if (!(extension.equalsIgnoreCase("py"))) {
-			throw exception.instance.new missingScriptException("Script file is not of type .py", scriptPath);
+			throw exception.instance.new MissingScriptException("Script file is not of type .py", this.scriptFile.getPath());
 		}
 	}
 
 	public NBTTagCompound writeToNbt() {
 		NBTTagCompound tag = new NBTTagCompound();
 
-		tag.setString("path", scriptFile.getPath());
+		tag.setString("path", this.scriptFile.getPath());
 
 		// Write args to NBT.
-		NBTTagList argList = new NBTTagList();
-		Object obj;
-		for(int i = 0; i < this.scriptArgs.size(); i++) {
-			obj = this.scriptArgs.get(i);
-			if(obj instanceof String) {
-				argList.appendTag(new NBTTagString((String)obj));
-			} else if(obj instanceof Boolean) {
-				argList.appendTag(new NBTTagByte(((Boolean)obj) == true ? (byte)1 : 0));
-			} else if(obj instanceof Integer) {
-				argList.appendTag(new NBTTagInt((Integer)obj));
-			} else if(obj instanceof Float) {
-				argList.appendTag(new NBTTagDouble((Float)obj));
-			} else {
-				throw new Error("Invalid type for args, " + obj.getClass());
-			}
+		NBTTagCompound compound = new NBTTagCompound();
+		Integer i = 0;
+		for(Object obj : this.scriptArgs) {
+			compound.setTag(i.toString(), NbtHelper.objToNbt(obj));
+			i++;
 		}
-		tag.setTag("args", argList);
+		tag.setTag("args", compound);
 
 		return tag;
 	}
@@ -211,16 +196,16 @@ public class RunnableScript {
 				} else {
 					list.add(f);
 				}
-			} else if (args[i].toLowerCase().equals("true")) {
+			} else if (StringUtils.capitalize(args[i]).equals("True")) {
 				list.add(true);
-			} else if (args[i].toLowerCase().equals("false")) {
+			} else if (StringUtils.capitalize(args[i]).equals("False")) {
 				list.add(false);
 			} else {
 				list.add(args[i]);
 			}
 		}
 
-		// Empty strings are added to the end of args sometimes from cammonds, remove
+		// Empty strings are added to the end of args sometimes from commands, remove
 		// these.
 		list.removeAll(Collections.singleton(""));
 

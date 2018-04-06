@@ -60,6 +60,8 @@ public class tileEntity {
 	@PythonClass
 	public class TileEntityBase<T extends TileEntity> extends PyObject {
 
+		private static final long serialVersionUID = -4299819910380054469L;
+
 		public T mcTileEntity;
 
 		public TileEntityBase(T tileEntity) {
@@ -90,7 +92,7 @@ public class tileEntity {
 		public Object getTag(String tagKey) {
 			NBTTagCompound nbttagcompound = this.mcTileEntity.writeToNBT(new NBTTagCompound());
 			NBTBase tag = nbttagcompound.getTag(tagKey);
-			return NbtHelper.getValueFromNbt(tag);
+			return NbtHelper.nbtToObject(tag);
 		}
 
 		@PythonFunction
@@ -121,16 +123,18 @@ public class tileEntity {
 				w.notifyBlockUpdate(this.mcTileEntity.getPos(), iblockstate, iblockstate, 3);
 			}
 		}
-		
+
 		protected void dirtyAndUpdate() {
 			this.mcTileEntity.markDirty();
-            IBlockState state = this.mcTileEntity.getWorld().getBlockState(this.mcTileEntity.getPos());
-            this.mcTileEntity.getWorld().notifyBlockUpdate(this.mcTileEntity.getPos(), state, state, 3);
+			IBlockState state = this.mcTileEntity.getWorld().getBlockState(this.mcTileEntity.getPos());
+			this.mcTileEntity.getWorld().notifyBlockUpdate(this.mcTileEntity.getPos(), state, state, 3);
 		}
 	}
 
 	@PythonClass
 	public class Lockable<T extends TileEntityLockable & IInventory> extends TileEntityBase<T> {
+
+		private static final long serialVersionUID = 7494001262819308455L;
 
 		public Lockable(T tileEntity) {
 			super(tileEntity);
@@ -145,16 +149,16 @@ public class tileEntity {
 		@PythonFunction
 		@PythonDocString("Pass an empty string to remove the lock.")
 		public void setLockCode(String lock) {
-			if(lock == null) {
+			if (lock == null) {
 				throw Py.ValueError("lock may not be None!");
 			}
 			this.mcTileEntity.setLockCode(new LockCode(lock));
 		}
-		
+
 		@PythonFunction
 		public PyTuple getItem(int slot) {
 			int i = this.getContainerSize();
-			if(slot < 0 || slot > (i - 1)) {
+			if (slot < 0 || slot > (i - 1)) {
 				throw Py.ValueError("Index must be between 0 and " + (i - 1));
 			}
 			return itemUtils.tupleFromItemStack(this.mcTileEntity.getStackInSlot(slot));
@@ -163,12 +167,12 @@ public class tileEntity {
 		@PythonFunction
 		public void setItem(int slot, PyTuple itemStack) {
 			int i = this.getContainerSize();
-			if(slot < 0 || slot > (i - 1)) {
+			if (slot < 0 || slot > (i - 1)) {
 				throw Py.ValueError("Index must be between 0 and " + (i - 1));
 			}
 			this.mcTileEntity.setInventorySlotContents(slot, itemUtils.itemStackFromTuple(itemStack));
 		}
-		
+
 		@PythonFunction
 		@PythonDocString("Returns the number of slots in the container.")
 		public final int getContainerSize() {
@@ -178,6 +182,8 @@ public class tileEntity {
 
 	@PythonClass
 	public class LockableLoot<T extends TileEntityLockableLoot> extends Lockable<T> {
+
+		private static final long serialVersionUID = 5861176632306201482L;
 
 		public LockableLoot(T tileEntity) {
 			super(tileEntity);
@@ -199,6 +205,8 @@ public class tileEntity {
 	@PythonClass
 	public class Beacon extends Lockable<TileEntityBeacon> {
 
+		private static final long serialVersionUID = -6547554580596062244L;
+
 		public Beacon(TileEntityBeacon tileEntity) {
 			super(tileEntity);
 		}
@@ -219,6 +227,8 @@ public class tileEntity {
 	@PythonClass
 	public class Bed extends TileEntityBase<TileEntityBed> {
 
+		private static final long serialVersionUID = -2362034535699233202L;
+
 		public Bed(TileEntityBed tileEntity) {
 			super(tileEntity);
 		}
@@ -237,6 +247,8 @@ public class tileEntity {
 	@PythonClass
 	public class BrewingStand extends Lockable<TileEntityBrewingStand> {
 
+		private static final long serialVersionUID = -4501498464782181069L;
+
 		@PythonField("0")
 		public final int ID_LEFT = 0;
 		@PythonField("1")
@@ -247,11 +259,11 @@ public class tileEntity {
 		public final int ID_INGREDIENT = 3;
 		@PythonField("4")
 		public final int ID_FUEL = 4;
-		
+
 		public BrewingStand(TileEntityBrewingStand tileEntity) {
 			super(tileEntity);
 		}
-		
+
 		@PythonFunction
 		public int getBrewTime() {
 			return this.mcTileEntity.getField(0);
@@ -261,7 +273,7 @@ public class tileEntity {
 		public void setBrewTime(int brewTime) {
 			this.mcTileEntity.setField(0, brewTime);
 		}
-		
+
 		@PythonFunction
 		public int getFuel() {
 			return this.mcTileEntity.getField(1);
@@ -276,22 +288,26 @@ public class tileEntity {
 	@PythonClass
 	public class CommandBlock extends TileEntityBase<TileEntityCommandBlock> {
 
-		private final String[] FIELD_NAMES = new String[] {"commandBlockLogic", "field_145824_a"};
-		
+		private static final long serialVersionUID = 1666817160387319102L;
+
+		private final String[] FIELD_NAMES = new String[] { "commandBlockLogic", "field_145824_a" };
+
 		public CommandBlock(TileEntityCommandBlock tileEntity) {
 			super(tileEntity);
 		}
 
 		@PythonFunction
 		public void setCommand(String command) {
-			CommandBlockBaseLogic cbbl = (CommandBlockBaseLogic) ReflectionHelper.getPrivateValue(
-					TileEntityCommandBlock.class, this.mcTileEntity, FIELD_NAMES);
+			CommandBlockBaseLogic cbbl = (CommandBlockBaseLogic) ReflectionHelper
+					.getPrivateValue(TileEntityCommandBlock.class, this.mcTileEntity, FIELD_NAMES);
 			cbbl.setCommand(command);
 		}
 	}
 
 	@PythonClass
 	public class FlowerPot extends TileEntityBase<TileEntityFlowerPot> {
+
+		private static final long serialVersionUID = 5646847644719526649L;
 
 		public FlowerPot(TileEntityFlowerPot tileEntity) {
 			super(tileEntity);
@@ -311,12 +327,12 @@ public class tileEntity {
 		}
 
 		@PythonFunction
-		//TODO not updated on client.
+		// TODO not updated on client.
 		public void setPotContents(String item, int meta) {
 			this.mcTileEntity.setItemStack(new ItemStack(Item.getByNameOrId(item), 1, meta));
-            this.mcTileEntity.markDirty();
-            IBlockState state = this.mcTileEntity.getWorld().getBlockState(this.mcTileEntity.getPos());
-            this.mcTileEntity.getWorld().notifyBlockUpdate(this.mcTileEntity.getPos(), state, state, 3);
+			this.mcTileEntity.markDirty();
+			IBlockState state = this.mcTileEntity.getWorld().getBlockState(this.mcTileEntity.getPos());
+			this.mcTileEntity.getWorld().notifyBlockUpdate(this.mcTileEntity.getPos(), state, state, 3);
 
 		}
 	}
@@ -324,20 +340,24 @@ public class tileEntity {
 	@PythonClass
 	public class Furnace extends Lockable<TileEntityFurnace> {
 
+		private static final long serialVersionUID = 7367812229820446548L;
+
 		@PythonField("0")
 		public final int ID_SMELT = 0;
 		@PythonField("1")
 		public final int ID_FUEL = 1;
 		@PythonField("2")
 		public final int ID_RESULT = 2;
-		
+
 		public Furnace(TileEntityFurnace tileEntity) {
 			super(tileEntity);
 		}
 	}
-	
+
 	@PythonClass
 	public class Hopper extends LockableLoot<TileEntityHopper> {
+
+		private static final long serialVersionUID = 3097927657009612724L;
 
 		public Hopper(TileEntityHopper tileEntity) {
 			super(tileEntity);
@@ -348,9 +368,11 @@ public class tileEntity {
 			this.mcTileEntity.setTransferCooldown(ticks);
 		}
 	}
-	
+
 	@PythonClass
 	public class Spawner extends TileEntityBase<TileEntityMobSpawner> {
+
+		private static final long serialVersionUID = 6463338206694416736L;
 
 		private final String[] FIELD_NAMES = new String[] { "potentialSpawns", "field_98285_e" };
 
@@ -360,8 +382,10 @@ public class tileEntity {
 
 		@PythonFunction
 		public PyList getSpawnPotentials() {
-			List<WeightedSpawnerEntity> list = (List<WeightedSpawnerEntity>) ReflectionHelper
-					.getPrivateValue(MobSpawnerBaseLogic.class, this.mcTileEntity.getSpawnerBaseLogic(), FIELD_NAMES);
+			Object obj = ReflectionHelper.getPrivateValue(MobSpawnerBaseLogic.class,
+					this.mcTileEntity.getSpawnerBaseLogic(), FIELD_NAMES);
+
+			List<WeightedSpawnerEntity> list = ((List<WeightedSpawnerEntity>) obj);
 
 			PyList list1 = new PyList();
 			for (WeightedSpawnerEntity weightedSpawnerEntity : list) {
@@ -375,7 +399,7 @@ public class tileEntity {
 		@PythonFunction
 		@PythonDocString("Takes a list of tuples of (entity name, weight).  Weight must be greater than 1")
 		public void setSpawnPotentials(PyList list) {
-			List<WeightedSpawnerEntity> list1 = new ArrayList();
+			List<WeightedSpawnerEntity> list1 = new ArrayList<>();
 
 			Object obj, entityIdentifier;
 			PyTuple tuple;
@@ -389,7 +413,7 @@ public class tileEntity {
 
 					tag = new NBTTagCompound();
 					entityIdentifier = tuple.get(0);
-					if(!(entityIdentifier instanceof String)) {
+					if (!(entityIdentifier instanceof String)) {
 						throw Py.ValueError("Entity identifier must be a string"); // is string a subclass of pyString?
 					}
 					tag.setString("id", (String) tuple.get(0));
@@ -410,6 +434,8 @@ public class tileEntity {
 	@PythonClass
 	public class NoteBlock extends TileEntityBase<TileEntityNote> {
 
+		private static final long serialVersionUID = -3298764120818473440L;
+
 		public NoteBlock(TileEntityNote tileEntity) {
 			super(tileEntity);
 		}
@@ -425,16 +451,19 @@ public class tileEntity {
 				throw Py.ValueError("note must be between 0 and 24.");
 			}
 			// More or less a copy of TileEntityNote.changePitch()
-	        byte old = (byte)note;
-	        this.mcTileEntity.note = (byte)((this.mcTileEntity.note + 1) % 25);
-	        if (!net.minecraftforge.common.ForgeHooks.onNoteChange(this.mcTileEntity, old)) return;
-	        this.mcTileEntity.markDirty();
+			byte old = (byte) note;
+			this.mcTileEntity.note = (byte) ((this.mcTileEntity.note + 1) % 25);
+			if (!net.minecraftforge.common.ForgeHooks.onNoteChange(this.mcTileEntity, old))
+				return;
+			this.mcTileEntity.markDirty();
 		}
 
 	}
 
 	@PythonClass
 	public class Sign extends TileEntityBase<TileEntitySign> {
+
+		private static final long serialVersionUID = -3977002864117163137L;
 
 		public Sign(TileEntitySign tileEntity) {
 			super(tileEntity);
@@ -457,13 +486,15 @@ public class tileEntity {
 			}
 			this.mcTileEntity.signText[lineNumber - 1] = new TextComponentString(text);
 			this.mcTileEntity.markDirty();
-            IBlockState state = this.mcTileEntity.getWorld().getBlockState(this.mcTileEntity.getPos());
-            this.mcTileEntity.getWorld().notifyBlockUpdate(this.mcTileEntity.getPos(), state, state, 3);
+			IBlockState state = this.mcTileEntity.getWorld().getBlockState(this.mcTileEntity.getPos());
+			this.mcTileEntity.getWorld().notifyBlockUpdate(this.mcTileEntity.getPos(), state, state, 3);
 		}
 	}
 
 	@PythonClass
 	public class Skull extends TileEntityBase<TileEntitySkull> {
+
+		private static final long serialVersionUID = -4226105205783622653L;
 
 		@PythonField("MHF_Alex")
 		public final String ALEX = "MHF_Alex";

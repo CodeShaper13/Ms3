@@ -3,12 +3,9 @@ package com.codeshaper.ms3.interpreter;
 import java.util.HashMap;
 import java.util.Set;
 
-import com.codeshaper.ms3.MS3;
-
 public class PyInterpreterManager {
 	
-	public static final String DEFAULT_NAME = "default";
-	
+	public static final String DEFAULT_NAME = "default";	
 	public static PyInterpreterManager instance;
 	
 	private HashMap<String, PyInterpreter> interpreterMap;
@@ -36,12 +33,15 @@ public class PyInterpreterManager {
 		}
 	}
 	
+	/**
+	 * Checks if an interpreter with the passed name exists.
+	 */
 	public boolean exists(String interpreterName) {
 		return this.interpreterMap.containsKey(interpreterName);		
 	}
 	
 	/**
-	 * @param interpreterName
+	 * Removes an Interpreter.
 	 * @return True if the interpreter was deleted, false if it couldn't be found.
 	 */
 	public boolean deleteInterpreter(String interpreterName) {
@@ -58,7 +58,7 @@ public class PyInterpreterManager {
 	}
 	
 	/**
-	 * @param interpreterName
+	 * Get an Interpreter from the list.
 	 * @return The interpreter, or null if it couldn't be found.
 	 */
 	public PyInterpreter getInterpreter(String interpreterName) {

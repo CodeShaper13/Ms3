@@ -10,56 +10,21 @@ import org.python.core.PyException;
 import org.python.core.PyInteger;
 import org.python.core.PyList;
 import org.python.core.PyObject;
-import org.python.core.PySequenceList;
 import org.python.core.PyString;
 import org.python.core.PyTuple;
 
-import com.codeshaper.ms3.api.entity.Tameable;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonExcludeType;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
-import com.codeshaper.ms3.util.ParserUtils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.command.CommandException;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IEntityLivingData;
-import net.minecraft.entity.boss.EntityDragon;
-import net.minecraft.entity.item.EntityBoat;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.monster.EntityEnderman;
-import net.minecraft.entity.monster.EntityEndermite;
-import net.minecraft.entity.monster.EntityGhast;
-import net.minecraft.entity.monster.EntityHusk;
-import net.minecraft.entity.monster.EntityMagmaCube;
-import net.minecraft.entity.monster.EntityShulker;
-import net.minecraft.entity.monster.EntitySlime;
-import net.minecraft.entity.monster.EntitySnowman;
-import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.entity.monster.EntityZombieVillager;
-import net.minecraft.entity.passive.AbstractChestHorse;
-import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.passive.EntityBat;
-import net.minecraft.entity.passive.EntityChicken;
-import net.minecraft.entity.passive.EntityHorse;
-import net.minecraft.entity.passive.EntityOcelot;
-import net.minecraft.entity.passive.EntityParrot;
-import net.minecraft.entity.passive.EntityPig;
-import net.minecraft.entity.passive.EntityRabbit;
-import net.minecraft.entity.passive.EntitySheep;
-import net.minecraft.entity.passive.EntitySkeletonHorse;
-import net.minecraft.entity.passive.EntityTameable;
-import net.minecraft.entity.passive.EntityVillager;
-import net.minecraft.entity.passive.EntityWolf;
-import net.minecraft.entity.passive.EntityZombieHorse;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
@@ -178,15 +143,15 @@ public class world {
 
 		@PythonFunction
 		@PythonDocString("Spawns an Entity into the World and returns it.  Entity can be an instance of net.minecraft.entity.Entity, PyEntity or it's string name.")
-		public entity.EntityBase spawnEntity(@PythonExcludeType @Nonnull Object entityIdentifier, float x, float y, float z, String nbt) {
+		public entity.Base<? extends Entity> spawnEntity(@PythonExcludeType @Nonnull Object entityIdentifier, float x, float y, float z, String nbt) {
 			// Get a string identifier for the entity from the passed argument.
 			String entityStringName = null;
 			if (entityIdentifier instanceof Entity) {
 				entityStringName = this.entityToStringName((Entity) entityIdentifier);
 			} else if (entityIdentifier instanceof String) {
 				entityStringName = (String) entityIdentifier;
-			} else if (entityIdentifier instanceof entity.EntityBase) {
-				entityStringName = this.entityToStringName(((entity.EntityBase) entityIdentifier).mcEntity);
+			} else if (entityIdentifier instanceof entity.Base) {
+				entityStringName = this.entityToStringName(((entity.Base) entityIdentifier).mcEntity);
 			}
 
 			BlockPos pos = new BlockPos(x, y, z);
@@ -234,14 +199,14 @@ public class world {
 
 		@PythonFunction
 		@PythonDocString("Kills the passed Entity.")
-		public void killEntity(@Nonnull entity.EntityBase entity) {
+		public void killEntity(@Nonnull entity.Base<Entity> entity) {
 			entity.mcEntity.onKillCommand();
 		}
 
 		@PythonFunction
 		@PythonDocString("Returns the closest Entity of type entityFilterName to (x, y, z) within the radius, or None if none are found.  Pass None for all entity types.")
 		@Nullable
-		public entity.EntityBase getClosestEntity(double x, double y, double z, float maxRadius,
+		public entity.Base<? extends Entity> getClosestEntity(double x, double y, double z, float maxRadius,
 				@Nullable String entityFilterName) {
 			double closestDistance = maxRadius + 1;
 			Entity closestEntity = null;
@@ -285,7 +250,7 @@ public class world {
 		@PythonFunction
 		@PythonDocString("Returns the passed tileEntity at x, y, z, or None if there isn't any.")
 		@Nullable
-		public tileEntity.TileEntityBase getTileEntity(int x, int y, int z) {
+		public tileEntity.TileEntityBase<? extends TileEntity> getTileEntity(int x, int y, int z) {
 			TileEntity te = this.worldObj.getTileEntity(new BlockPos(x, y, z));
 			if (te == null) {
 				return null;
@@ -348,7 +313,7 @@ public class world {
 			this.worldObj.playSound(null, x, y, z, soundEvent, category, volume, pitch);
 		}
 
-		private tileEntity.TileEntityBase getWrapperClassForTileEntity(@Nonnull TileEntity te) {
+		private tileEntity.TileEntityBase<? extends TileEntity> getWrapperClassForTileEntity(@Nonnull TileEntity te) {
 			// Specific types:
 			if (te instanceof TileEntityBeacon) {
 				return tileEntity.instance.new Beacon((TileEntityBeacon) te);
@@ -376,11 +341,11 @@ public class world {
 
 			// More generic type:
 			else if (te instanceof TileEntityLockableLoot) {
-				return tileEntity.instance.new LockableLoot((TileEntityLockableLoot) te);
+				return tileEntity.instance.new LockableLoot<TileEntityLockableLoot>((TileEntityLockableLoot) te);
 			} else if (te instanceof TileEntityLockable) {
-				return tileEntity.instance.new Lockable((TileEntityLockable) te);
+				return tileEntity.instance.new Lockable<TileEntityLockable>((TileEntityLockable) te);
 			} else {
-				return tileEntity.instance.new TileEntityBase(te);
+				return tileEntity.instance.new TileEntityBase<TileEntity>(te);
 			}
 		}
 

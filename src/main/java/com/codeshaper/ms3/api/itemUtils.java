@@ -8,14 +8,11 @@ import org.python.core.PyTuple;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 
-import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.translation.I18n;
 
 @PythonDocString("Utility features for items.")
 public class itemUtils {
@@ -40,7 +37,6 @@ public class itemUtils {
 		return Item.getIdFromItem(Item.getByNameOrId(name));
 	}
 
-	// TODO test nbt tag option?
 	@PythonFunction
 	@PythonDocString("Converts a tuple like (item_name/item_id, [optional]amount, [optional]meta) into a net.minecraft.item.ItemStack")
 	public static ItemStack itemStackFromTuple(PyTuple tuple) {
@@ -65,8 +61,13 @@ public class itemUtils {
 			e.printStackTrace();
 			throw Py.ValueError("Error parsing JSON.  See stack trace!");
 		}
+		
+		ItemStack stack = new ItemStack(Item.getByNameOrId(id), amount, meta);
+		if(tag != null) {
+			stack.setTagCompound(tag);
+		}
 
-		return new ItemStack(Item.getByNameOrId(id), amount, meta, tag);
+		return stack;
 	}
 
 	public static PyTuple tupleFromItemStack(ItemStack stack) {

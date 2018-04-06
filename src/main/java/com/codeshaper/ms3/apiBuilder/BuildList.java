@@ -1,9 +1,9 @@
 package com.codeshaper.ms3.apiBuilder;
 
-import com.codeshaper.ms3.MS3;
+import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.api.biomes;
-import com.codeshaper.ms3.api.blocks;
 import com.codeshaper.ms3.api.blockUtils;
+import com.codeshaper.ms3.api.blocks;
 import com.codeshaper.ms3.api.colors;
 import com.codeshaper.ms3.api.effectList;
 import com.codeshaper.ms3.api.entity;
@@ -12,16 +12,16 @@ import com.codeshaper.ms3.api.equipmentSlot;
 import com.codeshaper.ms3.api.exception;
 import com.codeshaper.ms3.api.executor;
 import com.codeshaper.ms3.api.formattingCode;
-import com.codeshaper.ms3.api.items;
 import com.codeshaper.ms3.api.itemUtils;
+import com.codeshaper.ms3.api.items;
 import com.codeshaper.ms3.api.obfuscationHelper;
 import com.codeshaper.ms3.api.particleType;
 import com.codeshaper.ms3.api.soundCategories;
 import com.codeshaper.ms3.api.sounds;
-import com.codeshaper.ms3.api.util;
 import com.codeshaper.ms3.api.tileEntity;
 import com.codeshaper.ms3.api.tileEntityList;
 import com.codeshaper.ms3.api.translations;
+import com.codeshaper.ms3.api.util;
 import com.codeshaper.ms3.api.world;
 
 /**
@@ -31,7 +31,7 @@ import com.codeshaper.ms3.api.world;
 public class BuildList {
 	
 	/** An array of all the classes to compile.  Update this manually to add more. */
-	public Class[] classList;
+	public Class<?>[] classList;
 	
 	public BuildList() {
 		this.classList = new Class[] {
@@ -69,9 +69,9 @@ public class BuildList {
 	 * Checks that there were no mistakes and an outside class was added to the list.
 	 */
 	private void validateList() {
-		for (Class clazz : this.classList) {
+		for (Class<?> clazz : this.classList) {
 			String s = clazz.getCanonicalName();
-			if(!s.startsWith("com." + MS3.AUTHOR + "." + MS3.MOD_ID)) {
+			if(!s.startsWith("com." + Ms3.AUTHOR + "." + Ms3.MOD_ID)) {
 				throw new Error("The module build list should not contain classes from other jars and it contains " + s + "!");
 			}
 		}

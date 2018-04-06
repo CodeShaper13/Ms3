@@ -6,10 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.codeshaper.ms3.MS3;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
+import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.util.Logger;
 import com.codeshaper.ms3.util.Util;
 
@@ -33,7 +30,7 @@ public class Module implements IMemberHolder {
 		this.classList = new ArrayList<ModuleClass>();
 	}
 	
-	public Module(Class clazz) {
+	public Module(Class<?> clazz) {
 		this();
 		
 		this.moduleName = clazz.getSimpleName();
@@ -51,7 +48,7 @@ public class Module implements IMemberHolder {
 		this();
 		
 		this.moduleName = name;
-		this.modulePath = "com/" + MS3.AUTHOR + "/" + MS3.MOD_ID;
+		this.modulePath = "com/" + Ms3.AUTHOR + "/" + Ms3.MOD_ID;
 		this.docString = docString;
 	}
 	

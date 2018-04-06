@@ -43,7 +43,7 @@ public class Main implements ActionListener { // TODO This is launched when the 
 		frame.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
 		JPanel p1 = new JPanel();
-		JLabel l = new JLabel(MS3.MOD_ID.toUpperCase() + " Version: " + MS3.VERSION);
+		JLabel l = new JLabel(Ms3.MOD_ID.toUpperCase() + " Version: " + Ms3.VERSION);
 		l.setAlignmentX(Component.CENTER_ALIGNMENT);
 		JTextArea ta = new JTextArea(5, 25);
 		ta.setText(INSTALL_TEXT);

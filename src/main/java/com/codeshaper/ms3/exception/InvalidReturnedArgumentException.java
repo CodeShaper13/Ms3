@@ -5,7 +5,7 @@ package com.codeshaper.ms3.exception;
  */
 public class InvalidReturnedArgumentException extends Exception {
 
-	private Class objClass;
+	private Class<?> objClass;
 	private String message;
 	
 	public InvalidReturnedArgumentException(Object obj, String message) {
@@ -15,19 +15,11 @@ public class InvalidReturnedArgumentException extends Exception {
 		this.message = message;
 	}
 
-	public Class getObjClass() {
+	public Class<?> getObjClass() {
 		return objClass;
 	}
-
-	/*
-	@Override
-	public String toString() {
-		return super.toString();
+	
+	public String getMessage() {
+		return this.message;
 	}
-
-	@Override
-	public String getLocalizedMessage() {
-		return super.getLocalizedMessage();
-	}	
-	*/
 }

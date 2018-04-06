@@ -3,6 +3,9 @@ package com.codeshaper.ms3.api;
 import javax.annotation.Nullable;
 
 import org.python.core.PyObject;
+import org.python.core.Untraversable;
+import org.python.expose.ExposedMethod;
+import org.python.expose.ExposedType;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
@@ -16,11 +19,14 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.WorldServer;
 
+@Untraversable
+@ExposedType(name = "EXEC")
 public class executor {
 
 	private executor() {
 	}
 
+	@ExposedType
 	@PythonClass
 	@PythonDocString("Represents whoever or whatever is executing a script.")
 	public static class Executor extends PyObject {
@@ -33,18 +39,21 @@ public class executor {
 			this.sender = sender;
 		}
 
+		@ExposedMethod
 		@PythonFunction
 		@PythonDocString("Returns the executor's X position as a float.")
 		public double getX() {
 			return this.senderPosition.x;
 		}
 
+		@ExposedMethod
 		@PythonFunction
 		@PythonDocString("Returns the executor's Y position as a float.")
 		public double getY() {
 			return this.senderPosition.y;
 		}
 
+		@ExposedMethod
 		@PythonFunction
 		@PythonDocString("Returns the executor's Z position as a float.")
 		public double getZ() {
@@ -81,7 +90,7 @@ public class executor {
 		
 		@PythonFunction
 		@PythonDocString("Returns the sender as an entity, or None if it can't be converted, in the case of a Command Block.")
-		public @Nullable entity.EntityBase asEntity() {
+		public @Nullable entity.Base asEntity() {
 			Entity e = this.sender.getCommandSenderEntity();
 			
 			if(e != null) {

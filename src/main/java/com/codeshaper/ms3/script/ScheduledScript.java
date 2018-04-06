@@ -1,13 +1,10 @@
 package com.codeshaper.ms3.script;
 
-import java.io.File;
-
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyList;
 
 import com.codeshaper.ms3.api.executor;
-import com.codeshaper.ms3.api.exception.missingScriptException;
 import com.codeshaper.ms3.api.executor.Executor;
 
 /**

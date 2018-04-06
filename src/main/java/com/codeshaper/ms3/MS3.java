@@ -15,6 +15,7 @@ import com.codeshaper.ms3.command.CommandScript;
 import com.codeshaper.ms3.interpreter.PyInterpreter;
 import com.codeshaper.ms3.items.ItemScriptBinder;
 import com.codeshaper.ms3.proxy.ProxyCommon;
+import com.codeshaper.ms3.update.Release;
 
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -28,21 +29,23 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@Mod(modid = MS3.MOD_ID, name = "MS3", version = MS3.VERSION)
-public class MS3 {
+@Mod(modid = Ms3.MOD_ID, name = "Ms3", version = Ms3.VERSION, dependencies = "after:*")
+public class Ms3 {
 
 	public static final String MOD_ID = "ms3";
-	/** String identifier for the version.  Changes with every update. */
-	public static final String VERSION = "Beta_1_0";
+	/** String identifier for the version.  Changes with every update.  Make sure to update mcmod.info */
+	public static final String VERSION = "0.1.0";
 	public static final String AUTHOR = "codeshaper";
-
+	public static final Release RELEASE = new Release(Ms3.VERSION, null, null, null);
+	
 	@Mod.Instance(MOD_ID)
-	public static MS3 instance;
+	public static Ms3 instance;
 
 	@SidedProxy(clientSide = "com.codeshaper.ms3.proxy.ProxyClient", serverSide = "com.codeshaper.ms3.proxy.ProxyCommon")
 	public static ProxyCommon proxy;
 
 	public static DirectoryManager dirManager;
+	public static Ms3Properties ms3Props;
 	public static Config configManager;
 	public static ApiBuilder apiBuilder;
 
@@ -52,17 +55,16 @@ public class MS3 {
 	/** Hashmap of actions set by players through the bindScript command. Note, null on the client side! */
 	public static HashMap<UUID, BindScriptAction> players = new HashMap<>();
 
-	/**
-	 * Single reference to the Python Interpreter. Note, null on the client side.
-	 */
+	/** Single reference to the Python Interpreter. Note, null on the client side. */
 	public PyInterpreter interpreter;
 
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		MS3.dirManager = new DirectoryManager(event);
-		MS3.configManager = new Config(new File(MS3.dirManager.ms3Folder, "config.cfg"));
-		MS3.apiBuilder = new ApiBuilder();
+		Ms3.dirManager = new DirectoryManager(event);
+		Ms3.ms3Props = new Ms3Properties();
+		Ms3.configManager = new Config(new File(Ms3.dirManager.getMs3Folder(), "config.cfg"));
+		Ms3.apiBuilder = new ApiBuilder();
 		this.interpreter = new PyInterpreter("default");
 		
 		// Make sure the classes are loaded by the class loader before Jython tries to
@@ -75,14 +77,14 @@ public class MS3 {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		this.proxy.init();
+		Ms3.proxy.init();
 
 		MinecraftForge.EVENT_BUS.register(new EventHandler());
 	}
 
 	@Mod.EventHandler
-	public void postInit(FMLPostInitializationEvent event) {		
-		MS3.apiBuilder.buildApiIfNeeded();
+	public void postInit(FMLPostInitializationEvent event) {
+		Ms3.apiBuilder.buildApiIfNeeded();
 	}
 
 	@Mod.EventBusSubscriber
@@ -95,7 +97,7 @@ public class MS3 {
 
 		@SubscribeEvent
 		public static void registerItem(ModelRegistryEvent event) {
-			MS3.proxy.registerItemRenderer(MS3.itemScriptBinder, 0, MS3.itemScriptBinder.registryName);
+			Ms3.proxy.registerItemRenderer(Ms3.itemScriptBinder, 0, Ms3.itemScriptBinder.registryName);
 		}
 	}
 
@@ -106,7 +108,7 @@ public class MS3 {
 	}
 
 	public static PyInterpreter getInterpreter() {
-		return MS3.instance.interpreter;
+		return Ms3.instance.interpreter;
 	}
 
 	// ClassLoader cl = Loader.instance().getModClassLoader();

@@ -1,7 +1,6 @@
 package com.codeshaper.ms3.api;
 
 import org.python.core.PyInteger;
-import org.python.core.PyString;
 import org.python.core.PyTuple;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;

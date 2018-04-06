@@ -4,16 +4,21 @@ import javax.annotation.Nullable;
 
 import com.codeshaper.ms3.script.RunnableScript;
 
+/**
+ * BindScriptActions are created when the /bindscript command and saved until
+ * the player clicks with the Script Binder item.
+ */
 public class BindScriptAction {
 
+	@Nullable
 	private final RunnableScript runnableScript;
-	private final Action action;
+	private final BSAction action;
 
-	public BindScriptAction(Action action) {
+	public BindScriptAction(BSAction action) {
 		this(null, action);
 	}
-	
-	public BindScriptAction(RunnableScript rs, Action action) {
+
+	public BindScriptAction(RunnableScript rs, BSAction action) {
 		this.runnableScript = rs;
 		this.action = action;
 	}
@@ -27,9 +32,9 @@ public class BindScriptAction {
 	}
 
 	/**
-	 * Returns true if the script should be bound, false if it should be removed.
+	 * Returns the action that this BindScriptAction should preform.
 	 */
-	public Action getAction() {
+	public BSAction getAction() {
 		return this.action;
 	}
 }

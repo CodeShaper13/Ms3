@@ -10,63 +10,39 @@ import org.python.core.Py;
 import org.python.core.PyBoolean;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
-import org.python.core.PyObject;
+import org.python.core.PyInteger;
 import org.python.core.PyList;
+import org.python.core.PyModule;
+import org.python.core.PyObject;
 import org.python.core.PyTuple;
+import org.python.expose.ExposedType;
 
-import com.codeshaper.ms3.api.entity.Animal;
-import com.codeshaper.ms3.api.entity.Bat;
-import com.codeshaper.ms3.api.entity.Boat;
-import com.codeshaper.ms3.api.entity.ChestHorse;
-import com.codeshaper.ms3.api.entity.Chicken;
-import com.codeshaper.ms3.api.entity.Creeper;
-import com.codeshaper.ms3.api.entity.EnderDragon;
-import com.codeshaper.ms3.api.entity.Enderman;
-import com.codeshaper.ms3.api.entity.Endermite;
-import com.codeshaper.ms3.api.entity.EntityBase;
-import com.codeshaper.ms3.api.entity.Ghast;
-import com.codeshaper.ms3.api.entity.Horse;
-import com.codeshaper.ms3.api.entity.ItemEntity;
-import com.codeshaper.ms3.api.entity.Living;
-import com.codeshaper.ms3.api.entity.LivingBase;
-import com.codeshaper.ms3.api.entity.Ocelot;
-import com.codeshaper.ms3.api.entity.Parrot;
-import com.codeshaper.ms3.api.entity.Pig;
-import com.codeshaper.ms3.api.entity.Player;
-import com.codeshaper.ms3.api.entity.Rabbit;
-import com.codeshaper.ms3.api.entity.Sheep;
-import com.codeshaper.ms3.api.entity.Shulker;
-import com.codeshaper.ms3.api.entity.SkeletonHorse;
-import com.codeshaper.ms3.api.entity.Slime;
-import com.codeshaper.ms3.api.entity.Snowman;
-import com.codeshaper.ms3.api.entity.Tameable;
-import com.codeshaper.ms3.api.entity.Villager;
-import com.codeshaper.ms3.api.entity.Wolf;
-import com.codeshaper.ms3.api.entity.Zombie;
-import com.codeshaper.ms3.api.entity.ZombieVillager;
-import com.codeshaper.ms3.api.exception.missingScriptException;
+import com.codeshaper.ms3.api.exception.MissingScriptException;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonExcludeType;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
-import com.codeshaper.ms3.capability.BoundScriptProvider;
-import com.codeshaper.ms3.capability.IBoundScript;
+import com.codeshaper.ms3.capability.EntityMs3DataProvider;
+import com.codeshaper.ms3.capability.IEntityMs3Data;
 import com.codeshaper.ms3.util.NbtHelper;
 import com.codeshaper.ms3.util.Util;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.command.CommandBase;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityHanging;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.boss.dragon.phase.PhaseList;
+import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityPainting;
+import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntityEndermite;
@@ -103,7 +79,9 @@ import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.StringUtils;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.village.MerchantRecipe;
@@ -115,10 +93,12 @@ public class entity {
 
 	public static final entity instance = new entity();
 
-	public static entity.EntityBase getWrapperClassForEntity(@Nonnull Entity javaEntity) {
+	public static entity.Base<? extends Entity> getWrapperClassForEntity(@Nonnull Entity javaEntity) {
 		// Specific types:
 		if (javaEntity instanceof AbstractChestHorse) { // Donkey, mule and llama.
 			return entity.instance.new ChestHorse((AbstractChestHorse) javaEntity);
+		} else if (javaEntity instanceof EntityArmorStand) {
+			return entity.instance.new ArmorStand((EntityArmorStand) javaEntity);
 		} else if (javaEntity instanceof EntityBat) {
 			return entity.instance.new Bat((EntityBat) javaEntity);
 		} else if (javaEntity instanceof EntityBoat) {
@@ -139,6 +119,12 @@ public class entity {
 			return entity.instance.new Horse((EntityHorse) javaEntity);
 		} else if (javaEntity instanceof EntityItem) {
 			return entity.instance.new ItemEntity((EntityItem) javaEntity);
+		} else if (javaEntity instanceof EntityOcelot) {
+			return entity.instance.new Ocelot((EntityOcelot) javaEntity);
+		} else if(javaEntity instanceof EntityPainting) {
+			return entity.instance.new Painting((EntityPainting) javaEntity);
+		} else if (javaEntity instanceof EntityParrot) {
+			return entity.instance.new Parrot((EntityParrot) javaEntity);
 		} else if (javaEntity instanceof EntityPig) {
 			return entity.instance.new Pig((EntityPig) javaEntity);
 		} else if (javaEntity instanceof EntityPlayer) {
@@ -151,10 +137,8 @@ public class entity {
 			return entity.instance.new Shulker((EntityShulker) javaEntity);
 		} else if (javaEntity instanceof EntitySkeletonHorse) {
 			return entity.instance.new SkeletonHorse((EntitySkeletonHorse) javaEntity);
-		} else if (javaEntity instanceof EntityOcelot) {
-			return entity.instance.new Ocelot((EntityOcelot) javaEntity);
-		} else if (javaEntity instanceof EntityParrot) {
-			return entity.instance.new Parrot((EntityParrot) javaEntity);
+		} else if(javaEntity instanceof EntityTNTPrimed) {
+			return entity.instance.new Tnt((EntityTNTPrimed) javaEntity);
 		} else if (javaEntity instanceof EntitySlime || javaEntity instanceof EntityMagmaCube) {
 			return entity.instance.new Slime((EntitySlime) javaEntity);
 		} else if (javaEntity instanceof EntitySnowman) {
@@ -164,7 +148,7 @@ public class entity {
 		} else if (javaEntity instanceof EntityWolf) {
 			return entity.instance.new Wolf((EntityWolf) javaEntity);
 		} else if (javaEntity instanceof EntityZombie || javaEntity instanceof EntityHusk) {
-			return entity.instance.new Zombie((EntityZombie) javaEntity);
+			return entity.instance.new Zombie<EntityZombie>((EntityZombie) javaEntity);
 		} else if (javaEntity instanceof EntityZombieVillager) {
 			return entity.instance.new ZombieVillager((EntityZombieVillager) javaEntity);
 		}
@@ -172,24 +156,31 @@ public class entity {
 		// More generic types:
 
 		else if (javaEntity instanceof EntityTameable) {
-			return entity.instance.new Tameable((EntityTameable) javaEntity);
+			return entity.instance.new Tameable<EntityTameable>((EntityTameable) javaEntity);
 		} else if (javaEntity instanceof EntityAnimal) {
-			return entity.instance.new Animal((EntityAnimal) javaEntity);
+			return entity.instance.new Animal<EntityAnimal>((EntityAnimal) javaEntity);
+		} else if(javaEntity instanceof EntityHanging) {
+			return entity.instance.new Hanging<EntityHanging>((EntityHanging) javaEntity);
 		} else if (javaEntity instanceof EntityLiving) {
-			return entity.instance.new Living((EntityLiving) javaEntity);
+			return entity.instance.new Living<EntityLiving>((EntityLiving) javaEntity);
 		} else if (javaEntity instanceof EntityLivingBase) {
-			return entity.instance.new LivingBase((EntityLivingBase) javaEntity);
+			return entity.instance.new LivingBase<EntityLivingBase>((EntityLivingBase) javaEntity);
 		} else {
-			return entity.instance.new EntityBase(javaEntity);
+			return entity.instance.new Base<Entity>(javaEntity);
 		}
 	}
 
+	/**
+	 * Equivalent to {@link net.minecraft.entity.Entity}.
+	 */
 	@PythonClass
-	public class EntityBase<T extends Entity> extends PyObject {
+	public class Base<T extends Entity> extends PyObject {
 
+		private static final long serialVersionUID = 4773038377439473236L;
+		
 		public T mcEntity;
 
-		public EntityBase(T entity) {
+		public Base(T entity) {
 			this.mcEntity = entity;
 		}
 
@@ -330,7 +321,7 @@ public class entity {
 		@Nullable
 		public Object getTag(String tagKey) {
 			NBTBase tag = CommandBase.entityToNBT(this.mcEntity).getTag(tagKey);
-			return NbtHelper.getValueFromNbt(tag);
+			return NbtHelper.nbtToObject(tag);
 		}
 
 		@PythonFunction
@@ -365,15 +356,15 @@ public class entity {
 
 		@PythonFunction
 		@PythonDocString("Binds a script to the entity, so it will execute every tick.")
-		public void bindScript(String scriptPath, @Nullable PyList args) throws PyException, missingScriptException {
-			IBoundScript bs = this.mcEntity.getCapability(BoundScriptProvider.BOUND_SCRIPT_CAP, null);
+		public void bindScript(String scriptPath, @Nullable PyList args) throws PyException, MissingScriptException {
+			IEntityMs3Data bs = this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
 			bs.addScript(scriptPath, args);
 		}
 
 		@PythonFunction
 		@PythonDocString("Removes all scripts that are bound to this entity.")
 		public void clearAllBoundScripts() {
-			IBoundScript bs = this.mcEntity.getCapability(BoundScriptProvider.BOUND_SCRIPT_CAP, null);
+			IEntityMs3Data bs = this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
 			bs.setClearMethodCall();
 		}
 
@@ -384,7 +375,7 @@ public class entity {
 				throw Py.ValueError("propertyName may not be None or empty");
 			}
 
-			IBoundScript bs = this.mcEntity.getCapability(BoundScriptProvider.BOUND_SCRIPT_CAP, null);
+			IEntityMs3Data bs = this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
 			return bs.getCustomProperty(propertyName);
 		}
 
@@ -395,14 +386,14 @@ public class entity {
 				throw Py.ValueError("propertyName may not be None or empty");
 			}
 
-			IBoundScript bs = this.mcEntity.getCapability(BoundScriptProvider.BOUND_SCRIPT_CAP, null);
+			IEntityMs3Data bs = this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
 			if (value == null) {
 				bs.removeCustomProperty(propertyName);
 			} else {
-				if (value instanceof Number || value instanceof String || value instanceof entity.EntityBase) {
+				if (value instanceof Number || value instanceof String || value instanceof entity.Base) {
 					bs.setCustomProperty(propertyName, value);
 				} else {
-					throw Py.ValueError("value must be a string, number, instance of EntityBase or or None");
+					throw Py.ValueError("value must be a string, number, instance of Base or or None");
 				}
 			}
 		}
@@ -418,8 +409,8 @@ public class entity {
 			if (other == null) {
 				return Py.False;
 			}
-			if (other instanceof EntityBase) {
-				EntityBase e = (EntityBase) other;
+			if (other instanceof Base) {
+				Base<?> e = (Base<?>) other;
 				return new PyBoolean(e.mcEntity.getUniqueID().equals(this.mcEntity.getUniqueID()));
 			}
 			return Py.False;
@@ -439,8 +430,13 @@ public class entity {
 		}
 	}
 
+	/**
+	 * Equivalent to {@link net.minecraft.entity.EntityLivingBase}.
+	 */
 	@PythonClass
-	public class LivingBase<T extends EntityLivingBase> extends EntityBase<T> {
+	public class LivingBase<T extends EntityLivingBase> extends Base<T> {
+
+		private static final long serialVersionUID = 6576870800969843533L;
 
 		public LivingBase(T entity) {
 			super(entity);
@@ -457,9 +453,13 @@ public class entity {
 		}
 	}
 
+	/**
+	 * Equivalent to {@link net.minecraft.entity.EntityLiving}.
+	 */
 	@PythonClass
-	@PythonDocString("Note for advanced users, this is equal to net.minecraft.entity.EntityLiving")
 	public class Living<T extends EntityLiving> extends LivingBase<T> implements IHasEquipment {
+
+		private static final long serialVersionUID = -7574703220388172933L;
 
 		public Living(T entity) {
 			super(entity);
@@ -473,7 +473,7 @@ public class entity {
 		}
 
 		@PythonFunction
-		public boolean getNoAi() {
+		public boolean isNoAi() {
 			return this.mcEntity.isAIDisabled();
 		}
 
@@ -527,8 +527,13 @@ public class entity {
 		}
 	}
 
+	/**
+	 * Equivalent to {@link net.minecraft.entity.passive.EntityAnimal}.
+	 */
 	@PythonClass
 	public class Animal<T extends EntityAnimal> extends Living<T> {
+
+		private static final long serialVersionUID = -7740390218861739942L;
 
 		public Animal(T entity) {
 			super(entity);
@@ -565,38 +570,39 @@ public class entity {
 	}
 
 	@PythonClass
-	public class Tameable<T extends EntityTameable> extends Animal<T> {
+	public class ArmorStand extends LivingBase<EntityArmorStand> {
 
-		public Tameable(T entity) {
+		private static final long serialVersionUID = 5645396411684790277L;
+
+		public ArmorStand(EntityArmorStand entity) {
 			super(entity);
 		}
 
 		@PythonFunction
-		public boolean isSitting() {
-			return this.mcEntity.isSitting();
+		public boolean isNoGravity() {
+			return this.mcEntity.hasNoGravity();
 		}
 
 		@PythonFunction
-		public void setSitting(boolean isSitting) {
-			this.mcEntity.setSitting(isSitting);
+		public void setNoGravity(boolean noGravity) {
+			this.mcEntity.setNoGravity(noGravity);
 		}
 
 		@PythonFunction
-		@PythonDocString("Sets the Player who owns this Entity.  Must be an instance of entity.Player or net.minecraft.entity.player.EntityPlayer")
-		public void setOwner(@PythonExcludeType Object owner) {
-			if (owner instanceof EntityPlayer) {
-				this.mcEntity.setTamedBy((EntityPlayer) owner);
-			} else if (owner instanceof Player) {
-				this.mcEntity.setTamedBy(((Player) owner).mcEntity);
-			} else {
-				throw Py.ValueError(
-						"owner must be an instance of entity.Player or net.minecraft.entity.player.EntityPlayer");
-			}
+		public boolean isNoBaseplate() {
+			return this.mcEntity.hasNoBasePlate();
+		}
+
+		@PythonFunction
+		public boolean isMarker() {
+			return this.mcEntity.hasMarker();
 		}
 	}
 
 	@PythonClass
 	public class Bat extends Living<EntityBat> {
+
+		private static final long serialVersionUID = -4486350108913718292L;
 
 		public Bat(EntityBat entity) {
 			super(entity);
@@ -615,7 +621,9 @@ public class entity {
 	}
 
 	@PythonClass
-	public class Boat extends EntityBase<EntityBoat> {
+	public class Boat extends Base<EntityBoat> {
+
+		private static final long serialVersionUID = -9198241601349531102L;
 
 		@PythonField(Boat.TYPE_OAK)
 		public static final String TYPE_OAK = "oak";
@@ -649,6 +657,8 @@ public class entity {
 	@PythonClass
 	public class Chicken extends Animal<EntityChicken> {
 
+		private static final long serialVersionUID = 1241156688676494683L;
+
 		public Chicken(EntityChicken entity) {
 			super(entity);
 		}
@@ -678,6 +688,8 @@ public class entity {
 
 	@PythonClass
 	public class Creeper extends Living<EntityCreeper> {
+
+		private static final long serialVersionUID = -7320650346138191612L;
 
 		public Creeper(EntityCreeper entity) {
 			super(entity);
@@ -717,6 +729,8 @@ public class entity {
 	@PythonClass
 	public class EnderDragon extends Living<EntityDragon> {
 
+		private static final long serialVersionUID = -5955391820741486510L;
+
 		@PythonField("0")
 		public static final int PHASE_CIRCLING = 0;
 		@PythonField("1")
@@ -746,7 +760,7 @@ public class entity {
 
 		@PythonFunction
 		public int getPhase() {
-			return this.mcEntity.getPhaseManager().getCurrentPhase().getPhaseList().getId();
+			return this.mcEntity.getPhaseManager().getCurrentPhase().getType().getId();
 		}
 
 		@PythonFunction
@@ -758,6 +772,8 @@ public class entity {
 
 	@PythonClass
 	public class Enderman extends Living<EntityEnderman> {
+
+		private static final long serialVersionUID = 1688539848618858505L;
 
 		public Enderman(EntityEnderman entity) {
 			super(entity);
@@ -797,6 +813,8 @@ public class entity {
 	@PythonClass
 	public class Endermite extends Living<EntityEndermite> {
 
+		private static final long serialVersionUID = 8466553682345667521L;
+
 		public Endermite(EntityEndermite entity) {
 			super(entity);
 		}
@@ -817,6 +835,8 @@ public class entity {
 	@PythonClass
 	public class Ghast extends Living<EntityGhast> {
 
+		private static final long serialVersionUID = 2108228874635569063L;
+
 		public Ghast(EntityGhast entity) {
 			super(entity);
 		}
@@ -833,13 +853,16 @@ public class entity {
 	}
 
 	@PythonClass
-	public class ItemEntity extends EntityBase<EntityItem> {
+	public class ItemEntity extends Base<EntityItem> {
+
+		private static final long serialVersionUID = -6818003122558490506L;
 
 		public ItemEntity(EntityItem entity) {
 			super(entity);
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the Item's age.  Once it's age reaches 6000 the item is destroyed.")
 		public int getAge() {
 			return this.mcEntity.getAge();
 		}
@@ -868,8 +891,13 @@ public class entity {
 		}
 	}
 
+	/**
+	 * Equivalent to {@link net.minecraft.entity.passive.AbstractHorse}.
+	 */
 	@PythonClass
 	public class GenericHorse<T extends AbstractHorse> extends Animal<T> {
+
+		private static final long serialVersionUID = 1473603312420702937L;
 
 		public GenericHorse(T entity) {
 			super(entity);
@@ -929,7 +957,40 @@ public class entity {
 	}
 
 	@PythonClass
+	public class Hanging<T extends EntityHanging> extends Base<T> {
+
+		private static final long serialVersionUID = -8908455875060292148L;
+
+		public Hanging(T entity) {
+			super(entity);
+		}
+
+		@PythonFunction
+		public int getFacing() {
+			return this.mcEntity.facingDirection.getHorizontalIndex();
+		}
+
+		@PythonFunction
+		public void setFacing(int facing) {
+			this.setTag("Facing", EnumFacing.getHorizontal(facing));
+		}
+		
+		@PythonFunction
+		public PyTuple getTilePos() {
+			BlockPos p = this.mcEntity.getHangingPosition();
+			return new PyTuple(new PyInteger(p.getX()), new PyInteger(p.getY()), new PyInteger(p.getZ()));
+		}
+
+		@PythonFunction
+		public void setTilePos(int x, int y, int z) {
+			this.mcEntity.setPosition(x, y, z);
+		}
+	}
+	
+	@PythonClass
 	public class Horse extends GenericHorse<EntityHorse> {
+
+		private static final long serialVersionUID = 7147534040184529530L;
 
 		@PythonField("0")
 		public static final int COLOR_WHITE = 0;
@@ -967,13 +1028,14 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Use computeVariantFlag to get a variant to pass in.")
 		public void setVariant(int variant) {
 			this.mcEntity.setHorseVariant(variant);
 		}
 
 		@PythonFunction
 		@PythonDocString("Returns a variant from a color and markings.  Algorithm (color | markings << 8)")
-		public int getVariantFlag(int color, int markings) {
+		public int computeVariantFlag(int color, int markings) {
 			int variant = color | markings << 8;
 			return variant;
 		}
@@ -981,6 +1043,8 @@ public class entity {
 
 	@PythonClass
 	public class ChestHorse extends GenericHorse<AbstractChestHorse> {
+
+		private static final long serialVersionUID = 2212092842255803485L;
 
 		public ChestHorse(AbstractChestHorse entity) {
 			super(entity);
@@ -1000,6 +1064,8 @@ public class entity {
 	@PythonClass
 	public class SkeletonHorse extends GenericHorse<EntitySkeletonHorse> {
 
+		private static final long serialVersionUID = 1221084166010555928L;
+
 		public SkeletonHorse(EntitySkeletonHorse entity) {
 			super(entity);
 		}
@@ -1017,6 +1083,8 @@ public class entity {
 
 	@PythonClass
 	public class Ocelot extends Tameable<EntityOcelot> {
+
+		private static final long serialVersionUID = -3752886054446835931L;
 
 		@PythonField("0")
 		public static final int TYPE_WILD = 0;
@@ -1043,7 +1111,90 @@ public class entity {
 	}
 
 	@PythonClass
+	public class Painting extends Hanging<EntityPainting> {
+		
+		private static final long serialVersionUID = 7791696705579553157L;
+		
+		@PythonField("Kebab")
+		public static final String KEBAB = "Kebab";
+		@PythonField("Aztec")
+		public static final String AZTEC = "Aztec";
+		@PythonField("Alban")
+		public static final String ALBAN = "Alban";
+		@PythonField("Aztec2")
+		public static final String AZTEC_2 = "Aztec2";
+		@PythonField("Bomb")
+		public static final String BOMB = "Bomb";
+		@PythonField("Plant")
+		public static final String PLANT = "Plant";
+		@PythonField("Wasteland")
+		public static final String WASTELAND = "Wasteland";
+		@PythonField("Pool")
+		public static final String POOL = "Pool";
+		@PythonField("Courbet")
+		public static final String COURBET = "Courbet";
+		@PythonField("Sea")
+		public static final String SEA = "Sea";
+		@PythonField("Sunset")
+		public static final String SUNSET = "Sunset";
+		@PythonField("Creebet")
+		public static final String CREEBET = "Creebet";
+		@PythonField("Wanderer")
+		public static final String WANDERER = "Wanderer";
+		@PythonField("Graham")
+		public static final String GRAHAM = "Graham";
+		@PythonField("Match")
+		public static final String MATCH = "Match";
+		@PythonField("Bust")
+		public static final String BUST = "Bust";
+		@PythonField("Stage")
+		public static final String STAGE = "Stage";
+		@PythonField("Void")
+		public static final String VOID = "Void";
+		@PythonField("SkullAndRoses")
+		public static final String SKULL_AND_ROSES = "SkullAndRoses";
+		@PythonField("Wither")
+		public static final String WITHER = "Wither";
+		@PythonField("Fighters")
+		public static final String FIGHTERS = "Fighters";
+		@PythonField("Pointer")
+		public static final String POINTER = "Pointer";
+		@PythonField("Pigscene")
+		public static final String PIGSCENE = "Pigscene";
+		@PythonField("BurningSkull")
+		public static final String BURNING_SKULL = "BurningSkull";
+		@PythonField("Skeleton")
+		public static final String SKELETON = "Skeleton";
+		@PythonField("DonkeyKong")
+		public static final String DONKEY_KONG = "DonkeyKong";
+
+		public Painting(EntityPainting entity) {
+			super(entity);
+		}
+
+		@PythonFunction
+		@PythonDocString("Returns the name of the art as a string.")
+		public String getArtName() {
+			return this.mcEntity.art.title;
+		}
+
+		@PythonFunction
+		public void setArt(String artName) {
+			for (EntityPainting.EnumArt art : EntityPainting.EnumArt.values()) {
+				if (art.title.equals(artName)) {
+					this.mcEntity.art = art;
+				}
+			}
+			if (this.mcEntity.art == null) {
+				this.mcEntity.art = EntityPainting.EnumArt.KEBAB;
+			}
+		}
+	}
+
+	@PythonClass
 	public class Parrot extends Tameable<EntityParrot> {
+
+		private static final long serialVersionUID = -8273033504720739347L;
 
 		@PythonField("0")
 		public static final int COLOR_RED = 0;
@@ -1074,6 +1225,8 @@ public class entity {
 	@PythonClass
 	public class Pig extends Animal<EntityPig> {
 
+		private static final long serialVersionUID = 8368727781457142488L;
+
 		public Pig(EntityPig entity) {
 			super(entity);
 		}
@@ -1091,6 +1244,8 @@ public class entity {
 
 	@PythonClass
 	public class Player extends LivingBase<EntityPlayerMP> implements IHasEquipment {
+
+		private static final long serialVersionUID = -8557759903366434251L;
 
 		public Player(EntityPlayerMP entity) {
 			super(entity);
@@ -1141,21 +1296,14 @@ public class entity {
 			this.mcEntity.inventory.mainInventory.set(slotIndex, itemUtils.itemStackFromTuple(itemStack));
 			this.mcEntity.inventoryContainer.detectAndSendChanges();
 		}
-		
+
 		@PythonFunction
 		@PythonDocString("Adds an item stack to the player's main inventory.  Returns the leftover items that couldn't be added, or None if all the items were added.")
 		public PyTuple addItemStack(PyTuple itemStack) {
-			boolean flag = this.mcEntity.inventory.addItemStackToInventory(itemUtils.itemStackFromTuple(itemStack));
-			
-			if(flag) {
-				System.out.println("true");
-			} else {
-				System.out.println("false");
-			}
-			
+			this.mcEntity.inventory.addItemStackToInventory(itemUtils.itemStackFromTuple(itemStack));
 			return itemStack;
 		}
-		
+
 		@PythonFunction
 		@PythonDocString("Returns true if the passed itemStack is in the player's main inventory.")
 		public boolean hasItemStack(PyTuple itemStack) {
@@ -1190,6 +1338,8 @@ public class entity {
 	@PythonClass
 	public class Rabbit extends Animal<EntityRabbit> {
 
+		private static final long serialVersionUID = 7640215810890520120L;
+
 		@PythonField("0")
 		public static final int TYPE_BROWN = 0;
 		@PythonField("1")
@@ -1223,6 +1373,8 @@ public class entity {
 	@PythonClass
 	public class Sheep extends Animal<EntitySheep> {
 
+		private static final long serialVersionUID = 3270857116516304734L;
+
 		public Sheep(EntitySheep entity) {
 			super(entity);
 		}
@@ -1251,6 +1403,8 @@ public class entity {
 	@PythonClass
 	public class Shulker extends Living<EntityShulker> {
 
+		private static final long serialVersionUID = -3505352210734560534L;
+
 		public Shulker(EntityShulker entity) {
 			super(entity);
 		}
@@ -1269,11 +1423,14 @@ public class entity {
 	@PythonClass
 	public class Slime extends Living<EntitySlime> {
 
+		private static final long serialVersionUID = 8553917442304661280L;
+
 		public Slime(EntitySlime entity) {
 			super(entity);
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the slime's size. 0, 1 and 3 are the default sizes.")
 		public int getSize() {
 			return this.mcEntity.getSlimeSize();
 		}
@@ -1286,6 +1443,8 @@ public class entity {
 
 	@PythonClass
 	public class Snowman extends Living<EntitySnowman> {
+
+		private static final long serialVersionUID = -6550695206594909228L;
 
 		public Snowman(EntitySnowman entity) {
 			super(entity);
@@ -1303,7 +1462,62 @@ public class entity {
 	}
 
 	@PythonClass
+	public class Tameable<T extends EntityTameable> extends Animal<T> {
+
+		private static final long serialVersionUID = -5756209361574406506L;
+
+		public Tameable(T entity) {
+			super(entity);
+		}
+
+		@PythonFunction
+		public boolean isSitting() {
+			return this.mcEntity.isSitting();
+		}
+
+		@PythonFunction
+		public void setSitting(boolean isSitting) {
+			this.mcEntity.setSitting(isSitting);
+		}
+
+		@PythonFunction
+		@PythonDocString("Sets the Player who owns this Entity.  Must be an instance of entity.Player or net.minecraft.entity.player.EntityPlayer")
+		public void setOwner(@PythonExcludeType Object owner) {
+			if (owner instanceof EntityPlayer) {
+				this.mcEntity.setTamedBy((EntityPlayer) owner);
+			} else if (owner instanceof Player) {
+				this.mcEntity.setTamedBy(((Player) owner).mcEntity);
+			} else {
+				throw Py.ValueError(
+						"owner must be an instance of entity.Player or net.minecraft.entity.player.EntityPlayer");
+			}
+		}
+	}
+	
+	@PythonClass
+	public class Tnt extends Base<EntityTNTPrimed> {
+
+		private static final long serialVersionUID = 1L;
+
+		public Tnt(EntityTNTPrimed entity) {
+			super(entity);
+		}
+
+		@PythonFunction
+		public int getFuse() {
+			return this.mcEntity.getFuse();
+		}
+
+		@PythonFunction
+		public void setFuse(int fuse) {
+			this.mcEntity.setFuse(fuse);
+		}
+	}
+
+	@PythonClass
 	public class Villager extends Living<EntityVillager> {
+
+		private static final long serialVersionUID = 6785232030225149328L;
 
 		private Field field;
 
@@ -1439,6 +1653,8 @@ public class entity {
 	@PythonClass
 	public class Wolf extends Tameable<EntityWolf> {
 
+		private static final long serialVersionUID = -5259915680673182799L;
+
 		public Wolf(EntityWolf entity) {
 			super(entity);
 		}
@@ -1469,6 +1685,8 @@ public class entity {
 	@PythonClass
 	public class Zombie<T extends EntityZombie> extends Living<T> {
 
+		private static final long serialVersionUID = 361288394972301593L;
+
 		public Zombie(T entity) {
 			super(entity);
 		}
@@ -1496,6 +1714,8 @@ public class entity {
 
 	@PythonClass
 	public class ZombieVillager extends Zombie<EntityZombieVillager> {
+
+		private static final long serialVersionUID = 4714016270839795244L;
 
 		public ZombieVillager(EntityZombieVillager entity) {
 			super(entity);
