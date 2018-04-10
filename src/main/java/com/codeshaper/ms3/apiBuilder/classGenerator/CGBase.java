@@ -65,7 +65,7 @@ public abstract class CGBase {
 			for (CGField field : this.fields) {
 				String value = field.value.toString();
 
-				br.write("    @PythonField(\"" + value + "\")\n");
+				br.write("    @PythonField\n");
 				br.write("    public static final String " + field.name + " = func(\"" + value + "\");\n");
 			}
 

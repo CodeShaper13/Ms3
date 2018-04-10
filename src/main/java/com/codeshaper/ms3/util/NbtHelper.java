@@ -57,9 +57,6 @@ public class NbtHelper {
 	/**
 	 * Takes a {@link NBTBase} object and converts it into a java object of the
 	 * respective data.
-	 * 
-	 * @param tag
-	 * @return
 	 */
 	@Nullable
 	public static Object nbtToObject(@Nullable NBTBase tag) {

@@ -3,9 +3,6 @@ package com.codeshaper.ms3.api;
 import javax.annotation.Nullable;
 
 import org.python.core.PyObject;
-import org.python.core.Untraversable;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedType;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
@@ -14,50 +11,43 @@ import com.codeshaper.ms3.util.Util;
 
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.WorldServer;
 
-@Untraversable
-@ExposedType(name = "EXEC")
 public class executor {
 
 	private executor() {
 	}
 
-	@ExposedType
 	@PythonClass
 	@PythonDocString("Represents whoever or whatever is executing a script.")
 	public static class Executor extends PyObject {
 
-		private Vec3d senderPosition;
+		private static final long serialVersionUID = 7248437926101357378L;
+		
 		private ICommandSender sender;
 
 		public Executor(ICommandSender sender) {
-			this.senderPosition = sender.getPositionVector();
 			this.sender = sender;
 		}
 
-		@ExposedMethod
 		@PythonFunction
 		@PythonDocString("Returns the executor's X position as a float.")
 		public double getX() {
-			return this.senderPosition.x;
+			return this.sender.getPositionVector().x;
 		}
 
-		@ExposedMethod
 		@PythonFunction
 		@PythonDocString("Returns the executor's Y position as a float.")
 		public double getY() {
-			return this.senderPosition.y;
+			return this.sender.getPositionVector().y;
 		}
 
-		@ExposedMethod
 		@PythonFunction
 		@PythonDocString("Returns the executor's Z position as a float.")
 		public double getZ() {
-			return this.senderPosition.z;
+			return this.sender.getPositionVector().z;
 		}
 
 		@PythonFunction
@@ -90,7 +80,7 @@ public class executor {
 		
 		@PythonFunction
 		@PythonDocString("Returns the sender as an entity, or None if it can't be converted, in the case of a Command Block.")
-		public @Nullable entity.Base asEntity() {
+		public @Nullable entity.Base<? extends Entity> asEntity() {
 			Entity e = this.sender.getCommandSenderEntity();
 			
 			if(e != null) {

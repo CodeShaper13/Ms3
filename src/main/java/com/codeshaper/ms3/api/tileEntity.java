@@ -249,16 +249,16 @@ public class tileEntity {
 
 		private static final long serialVersionUID = -4501498464782181069L;
 
-		@PythonField("0")
-		public final int ID_LEFT = 0;
-		@PythonField("1")
-		public final int ID_MIDDLE = 1;
-		@PythonField("2")
-		public final int ID_RIGHT = 2;
-		@PythonField("3")
-		public final int ID_INGREDIENT = 3;
-		@PythonField("4")
-		public final int ID_FUEL = 4;
+		@PythonField
+		public static final int ID_LEFT = 0;
+		@PythonField
+		public static final int ID_MIDDLE = 1;
+		@PythonField
+		public static final int ID_RIGHT = 2;
+		@PythonField
+		public static final int ID_INGREDIENT = 3;
+		@PythonField
+		public static final int ID_FUEL = 4;
 
 		public BrewingStand(TileEntityBrewingStand tileEntity) {
 			super(tileEntity);
@@ -342,12 +342,12 @@ public class tileEntity {
 
 		private static final long serialVersionUID = 7367812229820446548L;
 
-		@PythonField("0")
-		public final int ID_SMELT = 0;
-		@PythonField("1")
-		public final int ID_FUEL = 1;
-		@PythonField("2")
-		public final int ID_RESULT = 2;
+		@PythonField
+		public static final int ID_SMELT = 0;
+		@PythonField
+		public static final int ID_FUEL = 1;
+		@PythonField
+		public static final int ID_RESULT = 2;
 
 		public Furnace(TileEntityFurnace tileEntity) {
 			super(tileEntity);
@@ -496,90 +496,90 @@ public class tileEntity {
 
 		private static final long serialVersionUID = -4226105205783622653L;
 
-		@PythonField("MHF_Alex")
-		public final String ALEX = "MHF_Alex";
-		@PythonField("MHF_Blaze")
-		public final String BLAZE = "MHF_Blaze";
-		@PythonField("MHF_CaveSpider")
-		public final String CAVE_SPIDER = "MHF_CaveSpider";
-		@PythonField("MHF_Chicken")
-		public final String CHICKEN = "MHF_Chicken";
-		@PythonField("MHF_Cow")
-		public final String COW = "MHF_Cow";
-		@PythonField("MHF_Creeper")
-		public final String CREEPER = "MHF_Creeper";
-		@PythonField("MHF_Enderman")
-		public final String ENDERMAN = "MHF_Enderman";
-		@PythonField("MHF_Ghast")
-		public final String GHAST = "MHF_Ghast";
-		@PythonField("MHF_Golem")
-		public final String GOLEM = "MHF_Golem";
-		@PythonField("MHF_Herobrine")
-		public final String HEROBRINE = "MHF_Herobrine";
-		@PythonField("MHF_LavaSlime")
-		public final String MAGMA_CUBE = "MHF_LavaSlime";
-		@PythonField("MHF_MushroomCow")
-		public final String MUSHROOM_COW = "MHF_MushroomCow";
-		@PythonField("MHF_Ocelot")
-		public final String OCELOT = "HF_Ocelot";
-		@PythonField("MHF_Pig")
-		public final String PIG = "MHF_Pig";
-		@PythonField("MHF_PigZombie")
-		public final String PIG_ZOMBIE = "MHF_PigZombie";
-		@PythonField("MHF_Sheep")
-		public final String SHEEP = "MHF_Sheep";
-		@PythonField("MHF_Skeleton")
-		public final String SKELETON = "MHF_Skeleton";
-		@PythonField("MHF_Slime")
-		public final String SLIME = "MHF_Slime";
-		@PythonField("MHF_Spider")
-		public final String SPIDER = "MHF_Spider";
-		@PythonField("MHF_Squid")
-		public final String SQUID = "MHF_Squid";
-		@PythonField("MHF_Steve")
-		public final String STEVE = "MHF_Steve";
-		@PythonField("MHF_Villager")
-		public final String VILLAGER = "MHF_Villager";
-		@PythonField("MHF_WSkeleton")
-		public final String WITHER_SKELETON = "MHF_WSkeleton";
-		@PythonField("MHF_Zombie")
-		public final String ZOMBIE = "MHF_Zombie";
-		@PythonField("MHF_Cactus")
-		public final String CACTUS = "MHF_Cactus";
-		@PythonField("MHF_Cake")
-		public final String CAKE = "MHF_Cake";
-		@PythonField("MHF_Chest")
-		public final String CHEST = "MHF_Chest";
-		@PythonField("MHF_CoconutB")
-		public final String COCONUT_BROWN = "MHF_CoconutB";
-		@PythonField("MHF_CoconutG")
-		public final String COCONUT_GREEN = "MHF_CoconutG";
-		@PythonField("MHF_Melon")
-		public final String MELON = "MHF_Melon";
-		@PythonField("MHF_OakLog")
-		public final String OAK_LOG = "MHF_OakLog";
-		@PythonField("MHF_Present1")
-		public final String PRESENT_1 = "MHF_Present1";
-		@PythonField("MHF_Present2")
-		public final String PRESENT_2 = "MHF_Present2";
-		@PythonField("MHF_Pumpkin")
-		public final String PUMPKIN = "MHF_Pumpkin";
-		@PythonField("MHF_TNT")
-		public final String TNT = "MHF_TNT";
-		@PythonField("MHF_TNT2")
-		public final String TNT2 = "MHF_TNT2";
-		@PythonField("MHF_ArrowUp")
-		public final String ARROW_UP = "MHF_ArrowUp";
-		@PythonField("MHF_ArrowDown")
-		public final String ARROW_DOWN = "MHF_ArrowDown";
-		@PythonField("MHF_ArrowLeft")
-		public final String ARROW_LEFT = "MHF_ArrowLeft";
-		@PythonField("MHF_ArrowRight")
-		public final String ARROW_RIGHT = "MHF_ArrowRight";
-		@PythonField("MHF_Exclamation")
-		public final String EXCLAMATION = "MHF_Exclamation";
-		@PythonField("MHF_Question")
-		public final String QUESTION = "MHF_Question";
+		@PythonField
+		public static final String ALEX = "MHF_Alex";
+		@PythonField
+		public static final String BLAZE = "MHF_Blaze";
+		@PythonField
+		public static final String CAVE_SPIDER = "MHF_CaveSpider";
+		@PythonField
+		public static final String CHICKEN = "MHF_Chicken";
+		@PythonField
+		public static final String COW = "MHF_Cow";
+		@PythonField
+		public static final String CREEPER = "MHF_Creeper";
+		@PythonField
+		public static final String ENDERMAN = "MHF_Enderman";
+		@PythonField
+		public static final String GHAST = "MHF_Ghast";
+		@PythonField
+		public static final String GOLEM = "MHF_Golem";
+		@PythonField
+		public static final String HEROBRINE = "MHF_Herobrine";
+		@PythonField
+		public static final String MAGMA_CUBE = "MHF_LavaSlime";
+		@PythonField
+		public static final String MUSHROOM_COW = "MHF_MushroomCow";
+		@PythonField
+		public static final String OCELOT = "HF_Ocelot";
+		@PythonField
+		public static final String PIG = "MHF_Pig";
+		@PythonField
+		public static final String PIG_ZOMBIE = "MHF_PigZombie";
+		@PythonField
+		public static final String SHEEP = "MHF_Sheep";
+		@PythonField
+		public static final String SKELETON = "MHF_Skeleton";
+		@PythonField
+		public static final String SLIME = "MHF_Slime";
+		@PythonField
+		public static final String SPIDER = "MHF_Spider";
+		@PythonField
+		public static final String SQUID = "MHF_Squid";
+		@PythonField
+		public static final String STEVE = "MHF_Steve";
+		@PythonField
+		public static final String VILLAGER = "MHF_Villager";
+		@PythonField
+		public static final String WITHER_SKELETON = "MHF_WSkeleton";
+		@PythonField
+		public static final String ZOMBIE = "MHF_Zombie";
+		@PythonField
+		public static final String CACTUS = "MHF_Cactus";
+		@PythonField
+		public static final String CAKE = "MHF_Cake";
+		@PythonField
+		public static final String CHEST = "MHF_Chest";
+		@PythonField
+		public static final String COCONUT_BROWN = "MHF_CoconutB";
+		@PythonField
+		public static final String COCONUT_GREEN = "MHF_CoconutG";
+		@PythonField
+		public static final String MELON = "MHF_Melon";
+		@PythonField
+		public static final String OAK_LOG = "MHF_OakLog";
+		@PythonField
+		public static final String PRESENT_1 = "MHF_Present1";
+		@PythonField
+		public static final String PRESENT_2 = "MHF_Present2";
+		@PythonField
+		public static final String PUMPKIN = "MHF_Pumpkin";
+		@PythonField
+		public static final String TNT = "MHF_TNT";
+		@PythonField
+		public static final String TNT2 = "MHF_TNT2";
+		@PythonField
+		public static final String ARROW_UP = "MHF_ArrowUp";
+		@PythonField
+		public static final String ARROW_DOWN = "MHF_ArrowDown";
+		@PythonField
+		public static final String ARROW_LEFT = "MHF_ArrowLeft";
+		@PythonField
+		public static final String ARROW_RIGHT = "MHF_ArrowRight";
+		@PythonField
+		public static final String EXCLAMATION = "MHF_Exclamation";
+		@PythonField
+		public static final String QUESTION = "MHF_Question";
 
 		public Skull(TileEntitySkull tileEntity) {
 			super(tileEntity);

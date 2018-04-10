@@ -10,6 +10,7 @@ import org.python.core.PySequenceList;
 import org.python.core.PyTuple;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonExcludeType;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeName;
 
 /**
  * Represents a function within a python module, either in global or class scope
@@ -19,7 +20,7 @@ public class ModuleFunction extends ModuleMember {
 	public String[] argNames;
 
 	/**
-	 * Creates a python function based on a method
+	 * Creates a Python function based on a method
 	 */
 	public ModuleFunction(Executable exec) {
 		super(exec, exec);
@@ -28,18 +29,19 @@ public class ModuleFunction extends ModuleMember {
 		int pCount = exec.getParameterCount();
 		this.argNames = new String[pCount];
 		Parameter[] parameters = exec.getParameters();
-		Parameter param;
-		String s;
+		String name;
 		for (int i = 0; i < pCount; i++) {
-			param = parameters[i];
-			if (!param.isAnnotationPresent(PythonExcludeType.class)) {
-				String className = this.getTypeName(param.getType());
-				s = className.substring(className.lastIndexOf('.') + 1) + "_" + param.getName();
+			Parameter param = parameters[i];
+			if (param.isAnnotationPresent(PythonTypeName.class)) {
+				PythonTypeName a = param.getAnnotation(PythonTypeName.class);
+				name = a.value() + "_" + param.getName();
+			} else if (param.isAnnotationPresent(PythonExcludeType.class)) {
+				name = param.getName();
 			} else {
-				s = param.getName();
+				String className = this.getTypeName(param.getType());
+				name = className.substring(className.lastIndexOf('.') + 1) + "_" + param.getName();
 			}
-
-			this.argNames[i] = s;
+			this.argNames[i] = name;
 		}
 	}
 
@@ -50,7 +52,7 @@ public class ModuleFunction extends ModuleMember {
 	private String getTypeName(Class<?> clazz) {
 		if (clazz == boolean.class) {
 			return "bool";
-		// In there are no floats, only doubles but they are called floats.
+			// In there are no floats, only doubles but they are called floats.
 		} else if (clazz == double.class || clazz == float.class) {
 			return "float";
 		} else if (clazz == String.class) {
@@ -63,7 +65,7 @@ public class ModuleFunction extends ModuleMember {
 			return "tuple";
 		} else if (clazz == PySequenceList.class) {
 			return "list";
-		} else if(clazz == PyDictionary.class) {
+		} else if (clazz == PyDictionary.class) {
 			return "dict";
 		} else {
 			String className = clazz.getName();

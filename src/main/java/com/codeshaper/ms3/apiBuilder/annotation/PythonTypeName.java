@@ -5,12 +5,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
- * Marks a field where the value should be computed based on the fields value as
- * defined in the class. This should only be on fields that are both public and
- * static.
+ * Changes the name of a type when the Python module is generated.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-public @interface PythonField {
+@Target(ElementType.PARAMETER)
+public @interface PythonTypeName {
+	String value() default StringUtils.EMPTY;
 }

@@ -9,52 +9,52 @@ public class tileEntityList {
 	private tileEntityList() {
 	}
 
-	@PythonField(tileEntityList.FURNACE)
+	@PythonField
 	public static final String FURNACE = "furnace";
-	@PythonField(tileEntityList.CHEST)
+	@PythonField
 	public static final String CHEST = "chest";
-	@PythonField(tileEntityList.ENDER_CHEST)
+	@PythonField
 	public static final String ENDER_CHEST = "ender_chest";
-	@PythonField(tileEntityList.JUKEBOX)
+	@PythonField
 	public static final String JUKEBOX = "jukebox";
-	@PythonField(tileEntityList.DISPENSER)
+	@PythonField
 	public static final String DISPENSER = "dispenser";
-	@PythonField(tileEntityList.DROPPER)
+	@PythonField
 	public static final String DROPPER = "dropper";
-	@PythonField(tileEntityList.SIGN)
+	@PythonField
 	public static final String SIGN = "sign";
-	@PythonField(tileEntityList.MOB_SPAWNER)
+	@PythonField
 	public static final String MOB_SPAWNER = "mob_spawner";
-	@PythonField(tileEntityList.NOTE_BLOCK)
+	@PythonField
 	public static final String NOTE_BLOCK = "note_block";
-	@PythonField(tileEntityList.BREWING_STAND)
+	@PythonField
 	public static final String BREWING_STAND = "brewing_stand";
-	@PythonField(tileEntityList.ENCHANTING_TABLE)
+	@PythonField
 	public static final String ENCHANTING_TABLE = "enchanting_table";
-	@PythonField(tileEntityList.END_PORTAL)
+	@PythonField
 	public static final String END_PORTAL = "end_portal";
-	@PythonField(tileEntityList.BEACON)
+	@PythonField
 	public static final String BEACON = "beacon";
-	@PythonField(tileEntityList.SKULL)
+	@PythonField
 	public static final String SKULL = "skull";
-	@PythonField(tileEntityList.DAYLIGHT_DETECTOR)
+	@PythonField
 	public static final String DAYLIGHT_DETECTOR = "daylight_detector";
-	@PythonField(tileEntityList.HOPPER)
+	@PythonField
 	public static final String HOPPER = "hopper";
-	@PythonField(tileEntityList.COMPARATOR)
+	@PythonField
 	public static final String COMPARATOR = "comparator";
-	@PythonField(tileEntityList.FLOWER_POT)
+	@PythonField
 	public static final String FLOWER_POT = "flower_pot";
-	@PythonField(tileEntityList.BANNER)
+	@PythonField
 	public static final String BANNER = "banner";
-	@PythonField(tileEntityList.STRUCTURE_BLOCK)
+	@PythonField
 	public static final String STRUCTURE_BLOCK = "structure_block";
-	@PythonField(tileEntityList.END_GATEWAY)
+	@PythonField
 	public static final String END_GATEWAY = "end_gateway";
-	@PythonField(tileEntityList.COMMAND_BLOCK)
+	@PythonField
 	public static final String COMMAND_BLOCK = "command_block";
-	@PythonField(tileEntityList.SHULKER_BOX)
+	@PythonField
 	public static final String SHULKER_BOX = "shulker_box";
-	@PythonField(tileEntityList.BED)
+	@PythonField
 	public static final String BED = "bed";
 }

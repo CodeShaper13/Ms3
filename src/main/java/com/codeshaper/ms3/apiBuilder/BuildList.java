@@ -1,11 +1,13 @@
 package com.codeshaper.ms3.apiBuilder;
 
 import com.codeshaper.ms3.Ms3;
+import com.codeshaper.ms3.api.BoundObject;
 import com.codeshaper.ms3.api.biomes;
 import com.codeshaper.ms3.api.blockUtils;
 import com.codeshaper.ms3.api.blocks;
 import com.codeshaper.ms3.api.colors;
 import com.codeshaper.ms3.api.effectList;
+import com.codeshaper.ms3.api.enchantments;
 import com.codeshaper.ms3.api.entity;
 import com.codeshaper.ms3.api.entityList;
 import com.codeshaper.ms3.api.equipmentSlot;
@@ -25,7 +27,7 @@ import com.codeshaper.ms3.api.util;
 import com.codeshaper.ms3.api.world;
 
 /**
- * A list of classes to build into python modules.  Moved to a different class
+ * A list of classes to build into Python modules.  Moved to a different class
  * so we wouldn't bloat the import section of ModuleBuilder.
  */
 public class BuildList {
@@ -37,9 +39,11 @@ public class BuildList {
 		this.classList = new Class[] {
 				biomes.class,
 				blockUtils.class,
+				BoundObject.class,
 				blocks.class,
 				colors.class,
 				effectList.class,
+				enchantments.class,
 				entity.class,
 				entityList.class,
 				equipmentSlot.class,

@@ -25,7 +25,7 @@ public class itemUtils {
 	public static Item getMcItemFromName(String name) {
 		Item item = Item.getByNameOrId(name);
 		if(item == null) {
-			throw Py.ValueError("Block with name " + name + " could not be found");
+			throw Py.ValueError("Item with name " + name + " could not be found");
 		}
 		return item;
 	}

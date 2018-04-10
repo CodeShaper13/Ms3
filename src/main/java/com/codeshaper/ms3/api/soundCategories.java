@@ -11,24 +11,24 @@ public class soundCategories {
 	private soundCategories() {
 	}
 
-	@PythonField("master")
+	@PythonField
 	public static final String MASTER = "master";
-	@PythonField("music")
+	@PythonField
 	public static final String MUSIC = "music";
-	@PythonField("record")
+	@PythonField
 	public static final String RECORDS = "record";
-	@PythonField("weather")
+	@PythonField
 	public static final String WEATHER = "weather";
-	@PythonField("block")
+	@PythonField
 	public static final String BLOCKS = "block";
-	@PythonField("hostile")
+	@PythonField
 	public static final String HOSTILE = "hostile";
-	@PythonField("neutral")
+	@PythonField
 	public static final String NEUTRAL = "neutral";
-	@PythonField("players")
+	@PythonField
 	public static final String PLAYERS = "player";
-	@PythonField("ambient")
+	@PythonField
 	public static final String AMBIENT = "ambient";
-	@PythonField("voice")
+	@PythonField
 	public static final String VOICE = "voice";
 }

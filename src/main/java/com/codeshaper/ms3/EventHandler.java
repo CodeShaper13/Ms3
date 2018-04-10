@@ -204,7 +204,7 @@ public class EventHandler {
 	 * if the script isn't found.
 	 * 
 	 * @param player
-	 *            The player who preformed the click.
+	 *            The player who performed the click.
 	 * @param capabilityData
 	 * @param runnableScript
 	 *            The script to try and remove.
@@ -219,6 +219,9 @@ public class EventHandler {
 		}
 	}
 
+	/**
+	 * Sends a message to the sender, as long as sender is not null.
+	 */
 	private void safeSendMessage(@Nullable ICommandSender sender, ITextComponent component) {
 		if (sender != null) {
 			sender.sendMessage(component);

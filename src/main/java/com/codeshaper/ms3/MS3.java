@@ -31,6 +31,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod(modid = Ms3.MOD_ID, name = "Ms3", version = Ms3.VERSION, dependencies = "after:*")
 public class Ms3 {
+	
+	public static boolean DEBUG_MODE = true;
 
 	public static final String MOD_ID = "ms3";
 	/** String identifier for the version.  Changes with every update.  Make sure to update mcmod.info */

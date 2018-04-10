@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonConstructor;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldSpecified;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 import com.codeshaper.ms3.apiBuilder.classGenerator.CGRegisteredNamespace;
@@ -58,7 +59,7 @@ public class ApiBuilder {
 	}
 
 	public void buildApiIfNeeded() {
-		if (Ms3.configManager.getAlwaysRebuild() || !this.doesApiExist()) {
+		if (Ms3.configManager.getAlwaysRebuild() || !this.doesApiExist() || Ms3.DEBUG_MODE) {
 			Logger.msg("Starting Api Building!");
 			this.buildApi();
 			Logger.msg("Finished Api Building!");
@@ -132,7 +133,7 @@ public class ApiBuilder {
 
 		// Add fields.
 		for (Field field : classOfHolder.getDeclaredFields()) {
-			if (field.isAnnotationPresent(PythonField.class)) {
+			if (field.isAnnotationPresent(PythonFieldSpecified.class) || field.isAnnotationPresent(PythonField.class)) {
 				holder.addField(new ModuleField(field));
 			}
 		}

@@ -12,10 +12,8 @@ import org.python.core.PyException;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
 import org.python.core.PyList;
-import org.python.core.PyModule;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
-import org.python.expose.ExposedType;
 
 import com.codeshaper.ms3.api.exception.MissingScriptException;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
@@ -415,6 +413,11 @@ public class entity {
 			}
 			return Py.False;
 		}
+		
+		@Override
+		public PyObject __ne__(PyObject other) {
+			return Util.pyNotHelper(this.__eq__(other));
+		}
 
 		/**
 		 * Used to check that slot indices are in bounds.
@@ -625,17 +628,17 @@ public class entity {
 
 		private static final long serialVersionUID = -9198241601349531102L;
 
-		@PythonField(Boat.TYPE_OAK)
+		@PythonField
 		public static final String TYPE_OAK = "oak";
-		@PythonField(Boat.TYPE_SPRUCE)
+		@PythonField
 		public static final String TYPE_SPRUCE = "spruce";
-		@PythonField(Boat.TYPE_BIRCH)
+		@PythonField
 		public static final String TYPE_BIRCH = "birch";
-		@PythonField(Boat.TYPE_JUNGLE)
+		@PythonField
 		public static final String TYPE_JUNGLE = "jungle";
-		@PythonField(Boat.TYPE_ACACIA)
+		@PythonField
 		public static final String TYPE_ACACIA = "acacia";
-		@PythonField(Boat.TYPE_DARK_OAK)
+		@PythonField
 		public static final String TYPE_DARK_OAK = "dark_oak";
 
 		public Boat(EntityBoat entity) {
@@ -731,27 +734,27 @@ public class entity {
 
 		private static final long serialVersionUID = -5955391820741486510L;
 
-		@PythonField("0")
+		@PythonField
 		public static final int PHASE_CIRCLING = 0;
-		@PythonField("1")
+		@PythonField
 		public static final int PHASE_STRAFING_PLAYER = 1;
-		@PythonField("2")
+		@PythonField
 		public static final int PHASE_LANDING_APPROACH = 2;
-		@PythonField("3")
+		@PythonField
 		public static final int PHASE_LANDING = 3;
-		@PythonField("4")
+		@PythonField
 		public static final int PHASE_TAKEOFF = 4;
-		@PythonField("5")
+		@PythonField
 		public static final int PHASE_SITTING_FLAMING = 5;
-		@PythonField("6")
+		@PythonField
 		public static final int PHASE_SITTING_SCANNING = 6;
-		@PythonField("7")
+		@PythonField
 		public static final int PHASE_SITTING = 7;
-		@PythonField("8")
+		@PythonField
 		public static final int PHASE_CHARGING_PLAYER = 8;
-		@PythonField("9")
+		@PythonField
 		public static final int PHASE_DYING = 9;
-		@PythonField("10")
+		@PythonField
 		public static final int PHASE_HOVER = 10;
 
 		public EnderDragon(EntityDragon entity) {
@@ -992,30 +995,30 @@ public class entity {
 
 		private static final long serialVersionUID = 7147534040184529530L;
 
-		@PythonField("0")
+		@PythonField
 		public static final int COLOR_WHITE = 0;
-		@PythonField("1")
+		@PythonField
 		public static final int COLOR_CREAMY = 1;
-		@PythonField("2")
+		@PythonField
 		public static final int COLOR_CHESTNUT = 2;
-		@PythonField("3")
+		@PythonField
 		public static final int COLOR_BROWN = 3;
-		@PythonField("4")
+		@PythonField
 		public static final int COLOR_BLACK = 4;
-		@PythonField("5")
+		@PythonField
 		public static final int COLOR_GRAY = 5;
-		@PythonField("6")
+		@PythonField
 		public static final int COLOR_DARK_BROWN = 6;
 
-		@PythonField("0")
+		@PythonField
 		public static final int MARKING_NONE = 0;
-		@PythonField("1")
+		@PythonField
 		public static final int MARKING_WHITE = 1;
-		@PythonField("2")
+		@PythonField
 		public static final int MARKING_WHITE_FIELD = 2;
-		@PythonField("3")
+		@PythonField
 		public static final int MARKING_WHITE_DOTS = 3;
-		@PythonField("4")
+		@PythonField
 		public static final int MARKING_BLACK_DOTS = 4;
 
 		public Horse(EntityHorse entity) {
@@ -1086,13 +1089,13 @@ public class entity {
 
 		private static final long serialVersionUID = -3752886054446835931L;
 
-		@PythonField("0")
+		@PythonField
 		public static final int TYPE_WILD = 0;
-		@PythonField("1")
+		@PythonField
 		public static final int TYPE_TUXEDO = 01;
-		@PythonField("2")
+		@PythonField
 		public static final int TYPE_TABBY = 2;
-		@PythonField("3")
+		@PythonField
 		public static final int TYPE_SIAMESE = 3;
 
 		public Ocelot(EntityOcelot entity) {
@@ -1115,57 +1118,57 @@ public class entity {
 		
 		private static final long serialVersionUID = 7791696705579553157L;
 		
-		@PythonField("Kebab")
+		@PythonField
 		public static final String KEBAB = "Kebab";
-		@PythonField("Aztec")
+		@PythonField
 		public static final String AZTEC = "Aztec";
-		@PythonField("Alban")
+		@PythonField
 		public static final String ALBAN = "Alban";
-		@PythonField("Aztec2")
+		@PythonField
 		public static final String AZTEC_2 = "Aztec2";
-		@PythonField("Bomb")
+		@PythonField
 		public static final String BOMB = "Bomb";
-		@PythonField("Plant")
+		@PythonField
 		public static final String PLANT = "Plant";
-		@PythonField("Wasteland")
+		@PythonField
 		public static final String WASTELAND = "Wasteland";
-		@PythonField("Pool")
+		@PythonField
 		public static final String POOL = "Pool";
-		@PythonField("Courbet")
+		@PythonField
 		public static final String COURBET = "Courbet";
-		@PythonField("Sea")
+		@PythonField
 		public static final String SEA = "Sea";
-		@PythonField("Sunset")
+		@PythonField
 		public static final String SUNSET = "Sunset";
-		@PythonField("Creebet")
+		@PythonField
 		public static final String CREEBET = "Creebet";
-		@PythonField("Wanderer")
+		@PythonField
 		public static final String WANDERER = "Wanderer";
-		@PythonField("Graham")
+		@PythonField
 		public static final String GRAHAM = "Graham";
-		@PythonField("Match")
+		@PythonField
 		public static final String MATCH = "Match";
-		@PythonField("Bust")
+		@PythonField
 		public static final String BUST = "Bust";
-		@PythonField("Stage")
+		@PythonField
 		public static final String STAGE = "Stage";
-		@PythonField("Void")
+		@PythonField
 		public static final String VOID = "Void";
-		@PythonField("SkullAndRoses")
+		@PythonField
 		public static final String SKULL_AND_ROSES = "SkullAndRoses";
-		@PythonField("Wither")
+		@PythonField
 		public static final String WITHER = "Wither";
-		@PythonField("Fighters")
+		@PythonField
 		public static final String FIGHTERS = "Fighters";
-		@PythonField("Pointer")
+		@PythonField
 		public static final String POINTER = "Pointer";
-		@PythonField("Pigscene")
+		@PythonField
 		public static final String PIGSCENE = "Pigscene";
-		@PythonField("BurningSkull")
+		@PythonField
 		public static final String BURNING_SKULL = "BurningSkull";
-		@PythonField("Skeleton")
+		@PythonField
 		public static final String SKELETON = "Skeleton";
-		@PythonField("DonkeyKong")
+		@PythonField
 		public static final String DONKEY_KONG = "DonkeyKong";
 
 		public Painting(EntityPainting entity) {
@@ -1196,15 +1199,15 @@ public class entity {
 
 		private static final long serialVersionUID = -8273033504720739347L;
 
-		@PythonField("0")
+		@PythonField
 		public static final int COLOR_RED = 0;
-		@PythonField("1")
+		@PythonField
 		public static final int COLOR_BLUE = 1;
-		@PythonField("2")
+		@PythonField
 		public static final int COLOR_GREEN = 2;
-		@PythonField("3")
+		@PythonField
 		public static final int COLOR_CYAN = 3;
-		@PythonField("4")
+		@PythonField
 		public static final int COLOR_SILVEr = 4;
 
 		public Parrot(EntityParrot entity) {
@@ -1340,19 +1343,19 @@ public class entity {
 
 		private static final long serialVersionUID = 7640215810890520120L;
 
-		@PythonField("0")
+		@PythonField
 		public static final int TYPE_BROWN = 0;
-		@PythonField("1")
+		@PythonField
 		public static final int TYPE_WHITE = 1;
-		@PythonField("2")
+		@PythonField
 		public static final int TYPE_BLACK = 2;
-		@PythonField("3")
+		@PythonField
 		public static final int TYPE_BLACK_WHITE = 3;
-		@PythonField("4")
+		@PythonField
 		public static final int TYPE_GOLD = 4;
-		@PythonField("5")
+		@PythonField
 		public static final int TYPE_SALT_PEPPER = 5;
-		@PythonField("99")
+		@PythonField
 		public static final int TYPE_KILLER = 99;
 
 		public Rabbit(EntityRabbit entity) {
@@ -1521,44 +1524,44 @@ public class entity {
 
 		private Field field;
 
-		@PythonField("0")
+		@PythonField
 		public static final int PROFESSION_FARMER = 0;
-		@PythonField("1")
+		@PythonField
 		public static final int PROFESSION_LIBRARIAN = 1;
-		@PythonField("2")
+		@PythonField
 		public static final int PROFESSION_PRIEST = 2;
-		@PythonField("3")
+		@PythonField
 		public static final int PROFESSION_BLACKSMITH = 3;
-		@PythonField("4")
+		@PythonField
 		public static final int PROFESSION_BUTCHER = 4;
-		@PythonField("5")
+		@PythonField
 		public static final int PROFESSION_NITWIT = 5;
 
-		@PythonField("1")
+		@PythonField
 		public static final int CAREER_FARMER = 1;
-		@PythonField("2")
+		@PythonField
 		public static final int CAREER_FISHERMAN = 2;
-		@PythonField("3")
+		@PythonField
 		public static final int CAREER_SHEPHERD = 3;
-		@PythonField("4")
+		@PythonField
 		public static final int CAREER_FLETCHER = 4;
-		@PythonField("1")
+		@PythonField
 		public static final int CAREER_LIBRARIAN = 1;
-		@PythonField("2")
+		@PythonField
 		public static final int CAREER_CARTOGRAPHER = 2;
-		@PythonField("1")
+		@PythonField
 		public static final int CAREER_CLERIC = 1;
-		@PythonField("1")
+		@PythonField
 		public static final int CAREER_ARMORER = 1;
-		@PythonField("2")
+		@PythonField
 		public static final int CAREER_WEAPON_SMITH = 2;
-		@PythonField("3")
+		@PythonField
 		public static final int CAREER_TOOL_SMITH = 3;
-		@PythonField("1")
+		@PythonField
 		public static final int CAREER_BUTCHER = 1;
-		@PythonField("2")
+		@PythonField
 		public static final int CAREER_LEATHERWORKER = 2;
-		@PythonField("1")
+		@PythonField
 		public static final int CAREER_NITWIT = 1;
 
 		public Villager(EntityVillager entity) {

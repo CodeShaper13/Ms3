@@ -14,112 +14,112 @@ public class particleType extends PyObject {
 	private particleType() {
 	}
 
-	@PythonField("explode")
+	@PythonField
 	public static final String EXPLOSION_NORMAL = "explode";
-	@PythonField("largeexplode")
+	@PythonField
 	public static final String EXPLOSION_LARGE = "largeexplode";
-	@PythonField("hugeexplosion")
+	@PythonField
 	public static final String EXPLOSION_HUGE = "hugeexplosion";
-	@PythonField("fireworkSpark")
+	@PythonField
 	public static final String FIREWORKS_SPARK = "fireworksSpark";
-	@PythonField("bubble")
+	@PythonField
 	public static final String WATER_BUBBLE = "bubble";
-	@PythonField("splash")
+	@PythonField
 	public static final String WATER_SPLASH = "splash";
-	@PythonField("wake")
+	@PythonField
 	public static final String WATER_WAKE = "wake";
-	@PythonField("suspended")
+	@PythonField
 	@PythonDocString("Underwater.")
 	public static final String SUSPENDED = "suspended";
-	@PythonField("depthsuspend")
+	@PythonField
 	public static final String SUSPENDED_DEPTH = "depthsuspend";
-	@PythonField("crit")
+	@PythonField
 	public static final String CRIT = "crit";
-	@PythonField("magicCrit")
+	@PythonField
 	public static final String CRIT_MAGIC = "magicCrit";
-	@PythonField("smoke")
+	@PythonField
 	public static final String SMOKE_NORMAL = "smoke";
-	@PythonField("largesmoke")
+	@PythonField
 	public static final String SMOKE_LARGE = "largesmoke";
-	@PythonField("spell")
+	@PythonField
 	public static final String SPELL = "spell";
-	@PythonField("instantSpell")
+	@PythonField
 	public static final String SPELL_INSTANT = "instantSpell";
-	@PythonField("mobSpell")
+	@PythonField
 	public static final String SPELL_MOB = "mobSpell";
-	@PythonField("mobSpellAmbient")
+	@PythonField
 	public static final String SPELL_MOB_AMBIENT = "mobSpellAmbient";
-	@PythonField("witchMagic")
+	@PythonField
 	public static final String SPELL_WITCH = "witchMagic";
-	@PythonField("dripWater")
+	@PythonField
 	public static final String DRIP_WATER = "dripWater";
-	@PythonField("dripLava")
+	@PythonField
 	public static final String DRIP_LAVA = "dripLava";
-	@PythonField("angryVillager")
+	@PythonField
 	public static final String VILLAGER_ANGRY = "angryVillager";
-	@PythonField("happyVillager")
+	@PythonField
 	public static final String VILLAGER_HAPPY = "happyVillager";
-	@PythonField("townaura")
+	@PythonField
 	@PythonDocString("Caused by Mycelium.")
 	public static final String TOWN_AURA = "townaura";
-	@PythonField("note")
+	@PythonField
 	public static final String NOTE = "note";
-	@PythonField("portal")
+	@PythonField
 	public static final String PORTAL = "portal";
-	@PythonField("enchantmenttable")
+	@PythonField
 	public static final String ENCHANTMENT_TABLE = "enchantmenttable";
-	@PythonField("flame")
+	@PythonField
 	public static final String FLAME = "flame";
-	@PythonField("lava")
+	@PythonField
 	public static final String LAVA = "lava";
-	@PythonField("footstep")
+	@PythonField
 	public static final String FOOTSTEP = "footstep";
-	@PythonField("cloud")
+	@PythonField
 	@PythonDocString("Spawned by Illusion Illagers.")
 	public static final String CLOUD = "cloud";
-	@PythonField("reddust")
+	@PythonField
 	public static final String REDSTONE = "reddust";
-	@PythonField("snowballpoof")
+	@PythonField
 	public static final String SNOWBALL = "snowballpoof";
-	@PythonField("snowshovel")
+	@PythonField
 	public static final String SNOW_SHOVEL = "snowshovel";
-	@PythonField("slime")
+	@PythonField
 	public static final String SLIME = "slime";
-	@PythonField("heart")
+	@PythonField
 	public static final String HEART = "heart";
-	@PythonField("barrier")
+	@PythonField
 	public static final String BARRIER = "barrier";
-	@PythonField("iconcrack")
+	@PythonField
 	@PythonDocString("Takes two args, 1st for the block/item id, 2nd for data value.")
 	public static final String ITEM_CRACK = "iconcrack";
-	@PythonField("blockcrack")
+	@PythonField
 	@PythonDocString("Takes a single arg, the number for a combined block and meta.  Use particleType.getParam() for the number.")
 	public static final String BLOCK_CRACK = "blockcrack";
-	@PythonField("blockdust")
+	@PythonField
 	@PythonDocString("Takes a single arg, the number for a combined block and meta.  Use particleType.getParam() for the number.")
 	public static final String BLOCK_DUST = "blockdust";
-	@PythonField("droplet")
+	@PythonField
 	@PythonDocString("Rain.")
 	public static final String WATER_DROP = "droplet";
-	@PythonField("take")
+	@PythonField
 	public static final String ITEM_TAKE = "take";
-	@PythonField("mobappearance")
+	@PythonField
 	@PythonDocString("Caused by Elder Guardians when they give effects.")
 	public static final String MOB_APPEARANCE = "mobappearance";
-	@PythonField("dragonbreath")
+	@PythonField
 	public static final String DRAGON_BREATH = "dragonbreath";
-	@PythonField("endRod")
+	@PythonField
 	public static final String END_ROD = "endRod";
-	@PythonField("damageIndicator")
+	@PythonField
 	public static final String DAMAGE_INDICATOR = "damageIndicator";
-	@PythonField("sweepAttack")
+	@PythonField
 	public static final String SWEEP_ATTACK = "sweepAttack";
-	@PythonField("fallingdust")
+	@PythonField
 	@PythonDocString("Takes a single arg, the number for a combined block and meta.  Use particleType.getParam() for the number.")
 	public static final String FALLING_DUST = "fallingdust";
-	@PythonField("totem")
+	@PythonField
 	public static final String TOTEM = "totem";
-	@PythonField("spit")
+	@PythonField
 	public static final String SPIT = "spit";
 
 	@PythonFunction

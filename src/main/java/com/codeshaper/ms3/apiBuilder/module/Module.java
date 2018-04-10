@@ -173,7 +173,7 @@ public class Module implements IMemberHolder {
 			if(field.docString != null) {
 				br.write(indent + field.getFormatedDocString() + "\n");
 			}			
-			br.write(indent + field.name + field.getFieldValue() + "\n");
+			br.write(indent + field.name + " = " + field.getFieldValue() + "\n");
 		}
 	}
 

@@ -5,7 +5,7 @@ import org.python.core.PyException;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonConstructor;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldSpecified;
 
 public class exception {
 
@@ -15,7 +15,7 @@ public class exception {
 	@PythonDocString("Thrown from util.scheduleScript when the script can't be found.")
 	public class MissingScriptException extends PyException {
 
-		@PythonField
+		@PythonFieldSpecified
 		@PythonDocString("The path to the missing script from the scripts folder.")
 		public String path;
 		
