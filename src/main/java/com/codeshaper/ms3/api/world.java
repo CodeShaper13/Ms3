@@ -15,7 +15,7 @@ import org.python.core.PyTuple;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonExcludeType;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeExclude;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 
 import net.minecraft.block.Block;
@@ -143,7 +143,7 @@ public class world {
 
 		@PythonFunction
 		@PythonDocString("Spawns an Entity into the World and returns it.  Entity can be an instance of net.minecraft.entity.Entity, PyEntity or it's string name.")
-		public entity.Base<? extends Entity> spawnEntity(@PythonExcludeType @Nonnull Object entityIdentifier, float x, float y, float z, String nbt) {
+		public entity.Base<? extends Entity> spawnEntity(@PythonTypeExclude @Nonnull Object entityIdentifier, float x, float y, float z, String nbt) {
 			// Get a string identifier for the entity from the passed argument.
 			String entityStringName = null;
 			if (entityIdentifier instanceof Entity) {

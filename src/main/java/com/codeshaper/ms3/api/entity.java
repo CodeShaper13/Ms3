@@ -9,18 +9,17 @@ import javax.annotation.Nullable;
 import org.python.core.Py;
 import org.python.core.PyBoolean;
 import org.python.core.PyException;
-import org.python.core.PyFloat;
-import org.python.core.PyInteger;
 import org.python.core.PyList;
 import org.python.core.PyObject;
+import org.python.core.PySequence;
 import org.python.core.PyTuple;
 
 import com.codeshaper.ms3.api.exception.MissingScriptException;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonExcludeType;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeExclude;
 import com.codeshaper.ms3.capability.EntityMs3DataProvider;
 import com.codeshaper.ms3.capability.IEntityMs3Data;
 import com.codeshaper.ms3.util.NbtHelper;
@@ -71,6 +70,7 @@ import net.minecraft.entity.passive.EntityZombieHorse;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
@@ -119,7 +119,7 @@ public class entity {
 			return entity.instance.new ItemEntity((EntityItem) javaEntity);
 		} else if (javaEntity instanceof EntityOcelot) {
 			return entity.instance.new Ocelot((EntityOcelot) javaEntity);
-		} else if(javaEntity instanceof EntityPainting) {
+		} else if (javaEntity instanceof EntityPainting) {
 			return entity.instance.new Painting((EntityPainting) javaEntity);
 		} else if (javaEntity instanceof EntityParrot) {
 			return entity.instance.new Parrot((EntityParrot) javaEntity);
@@ -135,7 +135,7 @@ public class entity {
 			return entity.instance.new Shulker((EntityShulker) javaEntity);
 		} else if (javaEntity instanceof EntitySkeletonHorse) {
 			return entity.instance.new SkeletonHorse((EntitySkeletonHorse) javaEntity);
-		} else if(javaEntity instanceof EntityTNTPrimed) {
+		} else if (javaEntity instanceof EntityTNTPrimed) {
 			return entity.instance.new Tnt((EntityTNTPrimed) javaEntity);
 		} else if (javaEntity instanceof EntitySlime || javaEntity instanceof EntityMagmaCube) {
 			return entity.instance.new Slime((EntitySlime) javaEntity);
@@ -157,7 +157,7 @@ public class entity {
 			return entity.instance.new Tameable<EntityTameable>((EntityTameable) javaEntity);
 		} else if (javaEntity instanceof EntityAnimal) {
 			return entity.instance.new Animal<EntityAnimal>((EntityAnimal) javaEntity);
-		} else if(javaEntity instanceof EntityHanging) {
+		} else if (javaEntity instanceof EntityHanging) {
 			return entity.instance.new Hanging<EntityHanging>((EntityHanging) javaEntity);
 		} else if (javaEntity instanceof EntityLiving) {
 			return entity.instance.new Living<EntityLiving>((EntityLiving) javaEntity);
@@ -175,7 +175,7 @@ public class entity {
 	public class Base<T extends Entity> extends PyObject {
 
 		private static final long serialVersionUID = 4773038377439473236L;
-		
+
 		public T mcEntity;
 
 		public Base(T entity) {
@@ -189,25 +189,25 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the entity's name as seen in entityList.py.")
+		@PythonDocString("Returns the entity's name as a string as seen in entityList.py.")
 		public String getMobName() {
 			return EntityList.getKey(this.mcEntity).getResourcePath();
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the Entity's X position.")
+		@PythonDocString("Returns the Entity's X position as a float.")
 		public double getX() {
 			return this.mcEntity.posX;
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the Entity's Y position.")
+		@PythonDocString("Returns the Entity's Y position as a float.")
 		public double getY() {
 			return this.mcEntity.posY;
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the Entity's Z position.")
+		@PythonDocString("Returns the Entity's Z position as a float.")
 		public double getZ() {
 			return this.mcEntity.posZ;
 		}
@@ -215,20 +215,19 @@ public class entity {
 		@PythonFunction
 		@PythonDocString("Returns the Entity's position as a tuple.")
 		public PyTuple getPosition() {
-			return new PyTuple(new PyFloat(this.getX()), new PyFloat(this.getY()), new PyFloat(this.getZ()));
+			return Util.makeTuple(this.getX(), this.getY(), this.getZ());
 		}
 
 		@PythonFunction
 		@PythonDocString("Returns the Entity's rotation as a tuple of (yaw, pitch).")
 		public PyTuple getRotation() {
-			return new PyTuple(new PyFloat(this.mcEntity.rotationYaw), new PyFloat(this.mcEntity.rotationPitch));
+			return Util.makeTuple(this.mcEntity.rotationYaw, this.mcEntity.rotationPitch);
 		}
 
 		@PythonFunction
 		@PythonDocString("Returns the Entity's motion as a tuple.")
 		public PyTuple getMotion() {
-			return new PyTuple(new PyFloat(this.mcEntity.motionX), new PyFloat(this.mcEntity.motionY),
-					new PyFloat(this.mcEntity.motionZ));
+			return Util.makeTuple(this.mcEntity.motionX, this.mcEntity.motionY, this.mcEntity.motionZ);
 		}
 
 		@PythonFunction
@@ -300,6 +299,7 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("If True, the Entity's name will always be visible, if False, the cursor must be on them to see their name.")
 		public void setCustomNameVisible(boolean alwaysRenderNameTag) {
 			this.mcEntity.setAlwaysRenderNameTag(alwaysRenderNameTag);
 		}
@@ -324,7 +324,7 @@ public class entity {
 
 		@PythonFunction
 		@PythonDocString("Sets an NBT tag for the entity.  For byte tags that represtend boolean values 1/0, \"true\"/\"false\" or True/False will work.  For nested tags type them like you would for the /entitydata command, but without the beginning and ending curly braces {}")
-		public void setTag(String tagKey, @PythonExcludeType Object value) {
+		public void setTag(String tagKey, @PythonTypeExclude Object value) {
 			NBTTagCompound nbttagcompound = CommandBase.entityToNBT(this.mcEntity);
 			NBTTagCompound nbtTagCopy = nbttagcompound.copy();
 			NBTTagCompound nbttagcompound2;
@@ -347,20 +347,27 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Sends a message to the entity.  For Players this will show up in chat for them.")
-		public void sendMessage(String message) {
-			this.mcEntity.sendMessage(new TextComponentString(message.replace('&', Util.SECTION_SIGN)));
+		@PythonDocString("Sends a chat message to the Entity.  For Players this will show up in chat for them.")
+		public void sendChatMessage(String message) {
+			this.mcEntity.sendMessage(new TextComponentString(Util.correctColorCode(message)));
 		}
 
 		@PythonFunction
-		@PythonDocString("Binds a script to the entity, so it will execute every tick.")
+		@PythonDocString("Binds a script to this Entity, so it will execute every tick.")
 		public void bindScript(String scriptPath, @Nullable PyList args) throws PyException, MissingScriptException {
 			IEntityMs3Data bs = this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
 			bs.addScript(scriptPath, args);
 		}
 
 		@PythonFunction
-		@PythonDocString("Removes all scripts that are bound to this entity.")
+		@PythonDocString("Searches every script bound to this entity and calls all functions with the passed name with the passed args.")
+		public void call(String functionName, PyObject... args) {
+			IEntityMs3Data bs = this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
+			// TODO
+		}
+
+		@PythonFunction
+		@PythonDocString("Removes all scripts that are bound to this Entity.")
 		public void clearAllBoundScripts() {
 			IEntityMs3Data bs = this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
 			bs.setClearMethodCall();
@@ -379,7 +386,7 @@ public class entity {
 
 		@PythonFunction
 		@PythonDocString("Sets a custom property, overriding the previous one if it exists.  Pass None for value to remove the property.")
-		public void setProperty(String propertyName, @PythonExcludeType Object value) {
+		public void setProperty(String propertyName, @PythonTypeExclude Object value) {
 			if (StringUtils.isNullOrEmpty(propertyName)) {
 				throw Py.ValueError("propertyName may not be None or empty");
 			}
@@ -397,7 +404,7 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("")
+		@PythonDocString("If true the Entity is still alive and isn't in the process of dying.")
 		public boolean isAlive() {
 			return this.mcEntity.isEntityAlive();
 		}
@@ -413,7 +420,7 @@ public class entity {
 			}
 			return Py.False;
 		}
-		
+
 		@Override
 		public PyObject __ne__(PyObject other) {
 			return Util.pyNotHelper(this.__eq__(other));
@@ -425,7 +432,7 @@ public class entity {
 		 * @param index
 		 * @param upperSize
 		 */
-		protected void func_05(int index, int upperSize) {
+		protected void throwIfNotInBounds(int index, int upperSize) {
 			if (index < 0 || index > upperSize) {
 				throw Py.ValueError(
 						"Index is invalid, it must be between 0 and " + upperSize + " inclusive and was " + index);
@@ -502,29 +509,30 @@ public class entity {
 		}
 
 		@PythonFunction
-		public void setLeftHanded(boolean leftHanded) {
-			this.mcEntity.setLeftHanded(leftHanded);
+		@PythonDocString("Sets the Entity's dominate hand.")
+		public void setLeftHanded(boolean isLeftHanded) {
+			this.mcEntity.setLeftHanded(isLeftHanded);
 		}
 
 		@PythonFunction
-		@PythonDocString("See equipmentSlot.py for index constants.")
+		@PythonDocString("Returns an itemStack representing the contents of the slot, or None if it is empty.  See equipmentSlot.py for index constants.")
 		@Override
-		public PyTuple getSlotContents(int slotIndex) {
-			this.func_05(slotIndex, 6);
-			return itemUtils
-					.tupleFromItemStack(this.mcEntity.getItemStackFromSlot(equipmentSlot.indexToEnum(slotIndex)));
+		@Nullable
+		public itemStack getSlotContents(int slotIndex) {
+			this.throwIfNotInBounds(slotIndex, 6);
+			return itemStack.make(this.mcEntity.getItemStackFromSlot(equipmentSlot.indexToEnum(slotIndex)));
 		}
 
 		@PythonFunction
-		@PythonDocString("See equipmentSlot.py for index constants.")
+		@PythonDocString("Sets the contents of a slot.  Pass None for the itemStack to set the slot to be empty.  See equipmentSlot.py for index constants.")
 		@Override
-		public void setSlotContents(int slotIndex, @Nullable PyTuple itemStack) {
-			this.func_05(slotIndex, 6);
+		public void setSlotContents(int slotIndex, @Nullable itemStack itemStack) {
+			this.throwIfNotInBounds(slotIndex, 6);
 			ItemStack s;
-			if (itemStack == null) {
+			if (itemStack == null || itemStack.getCount() <= 0) {
 				s = ItemStack.EMPTY;
 			} else {
-				s = itemUtils.itemStackFromTuple(itemStack);
+				s = itemStack.getMcStack();
 			}
 			this.mcEntity.setItemStackToSlot(equipmentSlot.indexToEnum(slotIndex), s);
 		}
@@ -543,13 +551,14 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns true if the Entity's \"InLove\" tag is greater than 0, meaning it is still trying to breed.")
 		public boolean isInLove() {
 			return this.mcEntity.isInLove();
 		}
 
 		@PythonFunction
-		@PythonDocString("entityPlayer is whoever set the entity into love, used for achievements and stats.  Pass an instance of entity.Player, net.minecraft.entity.player.EntityPlayer or None.")
-		public void setInLove(@Nullable @PythonExcludeType Object entityPlayer) {
+		@PythonDocString("Sets the Entity's \\\"InLove\\\" tag to 600, causing it to try and breed for that many ticks.  entityPlayer is whoever set the entity into love, used for achievements and stats.  Pass an instance of entity.Player, net.minecraft.entity.player.EntityPlayer or None.")
+		public void setInLove(@Nullable @PythonTypeExclude Object entityPlayer) {
 			if (entityPlayer instanceof EntityPlayer) {
 				this.mcEntity.setInLove((EntityPlayer) entityPlayer);
 			} else if (entityPlayer instanceof Player) {
@@ -560,11 +569,13 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the Entity's age as an int.")
 		public int getAge() {
 			return this.mcEntity.getGrowingAge();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the Entity's age.  If the age is negative, the mob is a baby and it is incremented every tick until the mob grows up.  If age is above 0, that's how many ticks until the mob can breed again and it is decremented every tick..")
 		public void setAge(int age) {
 			this.mcEntity.setGrowingAge(age);
 		}
@@ -582,21 +593,13 @@ public class entity {
 		}
 
 		@PythonFunction
-		public boolean isNoGravity() {
-			return this.mcEntity.hasNoGravity();
-		}
-
-		@PythonFunction
-		public void setNoGravity(boolean noGravity) {
-			this.mcEntity.setNoGravity(noGravity);
-		}
-
-		@PythonFunction
-		public boolean isNoBaseplate() {
+		@PythonDocString("Returns True if the Armor Stand has no base plate, False if it does.")
+		public boolean hasNoBaseplate() {
 			return this.mcEntity.hasNoBasePlate();
 		}
 
 		@PythonFunction
+		@PythonDocString("If True, the Armor Stand will have a size of 0, a tiny hitbox interactions will be disabled.")
 		public boolean isMarker() {
 			return this.mcEntity.hasMarker();
 		}
@@ -612,12 +615,13 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns True if the bat is hanging from a block, False if it is flying.")
 		public boolean isHanging() {
 			return this.mcEntity.getIsBatHanging();
 		}
 
 		@PythonFunction
-		@PythonDocString("Sets tag \"BatFlags\" to 1 for True, or 0 for False.")
+		@PythonDocString("Sets if the Bat is hanging from a block.")
 		public void setHanging(boolean isHanging) {
 			this.mcEntity.setIsBatHanging(isHanging);
 		}
@@ -646,12 +650,13 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Sets the boats type.  Defaults to 'oak' if the name is invalid.")
+		@PythonDocString("Sets the Boat's type.  Defaults to 'oak' if the name is invalid.")
 		public void setBoatType(String type) {
 			this.mcEntity.setBoatType(EntityBoat.Type.getTypeFromString(type));
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the name identifier of the Boat's type.")
 		public String getBoatType() {
 			return this.mcEntity.getBoatType().getName();
 		}
@@ -700,10 +705,11 @@ public class entity {
 
 		@PythonFunction
 		public boolean isCharged() {
-			return (boolean) this.getTag("powered");
+			return this.mcEntity.getPowered();
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns True if the Creeper is charged, False otherwise.")
 		public void setCharged(boolean ignited) {
 			this.setTag("powered", ignited);
 		}
@@ -714,6 +720,7 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the explosion radius of the Creeper.  The default is 3.")
 		public void setExplosionRadius(int radius) {
 			this.setTag("ExplosionRadius", radius);
 		}
@@ -724,6 +731,7 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets if the Creeper has been ignited and is about to explode.")
 		public void setIgnited(boolean ignited) {
 			this.setTag("ignited", ignited);
 		}
@@ -737,10 +745,12 @@ public class entity {
 		@PythonField
 		public static final int PHASE_CIRCLING = 0;
 		@PythonField
+		@PythonDocString("The Dragon is about to shoot a fireball.")
 		public static final int PHASE_STRAFING_PLAYER = 1;
 		@PythonField
 		public static final int PHASE_LANDING_APPROACH = 2;
 		@PythonField
+		@PythonDocString("The Dragon has landed on the portal.")
 		public static final int PHASE_LANDING = 3;
 		@PythonField
 		public static final int PHASE_TAKEOFF = 4;
@@ -753,8 +763,10 @@ public class entity {
 		@PythonField
 		public static final int PHASE_CHARGING_PLAYER = 8;
 		@PythonField
+		@PythonDocString("Flying to portal to die.")
 		public static final int PHASE_DYING = 9;
 		@PythonField
+		@PythonDocString("Hovering with no AI. (Default when summoned via /summon)")
 		public static final int PHASE_HOVER = 10;
 
 		public EnderDragon(EntityDragon entity) {
@@ -762,11 +774,13 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the Ender Dragons current attack phase as an int.")
 		public int getPhase() {
 			return this.mcEntity.getPhaseManager().getCurrentPhase().getType().getId();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the Ender Dragons current attack phase.")
 		public void setPhase(int phase) {
 			this.mcEntity.getPhaseManager().setPhase(PhaseList.getById(phase));
 		}
@@ -783,29 +797,29 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns an item stack tuple of what it's carrying, or None if it isn't carrying anything.")
+		@PythonDocString("Returns an itemStack of what the Enderman is carrying, or None if it isn't carrying anything.")
 		@Nullable
-		public PyTuple getCarried() {
+		public itemStack getCarried() {
 			IBlockState state = this.mcEntity.getHeldBlockState();
 			if (state != null) {
 				Block block = state.getBlock();
-				return itemUtils.tupleFromItemStack(new ItemStack(block, 1, block.getMetaFromState(state)));
+				return itemStack.make(new ItemStack(block, 1, block.getMetaFromState(state)));
 			} else {
 				return null;
 			}
 		}
 
 		@PythonFunction
-		@PythonDocString("Sets the Enderman's carried block, taking an item stack tuple, or None if it shouldn't carry anything.")
+		@PythonDocString("Sets the Enderman's carried block.  Pass an itemStack to set the held block, or None if it shouldn't carry anything.")
 		@Nullable
-		public void setCarried(PyTuple tuple) {
-			if (tuple == null) {
+		public void setCarried(itemStack stack) {
+			if (stack == null) {
 				this.mcEntity.setHeldBlockState(null);
 			} else {
-				ItemStack stack = itemUtils.itemStackFromTuple(tuple);
-				if (stack.getItem() instanceof ItemBlock) {
-					ItemBlock ib = (ItemBlock) stack.getItem();
-					this.mcEntity.setHeldBlockState(ib.getBlock().getStateFromMeta(stack.getMetadata()));
+				Item i = stack.getMcStack().getItem();
+				if (i instanceof ItemBlock) {
+					ItemBlock ib = ((ItemBlock) i);
+					this.mcEntity.setHeldBlockState(ib.getBlock().getStateFromMeta(stack.getMeta()));
 				} else {
 					throw Py.ValueError("Enderman can not carry items, only blocks");
 				}
@@ -823,11 +837,13 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets if the Endermite is player spawned.")
 		public boolean isPlayerSpawned() {
 			return this.mcEntity.isSpawnedByPlayer();
 		}
 
 		@PythonFunction
+		@PythonDocString("If true, Endermen will attack this Endermite.")
 		public void setPlayerSpawned(boolean spawnedByPlayer) {
 			this.mcEntity.setSpawnedByPlayer(spawnedByPlayer);
 		}
@@ -845,11 +861,13 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the Ghast's fireball strength as an int.")
 		public int getExplosionRadius() {
 			return this.mcEntity.getFireballStrength();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the Ghast's fireball explosion radius.  The default is 1.")
 		public void setExplosionRadius(int power) {
 			this.setTag("ExplosionPower", power);
 		}
@@ -871,18 +889,22 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns a tuple representing the stack as (itemName, count, meta).")
-		public PyTuple getStack() {
-			return itemUtils.tupleFromItemStack(this.mcEntity.getItem());
+		@PythonDocString("Returns an itemStack representing the stack.")
+		public itemStack getStack() {
+			return itemStack.make(this.mcEntity.getItem());
 		}
 
 		@PythonFunction
-		public void setStack(PyTuple stack) {
-			this.mcEntity.setItem(itemUtils.itemStackFromTuple(stack));
+		@PythonDocString("Sets the Item Stack that this entity represents.")
+		public void setStack(itemStack stack) {
+			if (stack == null) {
+				throw Py.ValueError("stack can not be None");
+			}
+			this.mcEntity.setItem(stack.getMcStack());
 		}
 
 		@PythonFunction
-		@PythonDocString("Sets the item's PickupDelay to 32767 to stop it from being able to be picked up.")
+		@PythonDocString("Sets the item's pickup delay to 32767 to stop it from being able to be picked up.")
 		public void setInfinitePickupDelay() {
 			this.mcEntity.setInfinitePickupDelay();
 		}
@@ -907,51 +929,59 @@ public class entity {
 		}
 
 		@PythonFunction
-		public boolean isBreeding() {
+		public boolean isBreed() {
 			return this.mcEntity.isBreeding();
 		}
 
 		@PythonFunction
-		public void setBreeding(boolean breeding) {
-			this.mcEntity.setBreeding(breeding);
+		public void setBreed(boolean breed) {
+			this.mcEntity.setBreeding(breed);
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns True if the Horse is grazing the ground.  Used for animations.")
 		public boolean isEatingHaystack() {
 			return this.mcEntity.isEatingHaystack();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets if the Horse is grazing.  Used for animations.")
 		public void setEatingHaystack(boolean eating) {
 			this.mcEntity.setEatingHaystack(eating);
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns True if the Horse is taimed, False if it is not.")
 		public boolean isTame() {
 			return this.mcEntity.isTame();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets if the Horse is tamed.")
 		public void setTamed(boolean tamed) {
 			this.mcEntity.setHorseTamed(tamed);
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the Horse's temper as an int.")
 		public int getTemper() {
 			return this.mcEntity.getTemper();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the Horse's temper.  Higher values make it easier to tame.")
 		public void setTemper(int temper) {
 			this.mcEntity.setTemper(temper);
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns True if the Horse is wearing a saddle, False if it isn't.")
 		public boolean isSaddled() {
 			return this.mcEntity.isHorseSaddled();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets if the Horse is wearing a saddle.")
 		public void setSaddled(boolean saddled) {
 			this.mcEntity.setHorseSaddled(saddled);
 		}
@@ -959,7 +989,11 @@ public class entity {
 		// TODO Armor.
 	}
 
+	/**
+	 * Equivalent to {@link net.minecraft.entity.EntityHanging}.
+	 */
 	@PythonClass
+	@PythonDocString("Class to represent Entities that hang on a wall.")
 	public class Hanging<T extends EntityHanging> extends Base<T> {
 
 		private static final long serialVersionUID = -8908455875060292148L;
@@ -969,27 +1003,34 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the Entity's direction as an int.  0 = south, 1 = west, 2 = north, 3 = east.")
 		public int getFacing() {
 			return this.mcEntity.facingDirection.getHorizontalIndex();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the direction that the Entity is facing.  0 = south, 1 = west, 2 = north, 3 = east.")
 		public void setFacing(int facing) {
 			this.setTag("Facing", EnumFacing.getHorizontal(facing));
 		}
-		
+
 		@PythonFunction
+		@PythonDocString("Returns the Entity's hanging position as a tuple of (x, y, z).")
 		public PyTuple getTilePos() {
-			BlockPos p = this.mcEntity.getHangingPosition();
-			return new PyTuple(new PyInteger(p.getX()), new PyInteger(p.getY()), new PyInteger(p.getZ()));
+			BlockPos pos = this.mcEntity.getHangingPosition();
+			return Util.makeTuple(pos.getX(), pos.getY(), pos.getZ());
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the hanging position of the Entity.")
 		public void setTilePos(int x, int y, int z) {
-			this.mcEntity.setPosition(x, y, z);
+			this.mcEntity.setPosition(x, y, z); // Sets hanging position in method.
 		}
 	}
-	
+
+	/**
+	 * Equivalent to {@link net.minecraft.entity.passive.EntityHorse}
+	 */
 	@PythonClass
 	public class Horse extends GenericHorse<EntityHorse> {
 
@@ -1026,22 +1067,25 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the Horse's variant as an int.")
 		public int getVariant() {
 			return this.mcEntity.getHorseVariant();
 		}
 
 		@PythonFunction
-		@PythonDocString("Use computeVariantFlag to get a variant to pass in.")
+		@PythonDocString("Sets the Horse's variant.  Use computeVariantFlag to get a variant to pass in.")
 		public void setVariant(int variant) {
 			this.mcEntity.setHorseVariant(variant);
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns a variant from a color and markings.  Algorithm (color | markings << 8)")
+		@PythonDocString("Returns a variant from a color and marking.  Algorithm, (color | markings << 8)")
 		public int computeVariantFlag(int color, int markings) {
 			int variant = color | markings << 8;
 			return variant;
 		}
+
+		// TODO method to get the variant and markings from the flag?
 	}
 
 	@PythonClass
@@ -1054,12 +1098,14 @@ public class entity {
 		}
 
 		@PythonFunction
-		public boolean isChestedHorse() {
+		@PythonDocString("Returns True if the Horse has a chest.")
+		public boolean isCarryingChest() {
 			return this.mcEntity.hasChest();
 		}
 
 		@PythonFunction
-		public void setChestedHorse(boolean chested) {
+		@PythonDocString("Sets if the Horse is carrying a chest.")
+		public void setCarryingChest(boolean chested) {
 			this.mcEntity.setChested(chested);
 		}
 	}
@@ -1074,11 +1120,13 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns True if the horse is a Skeleton Trap Horse, False if it isn't.")
 		public boolean isSkeletonTrap() {
 			return this.mcEntity.isTrap();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the Skeleton Horse to be a trapped horse.")
 		public void setSkeletonTrap(boolean isTrapped) {
 			this.mcEntity.setTrap(isTrapped);
 		}
@@ -1103,11 +1151,13 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the Cat's type as an int.")
 		public int getCatType() {
 			return this.mcEntity.getTameSkin();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the Cat's type.")
 		public void setCatType(int catType) {
 			this.mcEntity.setTameSkin(catType);
 		}
@@ -1115,9 +1165,9 @@ public class entity {
 
 	@PythonClass
 	public class Painting extends Hanging<EntityPainting> {
-		
+
 		private static final long serialVersionUID = 7791696705579553157L;
-		
+
 		@PythonField
 		public static final String KEBAB = "Kebab";
 		@PythonField
@@ -1176,12 +1226,13 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the name of the art as a string.")
+		@PythonDocString("Returns the name of the Painting's art as a string.")
 		public String getArtName() {
 			return this.mcEntity.art.title;
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the art on the Painting to the passed name, or to " + KEBAB + " if the name is invalid.")
 		public void setArt(String artName) {
 			for (EntityPainting.EnumArt art : EntityPainting.EnumArt.values()) {
 				if (art.title.equals(artName)) {
@@ -1215,11 +1266,13 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the Parrots variant as in int.")
 		public int getVariant() {
 			return this.mcEntity.getVariant();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the Parrot's variant.")
 		public void setVariant(int variant) {
 			this.mcEntity.setVariant(variant);
 		}
@@ -1235,11 +1288,13 @@ public class entity {
 		}
 
 		@PythonFunction
-		public boolean getSaddled() {
+		@PythonDocString("Returns True if the Pig is saddled, False if it isn't.")
+		public boolean isSaddled() {
 			return this.mcEntity.getSaddled();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets if the Pig is wearing a saddle.")
 		public void setSaddled(boolean saddled) {
 			this.mcEntity.setSaddled(saddled);
 		}
@@ -1261,75 +1316,77 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the held item of the player, or None if they're not holding anything.  Same as getSlotContents with a slotIndex of 0")
-		public PyTuple getHeldStack() {
-			return itemUtils.tupleFromItemStack(this.mcEntity.inventory.getCurrentItem());
+		@PythonDocString("Returns the held item of the player as an itemStack, or None if they're not holding anything.  Same as getSlotContents with a slotIndex of 0")
+		public itemStack getHeldStack() {
+			return itemStack.make(this.mcEntity.inventory.getCurrentItem());
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns a piece or armor, held item or offhand item.")
+		@PythonDocString("Returns a piece or armor, held item or off hand item as an itemStack.")
 		@Override
-		public PyTuple getSlotContents(int slotIndex) {
-			this.func_05(slotIndex, 6);
-			return itemUtils
-					.tupleFromItemStack(this.mcEntity.getItemStackFromSlot(equipmentSlot.indexToEnum(slotIndex)));
+		public itemStack getSlotContents(int slotIndex) {
+			this.throwIfNotInBounds(slotIndex, 6);
+			return itemStack.make(this.mcEntity.getItemStackFromSlot(equipmentSlot.indexToEnum(slotIndex)));
 		}
 
 		@PythonFunction
 		@PythonDocString("Sets a piece or armor, held item or offhand item.")
 		@Override
-		public void setSlotContents(int slotIndex, PyTuple itemStack) {
-			this.func_05(slotIndex, 6);
-			this.mcEntity.setItemStackToSlot(equipmentSlot.indexToEnum(slotIndex),
-					itemUtils.itemStackFromTuple(itemStack));
+		public void setSlotContents(int slotIndex, itemStack stack) {
+			this.throwIfNotInBounds(slotIndex, 6);
+			this.mcEntity.setItemStackToSlot(equipmentSlot.indexToEnum(slotIndex), stack.getMcStack());
 			this.mcEntity.inventoryContainer.detectAndSendChanges();
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns an item stack in the player's main inventory.  slotIndex is 0-35 inclusive.")
-		public PyTuple getInventoryStack(int slotIndex) {
-			this.func_05(slotIndex, 36);
-			return itemUtils.tupleFromItemStack(this.mcEntity.inventory.mainInventory.get(slotIndex));
+		@PythonDocString("Returns an itemStack in the player's main inventory.  slotIndex is 0-35 inclusive.")
+		public itemStack getInventoryStack(int slotIndex) {
+			this.throwIfNotInBounds(slotIndex, 36);
+			return itemStack.make(this.mcEntity.inventory.mainInventory.get(slotIndex));
 		}
 
 		@PythonFunction
-		@PythonDocString("Sets an item stack in the player's main inventory.  slotIndex is 0-35 inclusive.")
-		public void setInventoryStack(int slotIndex, PyTuple itemStack) {
-			this.func_05(slotIndex, 36);
-			this.mcEntity.inventory.mainInventory.set(slotIndex, itemUtils.itemStackFromTuple(itemStack));
+		@PythonDocString("Sets an itemStack in the player's main inventory.  slotIndex is 0-35 inclusive.")
+		public void setInventoryStack(int slotIndex, itemStack stack) {
+			this.throwIfNotInBounds(slotIndex, 36);
+			this.mcEntity.inventory.mainInventory.set(slotIndex, stack.getMcStack());
 			this.mcEntity.inventoryContainer.detectAndSendChanges();
 		}
 
 		@PythonFunction
-		@PythonDocString("Adds an item stack to the player's main inventory.  Returns the leftover items that couldn't be added, or None if all the items were added.")
-		public PyTuple addItemStack(PyTuple itemStack) {
-			this.mcEntity.inventory.addItemStackToInventory(itemUtils.itemStackFromTuple(itemStack));
-			return itemStack;
+		@PythonDocString("Adds an itemStack to the player's main inventory.  Returns the leftover items that couldn't be added, or None if all the items were added.")
+		public itemStack addItemStack(itemStack stack) {
+			this.mcEntity.inventory.addItemStackToInventory(stack.getMcStack());
+			return stack;
 		}
 
 		@PythonFunction
 		@PythonDocString("Returns true if the passed itemStack is in the player's main inventory.")
-		public boolean hasItemStack(PyTuple itemStack) {
-			return this.mcEntity.inventory.hasItemStack(itemUtils.itemStackFromTuple(itemStack));
+		public boolean hasItemStack(itemStack stack) {
+			return this.mcEntity.inventory.hasItemStack(stack.getMcStack());
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns how much food the Player has left as an int.")
 		public int getFood() {
 			return this.mcEntity.getFoodStats().getFoodLevel();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the Player's food level.")
 		public void setFood(int foodLevel) {
 			this.mcEntity.getFoodStats().setFoodLevel(foodLevel);
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the Player's game mode as an int.")
 		public int getGameMode() {
 			this.mcEntity.interactionManager.getGameType().getID();
 			return 0;
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the Player's game mode.  0 = Survival, 1 = Creative, 2 = Adventure, 3 = Spectator.")
 		public void setGameMode(int gamemode) {
 			if (gamemode < 0 || gamemode > 3) {
 				throw Py.ValueError("game mode must be between 0 and 3");
@@ -1363,11 +1420,13 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the Rabbit's type as an int.")
 		public int getRabbitType() {
 			return this.mcEntity.getRabbitType();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the Rabbit's type.")
 		public void setRabbitType(int rabbitType) {
 			this.mcEntity.setRabbitType(rabbitType);
 		}
@@ -1393,11 +1452,13 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns True if the Sheep is sheared, False if it has wool.")
 		public boolean isSheared() {
 			return this.mcEntity.getSheared();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets if the Sheep has been sheared.")
 		public void setSheared(boolean isSheared) {
 			this.mcEntity.setSheared(isSheared);
 		}
@@ -1413,11 +1474,13 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the color ID of the Shulker.")
 		public int getColor() {
 			return this.mcEntity.getColor().getMetadata();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the color ID of the Shulker.")
 		public void setColor(int color) {
 			this.setTag("Color", color);
 		}
@@ -1433,12 +1496,13 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Sets the slime's size. 0, 1 and 3 are the default sizes.")
+		@PythonDocString("Returns the slime's size.")
 		public int getSize() {
 			return this.mcEntity.getSlimeSize();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the slime's size. 0, 1 and 3 are the default sizes.")
 		public void setSize(int size) {
 			this.setTag("Size", size);
 		}
@@ -1454,12 +1518,14 @@ public class entity {
 		}
 
 		@PythonFunction
-		public boolean getPumpkin() {
+		@PythonDocString("Returns True if the Snowman is wearing a pumpkin, False if it is not.")
+		public boolean isWearingPumpkin() {
 			return this.mcEntity.isPumpkinEquipped();
 		}
 
 		@PythonFunction
-		public void setPumpkin(boolean pumpkinEquipped) {
+		@PythonDocString("Sets if the Snowman is wearing a pumpkin.")
+		public void setWearingPumpkin(boolean pumpkinEquipped) {
 			this.mcEntity.setPumpkinEquipped(pumpkinEquipped);
 		}
 	}
@@ -1474,18 +1540,20 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns True if the Entity is sitting, false if it is not.")
 		public boolean isSitting() {
 			return this.mcEntity.isSitting();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets if the Entity is sitting or not.")
 		public void setSitting(boolean isSitting) {
 			this.mcEntity.setSitting(isSitting);
 		}
 
 		@PythonFunction
-		@PythonDocString("Sets the Player who owns this Entity.  Must be an instance of entity.Player or net.minecraft.entity.player.EntityPlayer")
-		public void setOwner(@PythonExcludeType Object owner) {
+		@PythonDocString("Sets the Player who owns the Entity.  Must be an instance of entity.Player or net.minecraft.entity.player.EntityPlayer")
+		public void setOwner(@PythonTypeExclude Object owner) {
 			if (owner instanceof EntityPlayer) {
 				this.mcEntity.setTamedBy((EntityPlayer) owner);
 			} else if (owner instanceof Player) {
@@ -1496,7 +1564,7 @@ public class entity {
 			}
 		}
 	}
-	
+
 	@PythonClass
 	public class Tnt extends Base<EntityTNTPrimed> {
 
@@ -1507,11 +1575,13 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns how many ticks until the Tnt explodes.")
 		public int getFuse() {
 			return this.mcEntity.getFuse();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets how many tick until the Tnt explodes.  Default is 80 ticks or 4 seconds..")
 		public void setFuse(int fuse) {
 			this.mcEntity.setFuse(fuse);
 		}
@@ -1569,21 +1639,25 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the ID of the Villager's profession.")
 		public int getProfession() {
 			return this.mcEntity.getProfession();
 		}
 
 		@PythonFunction
-		public void setProfession(int profession) {
-			this.mcEntity.setProfession(profession);
+		@PythonDocString("Sets the Villager's profession.")
+		public void setProfession(int professionId) {
+			this.mcEntity.setProfession(professionId);
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the ID of the Villager's career.")
 		public int getCareer() {
 			return (int) this.getTag("Career");
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the Villager's career.")
 		public void setCareer(int career) {
 			this.setTag("Career", career);
 			this.addNewTrade(null, null);
@@ -1591,24 +1665,24 @@ public class entity {
 
 		@PythonFunction
 		@PythonDocString("Adds a new trade to the Villager.  Item stacks are represented as tuples like (item_id, [optional]amount, [optional]meta)."
-				+ "\n  First Arg: A Tuple of Item Stacks that the villager buys, up to 2 long."
-				+ "\n  Second Arg: The ItemStack that the villager buys."
+				+ "\n  First Arg: A Tuple of itemStacks that the villager buys, up to 2 long."
+				+ "\n  Second Arg: The itemStack that the villager buys."
 				+ "\n  Third Arg: (Optional) The number of times the trade can be used.  If not specified or it's -1, a random number between 2 and 12 is used."
 				+ "\n  Fourth Arg: (Optional) The numbers of times this trade has been used.")
-		public void addNewTrade(PyTuple buyTuple, PyTuple sellTuple, Object... args) {
+		public void addNewTrade(Object buy, itemStack sellStack, Object... args) {
 			if (this.field == null) {
 				this.field = ReflectionHelper.findField(EntityVillager.class,
 						new String[] { "buyingList", "field_70963_i" });
 			}
-			MerchantRecipeList rl = null;
+			MerchantRecipeList recipeList = null;
 			try {
-				rl = (MerchantRecipeList) this.field.get(this.mcEntity);
+				recipeList = (MerchantRecipeList) this.field.get(this.mcEntity);
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 				e.printStackTrace();
 			}
 
-			if (rl == null) {
-				rl = new MerchantRecipeList();
+			if (recipeList == null) {
+				recipeList = new MerchantRecipeList();
 			}
 
 			// Add recipe:
@@ -1622,15 +1696,26 @@ public class entity {
 			// TODO give XP
 
 			// Parse args:
-			buy1 = itemUtils.itemStackFromTuple((PyTuple) buyTuple.get(0));
-			if (buyTuple.size() > 1) {
-				buy2 = itemUtils.itemStackFromTuple((PyTuple) buyTuple.get(1));
-			}
-			if (buyTuple.size() > 2) {
-				throw Py.ValueError("Buy list may not contain more than 2 items!");
+			if(buy instanceof itemStack) {
+				buy1 = ((itemStack) buy).getMcStack();
+				buy2 = ItemStack.EMPTY;
+			} else if(buy instanceof PyTuple) {
+				PyTuple buyTuple = ((PyTuple)buy);
+				if (buyTuple.__len__() <= 0 || buyTuple.__len__() > 2) {
+					throw Py.ValueError("Buy list may only contain 1 or 2 items");
+				}
+				
+				buy1 = ((itemStack)buyTuple.get(0)).getMcStack();
+				if (buyTuple.size() > 1) {
+					buy2 = ((itemStack) buyTuple.get(1)).getMcStack();
+				} else {
+					buy2 = ItemStack.EMPTY;
+				}
+			} else {
+				throw Py.ValueError("Argument \"buy\" must be an instance of itemStack or a sequence.");
 			}
 
-			sell = itemUtils.itemStackFromTuple(sellTuple);
+			sell = sellStack.getMcStack();
 			if (args.length > 0 && (int) args[0] != -1) {
 				maxTrades = (int) args[0];
 			} else {
@@ -1642,11 +1727,11 @@ public class entity {
 			}
 
 			// Add trade to list.
-			rl.add(new MerchantRecipe(buy1, buy2, sell, /* NBT "uses" */ timesTradeUsed, maxTrades));
+			recipeList.add(new MerchantRecipe(buy1, buy2, sell, /* NBT "uses" */ timesTradeUsed, maxTrades));
 
 			// Set the field within the villager.
 			try {
-				this.field.set(this.mcEntity, rl);
+				this.field.set(this.mcEntity, recipeList);
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 				e.printStackTrace();
 			}
@@ -1663,23 +1748,25 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Uses dye meta, default is 1 for red.")
+		@PythonDocString("Returns the Wolf's collar color.  Uses dye meta scheme.")
 		public int getCollarColor() {
 			return this.mcEntity.getCollarColor().getDyeDamage();
 		}
 
 		@PythonFunction
-		@PythonDocString("Uses dye meta, default is 1 for red.")
+		@PythonDocString("Sets the Wolf's collar color.  Uses dye meta scheme.  Default is 1 for red.")
 		public void setCollarColor(int dyeColor) {
 			this.mcEntity.setCollarColor(EnumDyeColor.byDyeDamage(dyeColor));
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns True if the Wolf is angry, False if it is not.")
 		public boolean isAngry() {
 			return this.mcEntity.isAngry();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets if the Wolf is angry.")
 		public void setAngry(boolean isAngry) {
 			this.mcEntity.setAngry(isAngry);
 		}
@@ -1695,21 +1782,25 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns True if the Entity is a baby, False if it is not.")
 		public boolean isBaby() {
 			return this.mcEntity.isChild();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets if the Entity is a baby.")
 		public void setIsBaby(boolean isBaby) {
 			this.mcEntity.setChild(isBaby);
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns True if the Entity can break doors, False if it can't.")
 		public boolean getCanBreakDoors() {
 			return this.mcEntity.isBreakDoorsTaskSet();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets if the Entity can break doors.")
 		public void setCanBreakDoors(boolean canBreakDoors) {
 			this.mcEntity.setBreakDoorsAItask(canBreakDoors);
 		}
@@ -1725,12 +1816,13 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the Zombie Villager's profession.  See entity.Villager for profession IDs.")
 		public String getProfession() {
 			return this.mcEntity.getForgeProfession().getRegistryName().toString();
 		}
 
 		@PythonFunction
-		@PythonDocString("See entity.Villager for profession ids.")
+		@PythonDocString("Returns the Zombie Villager's profession.  See entity.Villager for profession IDs.")
 		public void setProfession(int profession) {
 			this.mcEntity.setProfession(profession);
 		}
@@ -1741,9 +1833,10 @@ public class entity {
 	private interface IHasEquipment {
 
 		@PythonFunction
-		public PyTuple getSlotContents(int slotIndex);
+		@Nullable
+		public itemStack getSlotContents(int slotIndex);
 
 		@PythonFunction
-		public void setSlotContents(int slotIndex, PyTuple itemStack);
+		public void setSlotContents(int slotIndex, @Nullable itemStack itemStack);
 	}
 }

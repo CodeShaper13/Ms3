@@ -1,86 +1,51 @@
 package com.codeshaper.ms3.apiBuilder.module;
 
-import java.util.ArrayList;
+import javax.annotation.Nullable;
 
+import org.apache.commons.lang3.StringUtils;
 import org.python.core.PyObject;
 
 import com.codeshaper.ms3.exception.IllegalModuleFormatException;
-import com.codeshaper.ms3.util.Util;
 
 /**
  * Represents a class within a python module
  */
-public class ModuleClass implements IMemberHolder {
-	
-	public String name;
+public class ModuleClass extends AttributeHolder {
+
+	@Nullable
 	/** Null if the object inherits from Object. */
-	public String superClassName;
-	public String docString;
-	private ArrayList<ModuleFunction> methodList;
-	private ArrayList<ModuleField> fieldList;
-	private ArrayList<ModuleClass> innerClassList;
+	private final String superClassName;
+	@Nullable
 	private ModuleConstructor contsructor;
-	
-	private ModuleClass() {
-		this.fieldList = new ArrayList<ModuleField>();
-		this.methodList = new ArrayList<ModuleFunction>();
-		this.innerClassList = new ArrayList<ModuleClass>();
-	}
-	
+
 	public ModuleClass(Class<?> clazz) {
-		this();
-		this.name = clazz.getSimpleName();
+		super(clazz.getSimpleName(), clazz);
+
 		Class<?> superClass = clazz.getSuperclass();
-		if(superClass != null && superClass != Object.class && superClass != PyObject.class) {
-			this.superClassName = superClass.getSimpleName();			
+		if (superClass != null && superClass != Object.class && superClass != PyObject.class) {
+			this.superClassName = superClass.getSimpleName();
+		} else {
+			this.superClassName = null;
 		}
-		
-		this.docString = Util.getPydValue(clazz);
 	}
-	
-	public ModuleClass(String name) {
-		this();
-		this.name = name;
+
+	public boolean hasSuperClass() {
+		return StringUtils.isNotEmpty(this.superClassName);
+	}
+
+	@Nullable
+	public String getSuperClass() {
+		return this.superClassName;
 	}
 
 	public void setConstructor(ModuleConstructor ctor) {
-		if(contsructor != null) {
+		if (contsructor != null) {
 			throw new IllegalModuleFormatException("A class can not have more than one constructor!");
 		}
 		this.contsructor = ctor;
 	}
-	
+
 	public ModuleConstructor getConstructor() {
 		return this.contsructor;
-	}
-
-	@Override
-	public void addField(ModuleField field) {
-		this.fieldList.add(field);
-	}
-
-	@Override
-	public ArrayList<ModuleField> getFields() {
-		return this.fieldList;
-	}
-
-	@Override
-	public void addFunction(ModuleFunction function) {
-		this.methodList.add(function);
-	}
-
-	@Override
-	public ArrayList<ModuleFunction> getFunctions() {
-		return this.methodList;
-	}
-
-	@Override
-	public void addClass(ModuleClass clazz) {
-		this.innerClassList.add(clazz);
-	}
-
-	@Override
-	public ArrayList<ModuleClass> getClasses() {
-		return this.innerClassList;
 	}
 }

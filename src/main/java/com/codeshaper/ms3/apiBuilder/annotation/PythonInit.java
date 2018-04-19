@@ -6,11 +6,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Stops the Python module generator from including the parameter's type in its
- * name. Used when the parameter is of type object because multiple types are
- * accepted.
+ * Marks the annotated element to be included in the __init__ file of the ms3
+ * api module.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
-public @interface PythonExcludeType {
+@Target({
+		// ElementType.METHOD,
+		ElementType.TYPE,
+		// ElementType.FIELD
+})
+public @interface PythonInit {
+
 }

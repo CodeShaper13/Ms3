@@ -526,7 +526,7 @@ public class blocks {
     public static final String STRUCTURE_BLOCK = func("minecraft:structure_block");
 
     @PythonFunction
-    @PythonDocString("Returns a list of all the vanilla Blockss.")
+    @PythonDocString("Returns a list of all the vanilla Blocks.")
     public static PyList getAllBlocks() {
         return names;
     }

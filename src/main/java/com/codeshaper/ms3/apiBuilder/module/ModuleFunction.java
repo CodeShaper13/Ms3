@@ -9,21 +9,21 @@ import org.python.core.PyObject;
 import org.python.core.PySequenceList;
 import org.python.core.PyTuple;
 
-import com.codeshaper.ms3.apiBuilder.annotation.PythonExcludeType;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeExclude;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeName;
 
 /**
  * Represents a function within a python module, either in global or class scope
  */
-public class ModuleFunction extends ModuleMember {
+public class ModuleFunction extends BaseAttribute {
 
-	public String[] argNames;
+	private final String[] argNames;
 
 	/**
 	 * Creates a Python function based on a method
 	 */
 	public ModuleFunction(Executable exec) {
-		super(exec, exec);
+		super(exec.getName(), exec);
 
 		// Parameters
 		int pCount = exec.getParameterCount();
@@ -35,7 +35,7 @@ public class ModuleFunction extends ModuleMember {
 			if (param.isAnnotationPresent(PythonTypeName.class)) {
 				PythonTypeName a = param.getAnnotation(PythonTypeName.class);
 				name = a.value() + "_" + param.getName();
-			} else if (param.isAnnotationPresent(PythonExcludeType.class)) {
+			} else if (param.isAnnotationPresent(PythonTypeExclude.class)) {
 				name = param.getName();
 			} else {
 				String className = this.getTypeName(param.getType());
@@ -43,6 +43,14 @@ public class ModuleFunction extends ModuleMember {
 			}
 			this.argNames[i] = name;
 		}
+	}
+	
+	public int getArgsLength() {
+		return this.argNames.length;
+	}
+	
+	public String getArg(int index) {
+		return this.argNames[index];
 	}
 
 	/**

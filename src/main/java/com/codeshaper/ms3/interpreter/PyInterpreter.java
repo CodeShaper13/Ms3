@@ -5,6 +5,7 @@ import java.util.Collections;
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyList;
@@ -13,7 +14,6 @@ import org.python.core.PyObject;
 import org.python.core.PySequenceList;
 import org.python.core.PyString;
 import org.python.core.PySystemState;
-import org.python.core.__builtin__;
 import org.python.util.PythonInterpreter;
 
 import com.codeshaper.ms3.Ms3;
@@ -24,7 +24,6 @@ import com.codeshaper.ms3.exception.InvalidReturnedArgumentException;
 import com.codeshaper.ms3.script.RunnableScript;
 import com.codeshaper.ms3.stream.ChatErrorStream;
 import com.codeshaper.ms3.stream.ChatOutputStream;
-import com.codeshaper.ms3.util.Util;
 import com.codeshaper.ms3.util.textBuilder.TextBuilder;
 import com.codeshaper.ms3.util.textBuilder.TextBuilderTrans;
 
@@ -92,9 +91,9 @@ public class PyInterpreter {
 	public boolean runExecute(RunnableScript runnableScript, ICommandSender sender) throws CommandException {
 		try {
 			this.primeScript(runnableScript);
-			
+
 			executor.Executor e = new executor.Executor(sender);
-			if(!this.callFunction("execute", e.getSenderWorld(), e)) {
+			if (!this.callFunction("execute", e.getSenderWorld(), e)) {
 				return false;
 			}
 		} catch (PyException e) {
@@ -158,7 +157,8 @@ public class PyInterpreter {
 	public boolean runOnBind(RunnableScript runnableScript, ICommandSender sender, Entity e) {
 		try {
 			this.primeScript(runnableScript);
-			this.callFunction("onBind", new world.World((WorldServer)sender.getEntityWorld()), entity.getWrapperClassForEntity(e));
+			this.callFunction("onBind", new world.World((WorldServer) sender.getEntityWorld()),
+					entity.getWrapperClassForEntity(e));
 			return true;
 		} catch (PyException exception) {
 			this.senderErrorMessage(sender, "Error calling onBind()", exception);
@@ -192,16 +192,17 @@ public class PyInterpreter {
 	public void runOnClick(RunnableScript runnableScript, Entity entity, EntityPlayer player) {
 		try {
 			this.primeScript(runnableScript);
-			this.callFunction("onClick", new world.World((WorldServer)player.getEntityWorld()),
-						com.codeshaper.ms3.api.entity.getWrapperClassForEntity(entity),
-						com.codeshaper.ms3.api.entity.getWrapperClassForEntity(player));
+			this.callFunction("onClick", new world.World((WorldServer) player.getEntityWorld()),
+					com.codeshaper.ms3.api.entity.getWrapperClassForEntity(entity),
+					com.codeshaper.ms3.api.entity.getWrapperClassForEntity(player));
 		} catch (PyException e) {
 			this.senderErrorMessage(player, "Error calling onClick()", e);
 		}
 	}
-	
+
 	/**
 	 * Calls a function within the global namespace if it can be found.
+	 * 
 	 * @param functionName
 	 * @param args
 	 * @return True if the function was found and called, false otherwise.
@@ -226,6 +227,12 @@ public class PyInterpreter {
 		return this.pythonInterpreter.get(name) != null;
 	}
 
+	/**
+	 * Deletes a variable from the global scope.
+	 * 
+	 * @param name Name of the variable.
+	 * @return True if the variable was found and deleted, false otherwise.
+	 */
 	public boolean delIfExists(String name) {
 		if (this.exists(name)) {
 			this.pythonInterpreter.exec("del " + name); // TODO make faster.
@@ -262,25 +269,35 @@ public class PyInterpreter {
 			this.pythonInterpreter.setErr(this.consoleStdErr);
 		}
 	}
-
+	
 	/**
 	 * Runs a script to load the functions into the namespace.
 	 * 
-	 * @return True if there were no errors.
+	 * @param runnableScript
+	 * @throws PyException
+	 *             if there was an error running the script, including a syntax
+	 *             error.
 	 */
-	private void primeScript(RunnableScript rs) throws PyException {
+	private void primeScript(RunnableScript runnableScript) throws PyException {
 		// Cleanup the old functions.
 		this.delIfExists("onBind");
 		this.delIfExists("execute");
 		this.delIfExists("onClick");
 		this.delIfExists("getArgs");
 
-		PyList args = rs.getArgs();
-		// Empty strings are added to the end of args sometimes, remove these.
+		// Delete class with the same name, as it might exist from another script by
+		// chance.
+		//String name = runnableScript.getScriptName();
+		//this.delIfExists(name);
+		//this.delIfExists(WordUtils.capitalize(name));
+
+		PyList args = runnableScript.getArgs();
+		// Empty strings are added to the end of args sometimes by the Minecraft command
+		// parser, remove these.
 		args.removeAll(Collections.singleton(""));
 		this.pythonInterpreter.getSystemState().argv = args;
 
-		this.pythonInterpreter.execfile(rs.getFile().getAbsolutePath());
+		this.pythonInterpreter.execfile(runnableScript.getFile().getAbsolutePath());
 	}
 
 	private void senderErrorMessage(ICommandSender sender, String text) {

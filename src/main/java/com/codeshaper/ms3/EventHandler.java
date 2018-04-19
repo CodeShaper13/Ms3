@@ -187,13 +187,18 @@ public class EventHandler {
 		if (capabilityData.getScriptList().contains(runnableScript)) {
 			this.safeSendMessage(player, new TextBuilder("ms3.stick.cantAddDuplicate").color(TextFormatting.RED).get());
 		} else {
-			if (Ms3.getInterpreter().runOnBind(runnableScript, player, clickedEntity)) {
+			// Try to bind the script.
+			PyInterpreter i = Ms3.getInterpreter();			
+			boolean flag = i.runOnBind(runnableScript, player, clickedEntity);
+			if (flag) {
 				capabilityData.addScript(runnableScript);
+				
 				this.safeSendMessage(player, new TextBuilder("ms3.stick.successfulBind").color(TextFormatting.GREEN).get());
 			} else {
 				// More code because it must be in bold.
 				ITextComponent itc = new TextComponentTranslation("ms3.stick.bindingError");
 				itc.getStyle().setBold(true).setColor(TextFormatting.RED);
+				
 				this.safeSendMessage(player, itc);
 			}
 		}

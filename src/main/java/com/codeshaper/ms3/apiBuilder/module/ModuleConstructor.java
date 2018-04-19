@@ -6,6 +6,6 @@ public class ModuleConstructor extends ModuleFunction {
 
 	public ModuleConstructor(Constructor<?> ctor) {
 		super(ctor);
-		this.name = "__init__";
+		this.setName("__init__");
 	}
 }

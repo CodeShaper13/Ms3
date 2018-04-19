@@ -1116,7 +1116,7 @@ public class sounds {
     public static final String WEATHER_RAIN_ABOVE = func("minecraft:weather.rain.above");
 
     @PythonFunction
-    @PythonDocString("Returns a list of all the vanilla Soundss.")
+    @PythonDocString("Returns a list of all the vanilla Sounds.")
     public static PyList getAllSounds() {
         return names;
     }

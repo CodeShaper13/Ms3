@@ -7,14 +7,17 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+import javax.annotation.Nullable;
+
 import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonConstructor;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldSpecified;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldSpecified;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonInit;
 import com.codeshaper.ms3.apiBuilder.classGenerator.CGRegisteredNamespace;
-import com.codeshaper.ms3.apiBuilder.module.IMemberHolder;
+import com.codeshaper.ms3.apiBuilder.module.AttributeHolder;
 import com.codeshaper.ms3.apiBuilder.module.Module;
 import com.codeshaper.ms3.apiBuilder.module.ModuleClass;
 import com.codeshaper.ms3.apiBuilder.module.ModuleConstructor;
@@ -34,10 +37,14 @@ import net.minecraft.world.biome.Biome;
 public class ApiBuilder {
 
 	private BuildList buildList;
+	private File apiFolder;
+
+	private ApiPackage apiPackage;
 
 	@SuppressWarnings("unused")
-	public ApiBuilder() {
+	public ApiBuilder(File apiFolder) {
 		this.buildList = new BuildList();
+		this.apiFolder = apiFolder;
 
 		// Generate java class files to copy into project. For developing only!
 		if (false) {
@@ -54,8 +61,7 @@ public class ApiBuilder {
 	 * Checks if the api is missing and returns the result.
 	 */
 	private boolean doesApiExist() {
-		File f = Ms3.dirManager.getApiFolder();
-		return f.exists() && f.isDirectory();
+		return this.apiFolder.exists() && this.apiFolder.isDirectory();
 	}
 
 	public void buildApiIfNeeded() {
@@ -72,16 +78,26 @@ public class ApiBuilder {
 	public void buildApi() {
 		ArrayList<Module> moduleList = new ArrayList<Module>();
 
+		this.apiPackage = new ApiPackage();
+
 		for (Class<?> classToBuild : this.buildList.classList) {
 			// Create the module to representing the base class.
-			Module module = new Module(classToBuild);
-			this.generateClass(null, module, classToBuild);
-			moduleList.add(module);
+			boolean flag = classToBuild.isAnnotationPresent(PythonInit.class);
+
+			if (flag) {
+				this.generateClass(this.apiPackage.getModule(), new ModuleClass(classToBuild), classToBuild);
+			} else {
+				Module module = new Module(classToBuild);
+				this.generateClass(null, module, classToBuild);
+				moduleList.add(module);
+			}
 		}
+
+		moduleList.add(this.apiPackage.getModule());
 
 		// For every module, generate the file on the system.
 		for (Module module : moduleList) {
-			module.generateModuleFile(Ms3.dirManager.getApiFolder());
+			module.generateModuleFile(this.apiFolder);
 		}
 
 		this.generateInitFiles();
@@ -92,9 +108,9 @@ public class ApiBuilder {
 	 * modules.
 	 */
 	private void generateInitFiles() {
-		File folder = Ms3.dirManager.getApiFolder();
+		File folder = this.apiFolder;
 		File initFile;
-		for (String s : new String[] { "", "com", "codeshaper", "ms3", "api" }) {
+		for (String s : new String[] { "", "com", "codeshaper", "ms3" }) {
 			folder = new File(folder, s);
 			initFile = new File(folder, "__init__.py");
 			try {
@@ -107,26 +123,29 @@ public class ApiBuilder {
 	}
 
 	/**
-	 * Navigates a class, generating the content and recursively calling this on all inner
-	 * classes. parentHolder is null on root classes.
+	 * Navigates a class, generating the content and recursively calling this on all
+	 * inner classes. parentHolder is null on root classes.
 	 * 
-	 * @param parentHolder Pass null for outer/top level classes.
+	 * @param parentHolder
+	 *            Pass null for outer/top level classes.
 	 * @param holder
 	 * @param classOfHolder
 	 * @throws IllegalModuleFormatException
 	 */
-	private void generateClass(IMemberHolder parentHolder, IMemberHolder holder, Class<?> classOfHolder)
+	private void generateClass(@Nullable AttributeHolder parentHolder, AttributeHolder holder, Class<?> classOfHolder)
 			throws IllegalModuleFormatException {
+
 		// Add constructors.
 		for (Constructor<?> ctor : classOfHolder.getConstructors()) {
 			if (ctor.isAnnotationPresent(PythonConstructor.class)) {
 				if (parentHolder == null) {
-					throw new IllegalModuleFormatException("Found a constructor on a root class!");
+					throw new IllegalModuleFormatException(
+							"Found a constructor on root class " + classOfHolder.getName() + "!");
 				} else if (holder instanceof ModuleClass) {
 					((ModuleClass) holder).setConstructor(new ModuleConstructor(ctor));
 				} else {
-					throw new IllegalModuleFormatException(
-							"Found a constructor on a class that isn't marked as a ModuleClass!");
+					throw new IllegalModuleFormatException("Found a constructor on a class (" + classOfHolder.getName()
+							+ ") that isn't marked as a ModuleClass!");
 				}
 			}
 		}
@@ -134,14 +153,24 @@ public class ApiBuilder {
 		// Add fields.
 		for (Field field : classOfHolder.getDeclaredFields()) {
 			if (field.isAnnotationPresent(PythonFieldSpecified.class) || field.isAnnotationPresent(PythonField.class)) {
-				holder.addField(new ModuleField(field));
+				ModuleField mf = new ModuleField(field);
+				if (field.isAnnotationPresent(PythonInit.class)) {
+					this.apiPackage.addField(mf);
+				} else {
+					holder.addField(mf);
+				}
 			}
 		}
 
 		// Add methods.
 		for (Method method : classOfHolder.getDeclaredMethods()) {
 			if (method.isAnnotationPresent(PythonFunction.class)) {
-				holder.addFunction(new ModuleFunction(method));
+				ModuleFunction mfunc = new ModuleFunction(method);
+				if (method.isAnnotationPresent(PythonInit.class)) {
+					this.apiPackage.addFunction(mfunc);
+				} else {
+					holder.addFunction(mfunc);
+				}
 			}
 		}
 

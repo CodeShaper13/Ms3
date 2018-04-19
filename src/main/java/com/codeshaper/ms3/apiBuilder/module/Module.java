@@ -4,7 +4,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.util.Logger;
@@ -13,75 +17,29 @@ import com.codeshaper.ms3.util.Util;
 /**
  * Represents a python module and its contents.
  */
-public class Module implements IMemberHolder {
+public class Module extends AttributeHolder {
 	
-	public String moduleName;
+	@Nullable
 	/** Null if the module should be in the root folder */
-	public String modulePath;
-	/** Null if there is no doc */
-	public String docString;
-	private ArrayList<ModuleField> fieldList;
-	private ArrayList<ModuleFunction> functionList;
-	public ArrayList<ModuleClass> classList;
-	
-	private Module() {
-		this.fieldList = new ArrayList<ModuleField>();
-		this.functionList = new ArrayList<ModuleFunction>();
-		this.classList = new ArrayList<ModuleClass>();
-	}
+	private final String modulePath;
 	
 	public Module(Class<?> clazz) {
-		this();
-		
-		this.moduleName = clazz.getSimpleName();
-		
-		String s = clazz.getCanonicalName().replace('.', '/');
-		this.modulePath = s.substring(0, s.lastIndexOf('/'));
-		
-		this.docString = Util.getPydValue(clazz);
+		this(clazz.getSimpleName(), Util.getPydValue(clazz));
 	}
 	
 	/**
-	 * Called by DynamicModule
+	 * Used by DynamicModule
 	 */
-	public Module(String name, String docString) {
-		this();
+	public Module(String moduleName, String docString) {
+		super(moduleName, docString);
 		
-		this.moduleName = name;
-		this.modulePath = "com/" + Ms3.AUTHOR + "/" + Ms3.MOD_ID;
-		this.docString = docString;
+		this.modulePath = "com/" + Ms3.AUTHOR + "/" + Ms3.MOD_ID + "/api";
 	}
 	
-	@Override
-	public void addField(ModuleField field) {
-		this.fieldList.add(field);
+	public Module(String moduleName) {
+		this(moduleName, StringUtils.EMPTY);
 	}
 
-	@Override
-	public ArrayList<ModuleField> getFields() {
-		return this.fieldList;
-	}
-
-	@Override
-	public void addFunction(ModuleFunction function) {
-		this.functionList.add(function);
-	}
-
-	@Override
-	public ArrayList<ModuleFunction> getFunctions() {
-		return this.functionList;
-	}
-	
-	@Override
-	public void addClass(ModuleClass clazz) {
-		this.classList.add(clazz);		
-	}
-
-	@Override
-	public ArrayList<ModuleClass> getClasses() {
-		return this.classList;
-	}
-	
 	/**
 	 * Generates a file for this module, writing the module contents too it
 	 * @param rootFolder The folder that this module is to be in
@@ -92,39 +50,39 @@ public class Module implements IMemberHolder {
 			dest = new File(rootFolder, "/" + this.modulePath + "/");
 			dest.mkdirs();
 		}		
-		File moduleFile = new File(dest, this.moduleName + ".py");
+		File moduleFile = new File(dest, this.getName() + ".py");
 
 		try {				
 			BufferedWriter br = new BufferedWriter(new FileWriter(moduleFile));
 
 			br.write("# Auto generated python file to be used by an IDE.  Don't modify this, it won't do anything.\n\n");
-			if(this.docString != null) {
-				br.write("\"\"\" " + this.docString + " \"\"\"\n");
+			if(this.hasDocString()) {
+				br.write(this.getFormatedDocString() + "\n");
 			}
 
-			this.writeFields(br, this.fieldList, "");
-			this.writeFunctions(br, this.functionList, "");
+			this.writeFields(br, this.getFields(), "");
+			this.writeFunctions(br, this.getFunctions(), "");
 
-			for (ModuleClass clazz : this.classList) {
+			for (ModuleClass clazz : this.getClasses()) {
 				this.writeModuleClass(br, clazz, "    ");
 			}
 
 			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-			Logger.err("Unable to create auto generated module " + this.moduleName);
+			Logger.err("Unable to create auto generated module " + this.getName());
 		}
 	}
 	
 	private void writeModuleClass(BufferedWriter br, ModuleClass clazz, String indent) throws IOException {
-		br.write("class " + clazz.name);
-		if(clazz.superClassName != null) {
-			br.write("(" + clazz.superClassName + "):\n");
+		br.write("class " + clazz.getName());
+		if(clazz.hasSuperClass()) {
+			br.write("(" + clazz.getSuperClass() + "):\n");
 		} else {
 			br.write(":\n");
 		}
-		if(clazz.docString != null) {
-			br.write("    \"\"\" " + clazz.docString + " \"\"\"\n");
+		if(clazz.hasDocString()) {
+			br.write("    " + clazz.getFormatedDocString() + "\n");
 		}
 		
 		// Write fields and methods.
@@ -147,33 +105,33 @@ public class Module implements IMemberHolder {
 		}
 	}
 	
-	private void writeFunctions(BufferedWriter br, ArrayList<ModuleFunction> functions, String indent) throws IOException {
+	private void writeFunctions(BufferedWriter br, List<ModuleFunction> functions, String indent) throws IOException {
 		br.write("\n");
 		for (ModuleFunction func : functions) {
 			StringBuilder args = new StringBuilder();
-			int length = func.argNames.length;
+			int length = func.getArgsLength();
 			for(int i = 0; i < length; i++) {
-				args.append(func.argNames[i]);
+				args.append(func.getArg(i));
 				if(i != length - 1) { // Not last element.
 					args.append(", ");
 				}
 			}
 			
-			br.write(indent + "def " + func.name + "(" + args + "):\n");
-			if(func.docString != null) {
+			br.write(indent + "def " + func.getName() + "(" + args + "):\n");
+			if(func.hasDocString()) {
 				br.write(indent + "    " + func.getFormatedDocString() + "\n");
 			}
 			br.write(indent + "    pass\n\n");
 		}
 	}
 	
-	private void writeFields(BufferedWriter br, ArrayList<ModuleField> fields, String indent) throws IOException {
+	private void writeFields(BufferedWriter br, List<ModuleField> fields, String indent) throws IOException {
 		br.write("\n");
 		for (ModuleField field : fields) {
-			if(field.docString != null) {
+			if(field.hasDocString()) {
 				br.write(indent + field.getFormatedDocString() + "\n");
 			}			
-			br.write(indent + field.name + " = " + field.getFieldValue() + "\n");
+			br.write(indent + field.getName() + " = " + field.getFieldValue() + "\n");
 		}
 	}
 

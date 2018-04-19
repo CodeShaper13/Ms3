@@ -5,6 +5,7 @@ import java.lang.reflect.AnnotatedElement;
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.python.core.Py;
 import org.python.core.PyBoolean;
 import org.python.core.PyFloat;
@@ -119,6 +120,23 @@ public class Util {
 		} else {
 			throw new IllegalArgumentException(
 					"Parameter was of type " + obj.getClass().toString() + "!  It must be a primitive type or null");
+		}
+	}
+	
+	public static PyObject stringToPyObject(String string) {
+		if (NumberUtils.isCreatable(string)) {
+			float f = NumberUtils.createFloat(string);
+			if (f == ((int) f)) {
+				return new PyInteger((int) f);
+			} else {
+				return new PyFloat(f);
+			}
+		} else if (StringUtils.capitalize(string).equals("True")) {
+			return Py.True;
+		} else if (StringUtils.capitalize(string).equals("False")) {
+			return Py.False;
+		} else {
+			return new PyString(string);
 		}
 	}
 }

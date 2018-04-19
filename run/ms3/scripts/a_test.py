@@ -11,9 +11,21 @@ def execute(world, sender):
     
     print "execute()"
     
-    player = sender.asEntity()
-    assert isinstance(player, ms3.entity.Player)
-    print ms3.util.getScriptDataFolder()
+    stack = ms3.itemStack("stick", 0)
+    assert isinstance(stack, ms3.itemStack)
+    print stack.getCount()
+    
+    
+def unused():
+    #ms3.util.printObjectType(ms3)
+    
+    #ms3.__dict__['spam'] = "HELLO!"
+    #print ms3.spam
+    w = ms3.__dict__['world']
+    print w
+    i = ms3.__dict__['__name__']
+    print i.__dict__
+    print ms3.__dict__
             
 def onClick(world, clickedEntity, player):
     assert isinstance(world, ms3.world.World)

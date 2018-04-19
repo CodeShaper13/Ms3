@@ -1,7 +1,11 @@
+# Doc string is used to provide a help message for the script when /script help <name>.
+""" """
+
 # Import the api
 import com.codeshaper.ms3.api as ms3
 import com.codeshaper.ms3.api.formattingCode as cc
 import sys
+
 
 # Used to initialize an entity or set properties.
 # Called whenever a script is bound to an entity with the command
@@ -55,10 +59,3 @@ def getArgs(world, sender):
         return ["two", "dos", "2",]
     
     # None can be returned, as it is implied here, to suggest nothing for TAB.
-    
-    
-# Used to provide a help message for the script when /script help <name>.
-def getHelpText():
-    print ms3.formattingCode.ITALIC + "getHelpText()"
-    
-    return "Help text here..." # Return a string.

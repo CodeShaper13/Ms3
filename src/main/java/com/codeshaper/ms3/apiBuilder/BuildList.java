@@ -14,6 +14,7 @@ import com.codeshaper.ms3.api.equipmentSlot;
 import com.codeshaper.ms3.api.exception;
 import com.codeshaper.ms3.api.executor;
 import com.codeshaper.ms3.api.formattingCode;
+import com.codeshaper.ms3.api.itemStack;
 import com.codeshaper.ms3.api.itemUtils;
 import com.codeshaper.ms3.api.items;
 import com.codeshaper.ms3.api.obfuscationHelper;
@@ -39,7 +40,6 @@ public class BuildList {
 		this.classList = new Class[] {
 				biomes.class,
 				blockUtils.class,
-				BoundObject.class,
 				blocks.class,
 				colors.class,
 				effectList.class,
@@ -53,6 +53,7 @@ public class BuildList {
 				//interpreter.class,
 				itemUtils.class,
 				items.class,
+				itemStack.class,
 				obfuscationHelper.class,
 				particleType.class,
 				soundCategories.class,

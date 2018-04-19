@@ -7,6 +7,7 @@ import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonInit;
 
 @PythonClass
 @PythonDocString("A list of all the vanilla Item names.")
@@ -840,7 +841,7 @@ public class items {
     public static final String RECORD_WAIT = func("minecraft:record_wait");
 
     @PythonFunction
-    @PythonDocString("Returns a list of all the vanilla Itemss.")
+    @PythonDocString("Returns a list of all the vanilla Items.")
     public static PyList getAllItems() {
         return names;
     }

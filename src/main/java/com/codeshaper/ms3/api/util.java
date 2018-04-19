@@ -13,7 +13,7 @@ import org.python.core.PyString;
 import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.api.exception.MissingScriptException;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonExcludeType;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeExclude;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 import com.codeshaper.ms3.script.ScheduledScript;
 
@@ -43,7 +43,7 @@ public class util {
 
 	@PythonFunction
 	@PythonDocString("Executes a script after a set number of ticks.")
-	public static void executeDelayedScript(String pathToScript, int ticksUntil, @PythonExcludeType Object sender,
+	public static void executeDelayedScript(String pathToScript, int ticksUntil, @PythonTypeExclude Object sender,
 			@Nullable PyList args) throws MissingScriptException {
 
 		executor.Executor e = null;
@@ -69,7 +69,7 @@ public class util {
 
 	@PythonFunction
 	@PythonDocString("Prints text directly to the console.") // reguardless of the Interpreters stream settings.")
-	public static void printToConsole(@PythonExcludeType Object object) {
+	public static void printToConsole(@PythonTypeExclude Object object) {
 		System.out.println(object.toString());
 	}
 

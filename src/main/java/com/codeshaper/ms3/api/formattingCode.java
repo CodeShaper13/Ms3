@@ -3,10 +3,11 @@ package com.codeshaper.ms3.api;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
 
-@PythonDocString("Formatting code constants for colored and formatteds text.")
+@PythonDocString("Formatting code constants for colored and formatted text.  See minecraft.gamepedia.com/formatting_codes for more.")
 public class formattingCode {
 
 	@PythonField
+	@PythonDocString("Formatting code prefix character.  It is recomended to use this instead of hard coding it into strings.")
 	public static final char __PREFIX = '&';
 	
 	@PythonField

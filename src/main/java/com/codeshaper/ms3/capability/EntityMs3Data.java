@@ -10,6 +10,7 @@ import org.python.core.PyException;
 import org.python.core.PyList;
 
 import com.codeshaper.ms3.Ms3;
+import com.codeshaper.ms3.api.BoundObject;
 import com.codeshaper.ms3.api.exception.MissingScriptException;
 import com.codeshaper.ms3.interpreter.PyInterpreter;
 import com.codeshaper.ms3.script.RunnableScript;

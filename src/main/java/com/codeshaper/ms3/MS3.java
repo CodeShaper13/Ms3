@@ -66,7 +66,7 @@ public class Ms3 {
 		Ms3.dirManager = new DirectoryManager(event);
 		Ms3.ms3Props = new Ms3Properties();
 		Ms3.configManager = new Config(new File(Ms3.dirManager.getMs3Folder(), "config.cfg"));
-		Ms3.apiBuilder = new ApiBuilder();
+		Ms3.apiBuilder = new ApiBuilder(Ms3.dirManager.getApiFolder());
 		this.interpreter = new PyInterpreter("default");
 		
 		// Make sure the classes are loaded by the class loader before Jython tries to

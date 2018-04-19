@@ -18,10 +18,13 @@ public interface IEntityMs3Data {
 
 	/**
 	 * Adds a script to the list of scripts.
+	 * 
 	 * @param scriptPath
 	 * @param args
-	 * @throws PyException If the arguments are not of a valid type.
-	 * @throws MissingScriptException If the script file can not be found.
+	 * @throws PyException
+	 *             If the arguments are not of a valid type.
+	 * @throws MissingScriptException
+	 *             If the script file can not be found.
 	 */
 	public void addScript(String scriptPath, @Nullable PyList args) throws PyException, MissingScriptException;
 
@@ -31,7 +34,8 @@ public interface IEntityMs3Data {
 	public void addScript(RunnableScript runnableScript);
 
 	/**
-	 * Executes every execute function that is within a script bounded to this entity.
+	 * Executes every execute function that is within a script bounded to this
+	 * entity.
 	 */
 	public void runAllExecute(Entity entity);
 

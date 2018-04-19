@@ -1,5 +1,6 @@
 package com.codeshaper.ms3.api;
 
+import org.python.core.PyList;
 import org.python.core.PyTuple;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
@@ -49,9 +50,25 @@ public class colors {
 	public static final PyTuple BLACK = Util.makeTuple(15, 0);
 
 	@PythonFunction
-	@PythonDocString("Returns a tuple of all colors, ordered by their id.")
-	public static PyTuple getAllColors() {
-		return new PyTuple(WHITE, ORANGE, MAGENTA, LIGHT_BLUE, YELLOW, LIME, PINK, GRAY, LIGHT_GRAY, CYAN, PURPLE, BLUE,
-				BROWN, GREEN, RED, BLACK);
+	@PythonDocString("Returns a list of all colors, ordered by their ID.")
+	public static PyList getAllColors() {
+		PyList list = new PyList();
+		list.add(WHITE);
+		list.add(ORANGE);
+		list.add(MAGENTA);
+		list.add(LIGHT_BLUE);
+		list.add(YELLOW);
+		list.add(LIME);
+		list.add(PINK);
+		list.add(GRAY);
+		list.add(LIGHT_GRAY);
+		list.add(CYAN);
+		list.add(PURPLE);
+		list.add(BLUE);
+		list.add(BROWN);
+		list.add(GREEN);
+		list.add(RED);
+		list.add(BLACK);
+		return list;
 	}
 }

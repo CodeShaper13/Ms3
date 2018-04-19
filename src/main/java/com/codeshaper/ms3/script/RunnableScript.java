@@ -16,6 +16,7 @@ import org.python.core.PyString;
 import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.api.exception;
 import com.codeshaper.ms3.util.NbtHelper;
+import com.codeshaper.ms3.util.Util;
 
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -25,7 +26,7 @@ import net.minecraft.nbt.NBTTagCompound;
 public class RunnableScript {
 
 	private File scriptFile;
-	protected PyList scriptArgs;
+	private PyList scriptArgs;
 
 	public RunnableScript(String pathToScript, @Nullable String[] args) throws PyException {
 		this(pathToScript, args != null ? RunnableScript.stringArgsToPyType(args) : null);
@@ -123,19 +124,15 @@ public class RunnableScript {
 	}
 
 	/**
-	 * Returns the script file.  Note, the file may not exist.
+	 * Returns the script file.  Note, the file may not exist, so use {@link RunnableScript#exists()} to verify.
 	 */
 	public File getFile() {
 		return this.scriptFile;
 	}
-
-	/*
-	public String getModuleName() {
-		String s = FilenameUtils.removeExtension(this.scriptFile.getPath()).replace(File.separatorChar, '.');
-		System.out.println(s);
-		return s;
+	
+	public String getScriptName() {
+		return FilenameUtils.removeExtension(this.scriptFile.getName());
 	}
-	*/
 	
 	public PyList getArgs() {
 		return this.scriptArgs;
@@ -187,22 +184,8 @@ public class RunnableScript {
 
 	private static PyList stringArgsToPyType(String[] args) {
 		PyList list = new PyList();
-
-		for (int i = 0; i < args.length; i++) {
-			if (NumberUtils.isCreatable(args[i])) {
-				float f = NumberUtils.createFloat(args[i]);
-				if (f == ((int) f)) {
-					list.add((int) f);
-				} else {
-					list.add(f);
-				}
-			} else if (StringUtils.capitalize(args[i]).equals("True")) {
-				list.add(true);
-			} else if (StringUtils.capitalize(args[i]).equals("False")) {
-				list.add(false);
-			} else {
-				list.add(args[i]);
-			}
+		for (String s : args) {
+			list.add(Util.stringToPyObject(s));
 		}
 
 		// Empty strings are added to the end of args sometimes from commands, remove

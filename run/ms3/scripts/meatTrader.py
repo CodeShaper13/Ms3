@@ -35,7 +35,7 @@ def onBind(world, theEntity):
     theEntity.setCustomNameVisible(True)
     theEntity.setCustomName(cc.DARK_RED + "Meat Trader")
     theEntity.setInvulnerable(True)
-    
+        
     pickRandomTrade(theEntity)
     
 

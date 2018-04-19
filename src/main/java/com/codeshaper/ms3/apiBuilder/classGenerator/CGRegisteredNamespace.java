@@ -15,7 +15,7 @@ public class CGRegisteredNamespace extends CGBase {
 
 	@Override
 	public void addFields(String name) {
-		this.setGetAllDocString("Returns a list of all the vanilla " + WordUtils.capitalize(name) + "s.");
+		this.setGetAllDocString("Returns a list of all the vanilla " + WordUtils.capitalize(name) + ".");
 
 		String path, s1, upperPath;
 		for (ResourceLocation location : this.registryNamespace.getKeys()) {
