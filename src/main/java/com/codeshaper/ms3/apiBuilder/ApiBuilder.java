@@ -1,11 +1,14 @@
 package com.codeshaper.ms3.apiBuilder;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -15,7 +18,7 @@ import com.codeshaper.ms3.apiBuilder.annotation.PythonConstructor;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldSpecified;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonInit;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonMoveToInit;
 import com.codeshaper.ms3.apiBuilder.classGenerator.CGRegisteredNamespace;
 import com.codeshaper.ms3.apiBuilder.module.AttributeHolder;
 import com.codeshaper.ms3.apiBuilder.module.Module;
@@ -32,7 +35,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.world.biome.Biome;
 
 /**
- * Responsible for creating the auto generated python modules
+ * Responsible for creating the auto generated Python modules
  */
 public class ApiBuilder {
 
@@ -73,18 +76,18 @@ public class ApiBuilder {
 	}
 
 	/**
-	 * Builds the api, generating all of the python files.
+	 * Builds the api, generating all of the Python files.
 	 */
 	public void buildApi() {
-		ArrayList<Module> moduleList = new ArrayList<Module>();
+		List<Module> moduleList = new ArrayList<Module>();
 
 		this.apiPackage = new ApiPackage();
 
 		for (Class<?> classToBuild : this.buildList.classList) {
 			// Create the module to representing the base class.
-			boolean flag = classToBuild.isAnnotationPresent(PythonInit.class);
+			boolean hasMoveAnnotation = classToBuild.isAnnotationPresent(PythonMoveToInit.class);
 
-			if (flag) {
+			if (hasMoveAnnotation) {
 				this.generateClass(this.apiPackage.getModule(), new ModuleClass(classToBuild), classToBuild);
 			} else {
 				Module module = new Module(classToBuild);
@@ -95,12 +98,28 @@ public class ApiBuilder {
 
 		moduleList.add(this.apiPackage.getModule());
 
-		// For every module, generate the file on the system.
-		for (Module module : moduleList) {
-			module.generateModuleFile(this.apiFolder);
-		}
+		this.writeModuleFiles(moduleList);
 
 		this.generateInitFiles();
+	}
+	
+	private void writeModuleFiles(List<Module> moduleList) {
+		for (Module module : moduleList) {
+			File dest = this.apiFolder;
+			if (module.getModulePath() != null) {
+				dest = new File(this.apiFolder, "/" + module.getModulePath() + "/");
+				dest.mkdirs();
+			}
+			File moduleFile = new File(dest, module.getName() + ".py");
+
+			try(BufferedWriter br = new BufferedWriter(new FileWriter(moduleFile))) {
+				module.write("", br);
+			} catch (IOException e) {
+				Logger.err("Unable to create auto generated module " + module.getName());
+				Logger.err("See stack trace for more.");
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
@@ -142,7 +161,7 @@ public class ApiBuilder {
 					throw new IllegalModuleFormatException(
 							"Found a constructor on root class " + classOfHolder.getName() + "!");
 				} else if (holder instanceof ModuleClass) {
-					((ModuleClass) holder).setConstructor(new ModuleConstructor(ctor));
+					((ModuleClass) holder).addConstructor(new ModuleConstructor(ctor));
 				} else {
 					throw new IllegalModuleFormatException("Found a constructor on a class (" + classOfHolder.getName()
 							+ ") that isn't marked as a ModuleClass!");
@@ -154,7 +173,7 @@ public class ApiBuilder {
 		for (Field field : classOfHolder.getDeclaredFields()) {
 			if (field.isAnnotationPresent(PythonFieldSpecified.class) || field.isAnnotationPresent(PythonField.class)) {
 				ModuleField mf = new ModuleField(field);
-				if (field.isAnnotationPresent(PythonInit.class)) {
+				if (field.isAnnotationPresent(PythonMoveToInit.class)) {
 					this.apiPackage.addField(mf);
 				} else {
 					holder.addField(mf);
@@ -166,7 +185,7 @@ public class ApiBuilder {
 		for (Method method : classOfHolder.getDeclaredMethods()) {
 			if (method.isAnnotationPresent(PythonFunction.class)) {
 				ModuleFunction mfunc = new ModuleFunction(method);
-				if (method.isAnnotationPresent(PythonInit.class)) {
+				if (method.isAnnotationPresent(PythonMoveToInit.class)) {
 					this.apiPackage.addFunction(mfunc);
 				} else {
 					holder.addFunction(mfunc);

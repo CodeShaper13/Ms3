@@ -9,9 +9,9 @@ import com.codeshaper.ms3.util.Util;
 /**
  * Base class for any attribute that would contain a name and doc string.
  */
-public abstract class BaseAttribute {
+public abstract class BaseAttribute implements IWritable {
 
-	private String name;
+	private final String name;
 	private final String docString;
 
 	public BaseAttribute(String name, AnnotatedElement ao) {
@@ -49,10 +49,5 @@ public abstract class BaseAttribute {
 	 */
 	public String getName() {
 		return this.name;
-	}
-
-	// TODO remove setter, this shouldnt be changing
-	public void setName(String name) {
-		this.name = name;
 	}
 }

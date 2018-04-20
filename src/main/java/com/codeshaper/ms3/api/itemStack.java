@@ -12,7 +12,7 @@ import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonConstructor;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonInit;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonMoveToInit;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeExclude;
 import com.codeshaper.ms3.util.Util;
 
@@ -23,17 +23,23 @@ import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 
 @PythonClass
-@PythonInit
+@PythonMoveToInit
 //TODO ctor doc strings
 public class itemStack extends PyObject {
 
 	private static final long serialVersionUID = -1784931985189272310L;
 
 	private final ItemStack stack;
-
-	@PythonConstructor
+	
+	//@PythonConstructor
+	// Used internally.
 	public itemStack(Item item, int count) {
 		this(item, count, 1);
+	}
+	
+	@PythonConstructor
+	public itemStack(String item) {
+		this(item, 1);
 	}
 
 	@PythonConstructor

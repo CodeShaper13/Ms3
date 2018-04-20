@@ -1,89 +1,91 @@
 package com.codeshaper.ms3.apiBuilder.module;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Parameter;
 
-import org.python.core.PyDictionary;
-import org.python.core.PyList;
-import org.python.core.PyObject;
-import org.python.core.PySequenceList;
-import org.python.core.PyTuple;
+import org.apache.commons.lang3.StringUtils;
 
-import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeExclude;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeName;
+import com.codeshaper.ms3.util.Util;
 
 /**
- * Represents a function within a python module, either in global or class scope
+ * Represents a function within a Python module, either in global or class scope
  */
 public class ModuleFunction extends BaseAttribute {
 
-	private final String[] argNames;
+	private final FunctionParam[] paramArray;
 
 	/**
 	 * Creates a Python function based on a method
 	 */
 	public ModuleFunction(Executable exec) {
-		super(exec.getName(), exec);
+		this(func01(exec), Util.getPydValue(exec), ModuleFunction.func(exec.getParameters()));
+	}
 
-		// Parameters
-		int pCount = exec.getParameterCount();
-		this.argNames = new String[pCount];
-		Parameter[] parameters = exec.getParameters();
-		String name;
-		for (int i = 0; i < pCount; i++) {
-			Parameter param = parameters[i];
-			if (param.isAnnotationPresent(PythonTypeName.class)) {
-				PythonTypeName a = param.getAnnotation(PythonTypeName.class);
-				name = a.value() + "_" + param.getName();
-			} else if (param.isAnnotationPresent(PythonTypeExclude.class)) {
-				name = param.getName();
-			} else {
-				String className = this.getTypeName(param.getType());
-				name = className.substring(className.lastIndexOf('.') + 1) + "_" + param.getName();
-			}
-			this.argNames[i] = name;
-		}
+	public ModuleFunction(String name, FunctionParam... params) {
+		this(name, StringUtils.EMPTY, params);
 	}
-	
-	public int getArgsLength() {
-		return this.argNames.length;
-	}
-	
-	public String getArg(int index) {
-		return this.argNames[index];
+
+	public ModuleFunction(String name, String docString, FunctionParam... params) {
+		super(name, docString);
+		this.paramArray = params;
 	}
 
 	/**
-	 * Takes in a class and returns a name to use to represent it in parameter
-	 * names.
+	 * Returns the number of arguments that the function has.
 	 */
-	private String getTypeName(Class<?> clazz) {
-		if (clazz == boolean.class) {
-			return "bool";
-			// In there are no floats, only doubles but they are called floats.
-		} else if (clazz == double.class || clazz == float.class) {
-			return "float";
-		} else if (clazz == String.class) {
-			return "str";
-		} else if (clazz == PyList.class) {
-			return "list";
-		} else if (clazz == Object.class || clazz == PyObject.class) {
-			return "object";
-		} else if (clazz == PyTuple.class) {
-			return "tuple";
-		} else if (clazz == PySequenceList.class) {
-			return "list";
-		} else if (clazz == PyDictionary.class) {
-			return "dict";
-		} else {
-			String className = clazz.getName();
-			if (className.contains(";")) {
-				className = className.replace(";", "") + "_ARRAY";
-			} else if (className.contains("$")) {
-				className = className.substring(className.lastIndexOf('$') + 1);
-			}
+	public int getArgsLength() {
+		return this.paramArray.length;
+	}
 
-			return className;
+	/**
+	 * Returns the argument at the passed index as a string ready to write to a
+	 * file. See {@link FunctionParam#getParamAsString()}
+	 */
+	public String getArg(int index) {
+		return this.paramArray[index].getParamAsString();
+	}
+	
+	@Override
+	public void write(String indent, BufferedWriter br) throws IOException {
+		StringBuilder args = new StringBuilder();
+		int length = this.getArgsLength();
+		for (int i = 0; i < length; i++) {
+			args.append(this.getArg(i));
+			if (i != length - 1) { // Not last element.
+				args.append(", ");
+			}
 		}
+
+		br.write(indent + "def " + this.getName() + "(" + args + "):\n");
+		if (this.hasDocString()) {
+			br.write(indent + "    " + this.getFormatedDocString() + "\n");
+		}
+		
+		// All functions have no body.
+		br.write(indent + "    pass\n\n");		
+	}
+	
+	private static String func01(Executable exec) {
+		if(exec instanceof Constructor<?>) {
+			return "__init__";
+		} else {
+			return exec.getName();
+		}
+	}
+
+	/**
+	 * Converts an array of {@link Parameter} to an array of {@link FunctionParam}
+	 * and returns it.
+	 */
+	private static FunctionParam[] func(Parameter... params) {
+		int i = params.length;
+		FunctionParam[] ps = new FunctionParam[params.length];
+		for (int j = 0; j < i; j++) {
+			ps[j] = new FunctionParam(params[j]);
+		}
+		return ps;
 	}
 }

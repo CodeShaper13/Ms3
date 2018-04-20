@@ -29,17 +29,26 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+/*
+ * If the parameter names are arg followed by a number in the generated Python files,
+ * you need to setX under Project -> Properties -> Java Compiler -> Store information
+ * about method parameters.
+ */
+
 @Mod(modid = Ms3.MOD_ID, name = "Ms3", version = Ms3.VERSION, dependencies = "after:*")
 public class Ms3 {
-	
+
 	public static boolean DEBUG_MODE = true;
 
 	public static final String MOD_ID = "ms3";
-	/** String identifier for the version.  Changes with every update.  Make sure to update mcmod.info */
+	/**
+	 * String identifier for the version. Changes with every update. Make sure to
+	 * update mcmod.info
+	 */
 	public static final String VERSION = "0.1.0";
 	public static final String AUTHOR = "codeshaper";
 	public static final Release RELEASE = new Release(Ms3.VERSION, null, null, null);
-	
+
 	@Mod.Instance(MOD_ID)
 	public static Ms3 instance;
 
@@ -54,12 +63,16 @@ public class Ms3 {
 	/** Reference to the script binder item. */
 	public static ItemScriptBinder itemScriptBinder = new ItemScriptBinder("script_binder");
 
-	/** Hashmap of actions set by players through the bindScript command. Note, null on the client side! */
+	/**
+	 * Hashmap of actions set by players through the bindScript command. Note, null
+	 * on the client side!
+	 */
 	public static HashMap<UUID, BindScriptAction> players = new HashMap<>();
 
-	/** Single reference to the Python Interpreter. Note, null on the client side. */
+	/**
+	 * Single reference to the Python Interpreter. Note, null on the client side.
+	 */
 	public PyInterpreter interpreter;
-
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
@@ -68,7 +81,7 @@ public class Ms3 {
 		Ms3.configManager = new Config(new File(Ms3.dirManager.getMs3Folder(), "config.cfg"));
 		Ms3.apiBuilder = new ApiBuilder(Ms3.dirManager.getApiFolder());
 		this.interpreter = new PyInterpreter("default");
-		
+
 		// Make sure the classes are loaded by the class loader before Jython tries to
 		// look up a field with reflection.
 		biomes.getAllBiomes();

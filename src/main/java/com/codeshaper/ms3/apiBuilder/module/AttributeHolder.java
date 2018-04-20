@@ -1,5 +1,7 @@
 package com.codeshaper.ms3.apiBuilder.module;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.lang.reflect.AnnotatedElement;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +15,10 @@ public abstract class AttributeHolder extends BaseAttribute {
 	private final List<ModuleFunction> methodList;
 	private final List<ModuleField> fieldList;
 	private final List<ModuleClass> innerClassList;
-	
+
 	public AttributeHolder(String name, String docString) {
 		super(name, docString);
-		
+
 		this.fieldList = new ArrayList<ModuleField>();
 		this.methodList = new ArrayList<ModuleFunction>();
 		this.innerClassList = new ArrayList<ModuleClass>();
@@ -52,5 +54,46 @@ public abstract class AttributeHolder extends BaseAttribute {
 
 	public List<ModuleClass> getClasses() {
 		return this.innerClassList;
+	}
+
+	/**
+	 * Writes all the fields to a file by calling {@link write} on them.
+	 * 
+	 * @param br
+	 * @param indent
+	 * @return True if at least one field was written to the file.
+	 * @throws IOException
+	 */
+	public boolean writeFields(BufferedWriter br, String indent) throws IOException {
+		if (!this.getFields().isEmpty()) {
+			br.write("\n");
+			for (ModuleField field : this.getFields()) {
+				field.write(indent, br);
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Writes all the functions to a file by calling {@link write} on them.
+	 * 
+	 * @param br
+	 * @param indent
+	 * @return True if at least one function was written to the file.
+	 * @throws IOException
+	 */
+	public boolean writeFunctions(BufferedWriter br, String indent) throws IOException {
+		if (!this.getFunctions().isEmpty()) {
+			br.write("\n");
+			for (ModuleFunction func : this.getFunctions()) {
+				func.write(indent, br);
+
+			}
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

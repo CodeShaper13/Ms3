@@ -7,7 +7,7 @@ import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonInit;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonMoveToInit;
 
 @PythonClass
 @PythonDocString("A list of all the vanilla Item names.")
