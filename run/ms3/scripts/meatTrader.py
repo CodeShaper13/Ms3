@@ -20,12 +20,12 @@ def pickRandomTrade(theEntity):
     
     trade = random.choice(trades)
     
-    theEntity.setSlotContents(ms3.equipmentSlot.MAINHAND, (trade[0],))
+    theEntity.setSlotContents(ms3.equipmentSlot.MAINHAND, ms3.itemStack(trade[0]))
     
     theEntity.setProperty("meatTrader.wants", trade[0])
     theEntity.setProperty("meatTrader.quantity", random.randint(trade[1][0], trade[1][1]))
     theEntity.setProperty("meatTrader.nuggetsPerItem", trade[2])
-    theEntity.setSlotContents(ms3.equipmentSlot.CHEST, (ms3.items.LEATHER_CHESTPLATE, 1, 0, "{display:{color:14540253}}"))
+    theEntity.setSlotContents(ms3.equipmentSlot.CHEST, ms3.itemStack(ms3.items.LEATHER_CHESTPLATE, 1, 0, "{display:{color:14540253}}"))
 
 
 def onBind(world, theEntity):
@@ -41,7 +41,7 @@ def onBind(world, theEntity):
 
 def onClick(world, clickedEntity, player):
     assert isinstance(world, ms3.world.World)
-    assert isinstance(clickedEntity, ms3.entity.EntityBase)
+    assert isinstance(clickedEntity, ms3.entity.Base)
     assert isinstance(player, ms3.entity.Player)
         
     tradeItemWanted = clickedEntity.getProperty("meatTrader.wants")
@@ -49,10 +49,11 @@ def onClick(world, clickedEntity, player):
     tradeNugsGiven = clickedEntity.getProperty("meatTrader.nuggetsPerItem")
     
     playerStack = player.getHeldStack()
+    assert isinstance(playerStack, ms3.itemStack)
     
-    if playerStack != None and playerStack[0] == tradeItemWanted and playerStack[1] >= tradeQuantWanted:
-        player.setInventoryStack(player.getHeldIndex(), (playerStack[0], playerStack[1] - tradeQuantWanted, playerStack[2]))
-        player.addItemStack((ms3.items.GOLD_NUGGET, tradeNugsGiven * tradeQuantWanted))
+    if playerStack != None and playerStack.getItem() == tradeItemWanted and playerStack.getCount() >= tradeQuantWanted:        
+        player.setInventoryStack(player.getHeldIndex(), ms3.itemStack(playerStack.getItem(), playerStack.getCount() - tradeQuantWanted, playerStack.getMeta()))
+        player.addItemStack(ms3.itemStack(ms3.items.GOLD_NUGGET, tradeNugsGiven * tradeQuantWanted))
         print cc.YELLOW + "Yum, thanks for doing business"
         pickRandomTrade(clickedEntity)            
     else:

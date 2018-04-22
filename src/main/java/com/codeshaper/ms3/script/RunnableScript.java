@@ -69,7 +69,7 @@ public class RunnableScript {
 	}
 
 	public RunnableScript(NBTTagCompound tag) {
-		this.scriptFile = new File(Ms3.dirManager.getScriptFolder(), tag.getString("path"));
+		this.scriptFile = new File(tag.getString("path"));
 		this.scriptArgs = new PyList();
 		
 		Integer i = 0;

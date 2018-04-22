@@ -603,6 +603,12 @@ public class entity {
 		public boolean isMarker() {
 			return this.mcEntity.hasMarker();
 		}
+		
+		@PythonFunction
+		@PythonDocString("Sets if the ArmorStand is a marker or not.")
+		public void setMarker(boolean marker) {
+			this.setTag("Marker", marker);
+		}
 	}
 
 	@PythonClass

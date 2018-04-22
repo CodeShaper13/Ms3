@@ -58,6 +58,8 @@ public class EventHandler {
 				if (bsa != null) {
 					if (bsa.getAction() == BSAction.CHECK) {
 						this.boundScriptCheck(player, capData);
+					} else if(bsa.getAction() == BSAction.CLEAR) {
+						this.boundScriptClear(player, capData);
 					} else {
 						RunnableScript runnableScript = bsa.getRunnableScript();
 						if (!runnableScript.exists()) {
@@ -169,6 +171,11 @@ public class EventHandler {
 				player.sendMessage(new TextBuilderTrans("> " + rs.getFile().getPath()).color(TextFormatting.YELLOW).get());
 			}
 		}
+	}
+	
+	private void boundScriptClear(ICommandSender player, IEntityMs3Data capabilityData) {
+		capabilityData.getScriptList().clear();
+		this.safeSendMessage(player, new TextBuilderTrans("ms3.stick.allScriptsCleared").color(TextFormatting.YELLOW).get());
 	}
 
 	/**

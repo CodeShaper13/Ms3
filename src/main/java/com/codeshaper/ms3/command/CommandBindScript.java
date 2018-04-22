@@ -53,9 +53,17 @@ public class CommandBindScript extends CommandScript {
 			throw new CommandException("commands.bindScript.onlyByPlayer");
 		}
 		
-		if(args.length >= 1 && args[0].equals("check")) {
-			this.storeAction(e, new BindScriptAction(BSAction.CHECK));
-			CommandBase.notifyCommandListener(sender, this, "commands.bindScript.useStickCheck");
+		boolean checkArg = args[0].equals("check");
+		boolean clearArg = args[0].equals("clear");
+		
+		if(args.length >= 1 && (checkArg || clearArg)) {
+			if(checkArg) {
+				this.storeAction(e, new BindScriptAction(BSAction.CHECK));
+				CommandBase.notifyCommandListener(sender, this, "commands.bindScript.useStickCheck");	
+			} else { // checkArg
+				this.storeAction(e, new BindScriptAction(BSAction.CLEAR));
+				CommandBase.notifyCommandListener(sender, this, "commands.bindScript.useStickClear");
+			}
 		}
 		else if (args.length < 2 || !(args[0].equals("add") || args[0].equals("remove"))) {
 			throw new WrongUsageException("commands.bindScript.usage");
@@ -80,7 +88,7 @@ public class CommandBindScript extends CommandScript {
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args,
 			@Nullable BlockPos pos) {
 		if (args.length == 1) {
-			return CommandBase.getListOfStringsMatchingLastWord(args, "add", "remove", "check");
+			return CommandBase.getListOfStringsMatchingLastWord(args, "add", "remove", "check", "clear");
 		} else if (args.length == 2 && (args[0].equals("add") || args[0].equals("remove"))) {
 			return CommandBase.getListOfStringsMatchingLastWord(args, this.getAllScripts());
 		} else {

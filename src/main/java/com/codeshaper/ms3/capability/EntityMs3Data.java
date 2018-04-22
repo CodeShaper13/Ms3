@@ -57,6 +57,7 @@ public class EntityMs3Data implements IEntityMs3Data {
 		for (RunnableScript runnableScript : this.scripts) {
 			// TODO print error message if the script can't be found.
 			if (!runnableScript.exists()) {
+				System.out.println(runnableScript.getFile().toString());
 				System.out.println("script not found!");
 			} else {
 				try {

@@ -49,14 +49,14 @@ def execute(world, sender):
                         zombie = world.spawnEntity(ms3.entityList.ZOMBIE, x1, y1 + i, z1, None)
                         assert isinstance(zombie, ms3.entity.Zombie)
             
-                        zombie.setSlotContents(ms3.equipmentSlot.FEET, (ms3.items.LEATHER_BOOTS,))
-                        zombie.setSlotContents(ms3.equipmentSlot.LEGS, (ms3.items.LEATHER_LEGGINGS,))
-                        zombie.setSlotContents(ms3.equipmentSlot.CHEST, (ms3.items.LEATHER_CHESTPLATE,))
-                        zombie.setSlotContents(ms3.equipmentSlot.HEAD, (ms3.items.LEATHER_HELMET,))
+                        zombie.setSlotContents(ms3.equipmentSlot.FEET, ms3.itemStack(ms3.items.LEATHER_BOOTS))
+                        zombie.setSlotContents(ms3.equipmentSlot.LEGS, ms3.itemStack(ms3.items.LEATHER_LEGGINGS))
+                        zombie.setSlotContents(ms3.equipmentSlot.CHEST, ms3.itemStack(ms3.items.LEATHER_CHESTPLATE))
+                        zombie.setSlotContents(ms3.equipmentSlot.HEAD, ms3.itemStack(ms3.items.LEATHER_HELMET))
                         zombie.setNoAi(True)
                         zombie.setInvulnerable(True)
                         zombie.setIsBaby(False) # Make sure they're all adults.
-                        zombie.bindScript("PycExamples/zombieAttack/risingZombie.py", [])
+                        zombie.bindScript("zombieAttack/risingZombie.py", [])
                         zombie.setRotation(pos[2], 0) # Face the player
                                 
                         zombie.setProperty("zombieAttackTimer", 40)

@@ -7,7 +7,7 @@ def execute(world, sender):
     zombie = world.spawnEntity(pyapi.entityList.ZOMBIE, 3, 5, 3)
     assert isinstance(zombie, pyapi.entity.Zombie)
     
-    zombie.bindScript("PycExamples/boundScript/sayHello.py", ["Hello"]) # Pass an empty list or None for no args.
-    zombie.bindScript("PycExamples/boundScript/sayHello.py", ["World!"])
+    zombie.bindScript("boundScript/sayHello.py", ["Hello"]) # Pass an empty list or None for no args.
+    zombie.bindScript("boundScript/sayHello.py", ["World!"])
     
     zombie.setProperty("boundScript", "prefix", 123);

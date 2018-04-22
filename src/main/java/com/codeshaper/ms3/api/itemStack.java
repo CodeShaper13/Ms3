@@ -44,7 +44,7 @@ public class itemStack extends PyObject {
 
 	@PythonConstructor
 	public itemStack(String item, int count) {
-		this(item, count, 1);
+		this(item, count, 0);
 	}
 
 	@PythonConstructor
