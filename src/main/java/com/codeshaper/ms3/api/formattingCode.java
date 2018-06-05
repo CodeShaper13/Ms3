@@ -1,57 +1,57 @@
 package com.codeshaper.ms3.api;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
 
 @PythonDocString("Formatting code constants for colored and formatted text.  See minecraft.gamepedia.com/formatting_codes for more.")
 public class formattingCode {
 
-	@PythonField
+	@PythonFieldGenerated
 	@PythonDocString("Formatting code prefix character.  It is recomended to use this instead of hard coding it into strings.")
 	public static final char __PREFIX = '&';
 	
-	@PythonField
+	@PythonFieldGenerated
 	public static final String BLACK = formattingCode.__PREFIX + "0";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String DARK_BLUE = formattingCode.__PREFIX + "1";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String DARK_GREEN = formattingCode.__PREFIX + "2";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String DARK_AQUA = formattingCode.__PREFIX + "3";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String DARK_RED = formattingCode.__PREFIX + "4";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String DARK_PURPLE = formattingCode.__PREFIX + "5";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String GOLD = formattingCode.__PREFIX + "6";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String GRAY = formattingCode.__PREFIX + "7";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String DARK_GRAY = formattingCode.__PREFIX + "8";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String BLUE = formattingCode.__PREFIX + "9";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String GREEN = formattingCode.__PREFIX + "a";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String AQUA = formattingCode.__PREFIX + "b";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String RED = formattingCode.__PREFIX + "c";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String LIGHT_PURPLE = formattingCode.__PREFIX + "d";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String YELLOW = formattingCode.__PREFIX + "e";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String WHITE = formattingCode.__PREFIX + "f";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String OBFUSCATED = formattingCode.__PREFIX + "k";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String BOLD = formattingCode.__PREFIX + "l";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String STRIKETHROUGH = formattingCode.__PREFIX + "m";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String UNDERLINE = formattingCode.__PREFIX + "n";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String ITALIC = formattingCode.__PREFIX + "o";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String RESET = formattingCode.__PREFIX + "r";
 }

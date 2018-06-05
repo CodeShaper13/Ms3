@@ -5,14 +5,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
- * Marks the passed field to be added to the module generate from the field's
- * class.
+ * Marks a field where the value should be computed based on the fields value as
+ * defined in the class. This should only be on fields that are both public and
+ * static.  Used in module generation.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface PythonFieldSpecified {
-	String value() default StringUtils.EMPTY;
+public @interface PythonFieldGenerated {
 }

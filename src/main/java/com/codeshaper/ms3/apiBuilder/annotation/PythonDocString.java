@@ -7,7 +7,9 @@ import java.lang.annotation.Target;
 
 /**
  * Defines the docstring that this class or function should have. Used in module
- * generation
+ * generation.
+ * 
+ * @author CodeShaper
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.FIELD })

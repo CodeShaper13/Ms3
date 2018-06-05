@@ -9,8 +9,8 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldSpecified;
 import com.codeshaper.ms3.exception.IllegalModuleFormatException;
 
 public class ModuleField extends BaseAttribute {
@@ -22,9 +22,8 @@ public class ModuleField extends BaseAttribute {
 	public ModuleField(Field field) {
 		super(field.getName(), field);
 
-		if (field.isAnnotationPresent(PythonField.class)) {
-			// Tries to find the value of the field, throwing an exception if the field has
-			// invalid modifiers.
+		if (field.isAnnotationPresent(PythonFieldGenerated.class)) {
+			// Tries to find the value of the field, throwing an exception if the field is not both public and static.
 			int mod = field.getModifiers();
 			if (Modifier.isStatic(mod) && Modifier.isPublic(mod)) {
 				Object obj = null;
@@ -43,12 +42,12 @@ public class ModuleField extends BaseAttribute {
 				}
 			} else {
 				throw new IllegalModuleFormatException(field.toString()
-						+ " was found with a PythonField annotation, but it was not marked as public and static!");
+						+ " was found with a PythonFieldGenerated annotation, but it was not marked as public and static!");
 			}
 		} else {
-			PythonFieldSpecified pf = field.getAnnotation(PythonFieldSpecified.class);
+			PythonField pf = field.getAnnotation(PythonField.class);
 			String v = pf.value();
-			this.value = (v.equals("") ? NONE : StringUtils.isNumeric(v) ? v : ("\"" + v + "\""));
+			this.value = (v.equals(StringUtils.EMPTY) ? NONE : StringUtils.isNumeric(v) ? v : ("\"" + v + "\""));
 
 		}
 	}

@@ -4,7 +4,7 @@ import com.codeshaper.ms3.api as ms3
 import com.codeshaper.ms3.api.formattingCode as cc
 
 def pickRandomTrade(theEntity):
-    """ Picks a new random trade and stores it as a property. """
+    """ Picks a new random trade and stores it as a series of properties. """
     assert isinstance(theEntity, ms3.entity.Zombie)
     
     trades = (
@@ -20,6 +20,7 @@ def pickRandomTrade(theEntity):
     
     trade = random.choice(trades)
     
+    # Set them to hold the item they want.
     theEntity.setSlotContents(ms3.equipmentSlot.MAINHAND, ms3.itemStack(trade[0]))
     
     theEntity.setProperty("meatTrader.wants", trade[0])
@@ -37,6 +38,20 @@ def onBind(world, theEntity):
     theEntity.setInvulnerable(True)
         
     pickRandomTrade(theEntity)
+    
+
+def execute(world, sender):
+    '@type world: ms3.world.World'
+    '@type sender: ms3.executor.Executor'
+
+    '@type zombie: ms3.entity.Zombie'    
+    zombie = None
+    if len(sys.argv) < 4:
+        zombie = world.spawnEntity(ms3.entityList.ZOMBIE, sender.getX(), sender.getY(), sender.getZ(), None)
+    else :
+        zombie = world.spawnEntity(ms3.entityList.ZOMBIE, float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3]), None)
+    
+    zombie.bindScript("")
     
 
 def onClick(world, clickedEntity, player):

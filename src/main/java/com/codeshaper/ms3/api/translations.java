@@ -13,18 +13,21 @@ public class translations {
 	private translations() {
 	}
 
+	@SuppressWarnings("deprecation")
 	@PythonFunction
 	@PythonDocString("Translates the passed unlocalized key to a localized string.")
 	public static String translate(String key) {
 		return I18n.translateToLocal(key);
 	}
 
+	@SuppressWarnings("deprecation")
 	@PythonFunction
 	@PythonDocString("Translates the passed unlocalized key to a localized string using the passed arguments.")
 	public static String translate(String key, Object... args) {
 		return I18n.translateToLocalFormatted(key, args);
 	}
 
+	@SuppressWarnings("deprecation")
 	@PythonFunction
 	@PythonDocString("Returns a Block or Items localized name.")
 	public static String getLocalizedName(String name, int meta) {

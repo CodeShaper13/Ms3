@@ -1,6 +1,22 @@
 import com.codeshaper.ms3.api as ms3
 import sys
 from com.codeshaper.ms3.api import itemUtils
+import math
+
+class Test(ms3.BoundObject):
+    
+    #def __init__(self, e):
+    #    super(Test, self).__init__(e)
+    #    print "__init__(self, e)"
+        
+    def onTick(self):
+        print "onTick(self)"
+        
+    def onTick(self):
+        print self.getPrefix()
+        
+    def spam(self):
+        print "spam"
 
 def onBind(world, entity):
     print "onBind()"
@@ -11,10 +27,10 @@ def execute(world, sender):
     
     print "execute()"
     
-    stack = ms3.itemStack("stick", 0)
-    assert isinstance(stack, ms3.itemStack)
-    print stack.getCount()
+    from ms3util import mathUtils
+    print mathUtils.distance(0, 0, 0, 10, 10, 10)
     
+        
     
 def unused():
     #ms3.util.printObjectType(ms3)

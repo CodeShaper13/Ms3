@@ -1,8 +1,6 @@
 package com.codeshaper.ms3.apiBuilder.module;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.annotation.Nullable;
@@ -10,7 +8,6 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 
 import com.codeshaper.ms3.Ms3;
-import com.codeshaper.ms3.util.Logger;
 import com.codeshaper.ms3.util.Util;
 
 /**
@@ -35,7 +32,7 @@ public class Module extends AttributeHolder {
 
 		this.modulePath = "com/" + Ms3.AUTHOR + "/" + Ms3.MOD_ID + "/api";
 	}
-	
+
 	public String getModulePath() {
 		return this.modulePath;
 	}

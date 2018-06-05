@@ -10,6 +10,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.codeshaper.ms3.util.Util;
 
+/**
+ * Abstract base class for any attribute that holds fields, methods and classes.
+ * 
+ * @author CodeShaper
+ */
 public abstract class AttributeHolder extends BaseAttribute {
 
 	private final List<ModuleFunction> methodList;

@@ -5,11 +5,14 @@ import org.apache.commons.lang3.text.WordUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.RegistryNamespaced;
 
-public class CGRegisteredNamespace extends CGBase {
+/**
+ * @author CodeShaper
+ */
+public class ClassGeneratorRegisteredNamespace extends ClassGeneratorBase {
 
 	private RegistryNamespaced<ResourceLocation, ?> registryNamespace;
 
-	public CGRegisteredNamespace(RegistryNamespaced<ResourceLocation, ?> rn) {
+	public ClassGeneratorRegisteredNamespace(RegistryNamespaced<ResourceLocation, ?> rn) {
 		this.registryNamespace = rn;
 	}
 

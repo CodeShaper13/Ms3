@@ -7,8 +7,10 @@ import java.lang.annotation.Target;
 
 /**
  * Stops the Python module generator from including the parameter's type in its
- * name. Used when the parameter is of type object because multiple types are
+ * name. Recommended to use when the parameter is of type object because multiple types are
  * accepted.
+ * 
+ * @author CodeShaper
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)

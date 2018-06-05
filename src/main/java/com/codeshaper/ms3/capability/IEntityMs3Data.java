@@ -7,7 +7,11 @@ import javax.annotation.Nullable;
 
 import org.python.core.PyException;
 import org.python.core.PyList;
+import org.python.core.PyType;
 
+import com.codeshaper.ms3.EnumCallbackType;
+import com.codeshaper.ms3.annotation.NotYetImplemented;
+import com.codeshaper.ms3.api.BoundObject;
 import com.codeshaper.ms3.api.exception.MissingScriptException;
 import com.codeshaper.ms3.script.RunnableScript;
 
@@ -63,4 +67,35 @@ public interface IEntityMs3Data {
 	public void runAllOnClick(Entity entity, EntityPlayer player);
 
 	public void setClearMethodCall();
+
+	/**
+	 * Calls one of the defined callbacks in {@link EnumCallbackType} and calls that
+	 * method on every {@link BoundObject} that is bound to this Entity.
+	 * 
+	 * @param type
+	 *            The callback to call.
+	 * @param args
+	 *            Optional arguments to pass into the called method.
+	 */
+	public void runCallback(EnumCallbackType type, Object... args);
+
+	/**
+	 * Adds a {@link BoundObject} to the Entity.
+	 * 
+	 * @param obj
+	 * @return True if the object was added, False if the Entity already has an
+	 *         object bound with the same type.
+	 */
+	@NotYetImplemented
+	public boolean addObject(BoundObject obj);
+
+	/**
+	 * Returns the {@link BoundObject} that is bound to the entity with the passed
+	 * key.
+	 * 
+	 * @param type
+	 * @return
+	 */
+	@NotYetImplemented
+	public BoundObject getObject(PyType type);
 }

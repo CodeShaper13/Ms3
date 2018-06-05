@@ -15,11 +15,11 @@ import javax.annotation.Nullable;
 import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonConstructor;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldSpecified;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonMoveToInit;
-import com.codeshaper.ms3.apiBuilder.classGenerator.CGRegisteredNamespace;
+import com.codeshaper.ms3.apiBuilder.classGenerator.ClassGeneratorRegisteredNamespace;
 import com.codeshaper.ms3.apiBuilder.module.AttributeHolder;
 import com.codeshaper.ms3.apiBuilder.module.Module;
 import com.codeshaper.ms3.apiBuilder.module.ModuleClass;
@@ -44,7 +44,6 @@ public class ApiBuilder {
 
 	private ApiPackage apiPackage;
 
-	@SuppressWarnings("unused")
 	public ApiBuilder(File apiFolder) {
 		this.buildList = new BuildList();
 		this.apiFolder = apiFolder;
@@ -53,10 +52,10 @@ public class ApiBuilder {
 		if (false) {
 			File outputFolder = new File(System.getProperty("user.home")
 					+ "\\Desktop\\Forge Workspace\\Ms3\\src\\main\\java\\com\\codeshaper\\ms3\\api");
-			new CGRegisteredNamespace(Block.REGISTRY).generateClass("block", outputFolder);
-			new CGRegisteredNamespace(Item.REGISTRY).generateClass("item", outputFolder);
-			new CGRegisteredNamespace(Biome.REGISTRY).generateClass("biome", outputFolder);
-			new CGRegisteredNamespace(SoundEvent.REGISTRY).generateClass("sound", outputFolder);
+			new ClassGeneratorRegisteredNamespace(Block.REGISTRY).generateClass("block", outputFolder);
+			new ClassGeneratorRegisteredNamespace(Item.REGISTRY).generateClass("item", outputFolder);
+			new ClassGeneratorRegisteredNamespace(Biome.REGISTRY).generateClass("biome", outputFolder);
+			new ClassGeneratorRegisteredNamespace(SoundEvent.REGISTRY).generateClass("sound", outputFolder);
 		}
 	}
 
@@ -171,7 +170,7 @@ public class ApiBuilder {
 
 		// Add fields.
 		for (Field field : classOfHolder.getDeclaredFields()) {
-			if (field.isAnnotationPresent(PythonFieldSpecified.class) || field.isAnnotationPresent(PythonField.class)) {
+			if (field.isAnnotationPresent(PythonField.class) || field.isAnnotationPresent(PythonFieldGenerated.class)) {
 				ModuleField mf = new ModuleField(field);
 				if (field.isAnnotationPresent(PythonMoveToInit.class)) {
 					this.apiPackage.addField(mf);

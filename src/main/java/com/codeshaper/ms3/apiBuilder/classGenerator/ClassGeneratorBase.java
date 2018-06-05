@@ -13,8 +13,10 @@ import org.apache.commons.lang3.text.WordUtils;
 
 /**
  * Used to generate java source files.
+ * 
+ * @author CodeShaper
  */
-public abstract class CGBase {
+public abstract class ClassGeneratorBase {
 
 	private List<CGField> fields = new ArrayList<CGField>();
 	private List<String> moreImports = new ArrayList<String>();
@@ -40,7 +42,7 @@ public abstract class CGBase {
 			br.write("\n");
 			br.write("import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;\n");
 			br.write("import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;\n");
-			br.write("import com.codeshaper.ms3.apiBuilder.annotation.PythonField;\n");
+			br.write("import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;\n");
 			br.write("import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;\n");
 			br.write("\n");
 
@@ -65,7 +67,7 @@ public abstract class CGBase {
 			for (CGField field : this.fields) {
 				String value = field.value.toString();
 
-				br.write("    @PythonField\n");
+				br.write("    @PythonFieldGenerated\n");
 				br.write("    public static final String " + field.name + " = func(\"" + value + "\");\n");
 			}
 

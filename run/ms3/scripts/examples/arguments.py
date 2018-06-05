@@ -1,5 +1,3 @@
-# Example of the use of the getArgs() function.
-
 import com.codeshaper.ms3.api as ms3
 import sys
 
@@ -9,9 +7,10 @@ def execute(world, sender):
         
     print "Value of sys.argv:"
         
-    for arg in sys.argv:
-        print "    " + arg
-    
+    i = 0
+    for arg in sys.argv:        
+        print str(i) + ":    " + arg
+        i += 1
     
 def getArgs(world, sender):
     assert isinstance(world, ms3.world.World)

@@ -6,6 +6,8 @@ import java.io.IOException;
 /**
  * Indicates that this class's data can be written to a Python file. Used by the
  * classes in {@link com.codeshaper.ms3.module } package.
+ * 
+ * @author CodeShaper
  */
 public interface IWritable {
 

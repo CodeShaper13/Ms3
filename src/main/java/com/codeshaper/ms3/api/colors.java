@@ -5,7 +5,7 @@ import org.python.core.PyTuple;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 import com.codeshaper.ms3.util.Util;
 
@@ -16,37 +16,37 @@ public class colors {
 	private colors() {
 	}
 
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple WHITE = Util.makeTuple(0, 15);
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple ORANGE = Util.makeTuple(1, 14);
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple MAGENTA = Util.makeTuple(2, 13);
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple LIGHT_BLUE = Util.makeTuple(3, 12);
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple YELLOW = Util.makeTuple(4, 11);
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple LIME = Util.makeTuple(5, 10);
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple PINK = Util.makeTuple(6, 9);
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple GRAY = Util.makeTuple(7, 8);
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple LIGHT_GRAY = Util.makeTuple(8, 7);
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple CYAN = Util.makeTuple(9, 6);
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple PURPLE = Util.makeTuple(10, 5);
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple BLUE = Util.makeTuple(11, 4);
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple BROWN = Util.makeTuple(12, 3);
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple GREEN = Util.makeTuple(13, 2);
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple RED = Util.makeTuple(14, 1);
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple BLACK = Util.makeTuple(15, 0);
 
 	@PythonFunction

@@ -11,17 +11,17 @@ import org.python.core.PyBoolean;
 import org.python.core.PyException;
 import org.python.core.PyList;
 import org.python.core.PyObject;
-import org.python.core.PySequence;
 import org.python.core.PyTuple;
 
 import com.codeshaper.ms3.api.exception.MissingScriptException;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeExclude;
 import com.codeshaper.ms3.capability.EntityMs3DataProvider;
 import com.codeshaper.ms3.capability.IEntityMs3Data;
+import com.codeshaper.ms3.util.Assert;
 import com.codeshaper.ms3.util.NbtHelper;
 import com.codeshaper.ms3.util.Util;
 
@@ -360,7 +360,37 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Searches every script bound to this entity and calls all functions with the passed name with the passed args.")
+		@PythonDocString("Binds an object to the entity")
+		public void bindObject(PyObject type) {
+			Assert.isClassType(type);
+
+			// Instantiate the type.
+			PyObject object = type.__call__(this); // Pass the entity into the constructor.
+			object.getType();
+			Object tempObj = object.__tojava__(BoundObject.class);
+			if (tempObj == Py.NoConversion) {
+				throw Py.ValueError("objectType must inherit from BoundObject");
+			}
+			BoundObject boundObj = (BoundObject) tempObj;
+
+			IEntityMs3Data bs = this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
+			boolean flag = bs.addObject(boundObj);
+			if(!flag) {
+				throw Py.ValueError("Entity already has an object bound with the same type!");
+			}
+		}
+
+		@PythonFunction
+		@PythonDocString("")
+		public BoundObject getBoundObject(PyObject objectType) {
+			Assert.isClassType(objectType);
+			IEntityMs3Data bs = this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
+			return bs.getObject(objectType.getType());
+		}
+
+		// @PythonFunction
+		// @PythonDocString("Searches every script bound to this entity and calls all
+		// functions with the passed name with the passed args.")
 		public void call(String functionName, PyObject... args) {
 			IEntityMs3Data bs = this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
 			// TODO
@@ -424,19 +454,6 @@ public class entity {
 		@Override
 		public PyObject __ne__(PyObject other) {
 			return Util.pyNotHelper(this.__eq__(other));
-		}
-
-		/**
-		 * Used to check that slot indices are in bounds.
-		 * 
-		 * @param index
-		 * @param upperSize
-		 */
-		protected void throwIfNotInBounds(int index, int upperSize) {
-			if (index < 0 || index > upperSize) {
-				throw Py.ValueError(
-						"Index is invalid, it must be between 0 and " + upperSize + " inclusive and was " + index);
-			}
 		}
 	}
 
@@ -519,7 +536,7 @@ public class entity {
 		@Override
 		@Nullable
 		public itemStack getSlotContents(int slotIndex) {
-			this.throwIfNotInBounds(slotIndex, 6);
+			Assert.isIndexInBounds(slotIndex, 6);
 			return itemStack.make(this.mcEntity.getItemStackFromSlot(equipmentSlot.indexToEnum(slotIndex)));
 		}
 
@@ -527,7 +544,7 @@ public class entity {
 		@PythonDocString("Sets the contents of a slot.  Pass None for the itemStack to set the slot to be empty.  See equipmentSlot.py for index constants.")
 		@Override
 		public void setSlotContents(int slotIndex, @Nullable itemStack itemStack) {
-			this.throwIfNotInBounds(slotIndex, 6);
+			Assert.isIndexInBounds(slotIndex, 6);
 			ItemStack s;
 			if (itemStack == null || itemStack.getCount() <= 0) {
 				s = ItemStack.EMPTY;
@@ -603,7 +620,7 @@ public class entity {
 		public boolean isMarker() {
 			return this.mcEntity.hasMarker();
 		}
-		
+
 		@PythonFunction
 		@PythonDocString("Sets if the ArmorStand is a marker or not.")
 		public void setMarker(boolean marker) {
@@ -638,17 +655,17 @@ public class entity {
 
 		private static final long serialVersionUID = -9198241601349531102L;
 
-		@PythonField
+		@PythonFieldGenerated
 		public static final String TYPE_OAK = "oak";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String TYPE_SPRUCE = "spruce";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String TYPE_BIRCH = "birch";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String TYPE_JUNGLE = "jungle";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String TYPE_ACACIA = "acacia";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String TYPE_DARK_OAK = "dark_oak";
 
 		public Boat(EntityBoat entity) {
@@ -748,30 +765,30 @@ public class entity {
 
 		private static final long serialVersionUID = -5955391820741486510L;
 
-		@PythonField
+		@PythonFieldGenerated
 		public static final int PHASE_CIRCLING = 0;
-		@PythonField
+		@PythonFieldGenerated
 		@PythonDocString("The Dragon is about to shoot a fireball.")
 		public static final int PHASE_STRAFING_PLAYER = 1;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int PHASE_LANDING_APPROACH = 2;
-		@PythonField
+		@PythonFieldGenerated
 		@PythonDocString("The Dragon has landed on the portal.")
 		public static final int PHASE_LANDING = 3;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int PHASE_TAKEOFF = 4;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int PHASE_SITTING_FLAMING = 5;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int PHASE_SITTING_SCANNING = 6;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int PHASE_SITTING = 7;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int PHASE_CHARGING_PLAYER = 8;
-		@PythonField
+		@PythonFieldGenerated
 		@PythonDocString("Flying to portal to die.")
 		public static final int PHASE_DYING = 9;
-		@PythonField
+		@PythonFieldGenerated
 		@PythonDocString("Hovering with no AI. (Default when summoned via /summon)")
 		public static final int PHASE_HOVER = 10;
 
@@ -1042,30 +1059,30 @@ public class entity {
 
 		private static final long serialVersionUID = 7147534040184529530L;
 
-		@PythonField
+		@PythonFieldGenerated
 		public static final int COLOR_WHITE = 0;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int COLOR_CREAMY = 1;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int COLOR_CHESTNUT = 2;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int COLOR_BROWN = 3;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int COLOR_BLACK = 4;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int COLOR_GRAY = 5;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int COLOR_DARK_BROWN = 6;
 
-		@PythonField
+		@PythonFieldGenerated
 		public static final int MARKING_NONE = 0;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int MARKING_WHITE = 1;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int MARKING_WHITE_FIELD = 2;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int MARKING_WHITE_DOTS = 3;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int MARKING_BLACK_DOTS = 4;
 
 		public Horse(EntityHorse entity) {
@@ -1143,13 +1160,13 @@ public class entity {
 
 		private static final long serialVersionUID = -3752886054446835931L;
 
-		@PythonField
+		@PythonFieldGenerated
 		public static final int TYPE_WILD = 0;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int TYPE_TUXEDO = 01;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int TYPE_TABBY = 2;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int TYPE_SIAMESE = 3;
 
 		public Ocelot(EntityOcelot entity) {
@@ -1174,57 +1191,57 @@ public class entity {
 
 		private static final long serialVersionUID = 7791696705579553157L;
 
-		@PythonField
+		@PythonFieldGenerated
 		public static final String KEBAB = "Kebab";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String AZTEC = "Aztec";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String ALBAN = "Alban";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String AZTEC_2 = "Aztec2";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String BOMB = "Bomb";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String PLANT = "Plant";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String WASTELAND = "Wasteland";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String POOL = "Pool";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String COURBET = "Courbet";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String SEA = "Sea";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String SUNSET = "Sunset";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String CREEBET = "Creebet";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String WANDERER = "Wanderer";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String GRAHAM = "Graham";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String MATCH = "Match";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String BUST = "Bust";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String STAGE = "Stage";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String VOID = "Void";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String SKULL_AND_ROSES = "SkullAndRoses";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String WITHER = "Wither";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String FIGHTERS = "Fighters";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String POINTER = "Pointer";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String PIGSCENE = "Pigscene";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String BURNING_SKULL = "BurningSkull";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String SKELETON = "Skeleton";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String DONKEY_KONG = "DonkeyKong";
 
 		public Painting(EntityPainting entity) {
@@ -1256,15 +1273,15 @@ public class entity {
 
 		private static final long serialVersionUID = -8273033504720739347L;
 
-		@PythonField
+		@PythonFieldGenerated
 		public static final int COLOR_RED = 0;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int COLOR_BLUE = 1;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int COLOR_GREEN = 2;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int COLOR_CYAN = 3;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int COLOR_SILVEr = 4;
 
 		public Parrot(EntityParrot entity) {
@@ -1331,7 +1348,7 @@ public class entity {
 		@PythonDocString("Returns a piece or armor, held item or off hand item as an itemStack.")
 		@Override
 		public itemStack getSlotContents(int slotIndex) {
-			this.throwIfNotInBounds(slotIndex, 6);
+			Assert.isIndexInBounds(slotIndex, 6);
 			return itemStack.make(this.mcEntity.getItemStackFromSlot(equipmentSlot.indexToEnum(slotIndex)));
 		}
 
@@ -1339,7 +1356,7 @@ public class entity {
 		@PythonDocString("Sets a piece or armor, held item or offhand item.")
 		@Override
 		public void setSlotContents(int slotIndex, itemStack stack) {
-			this.throwIfNotInBounds(slotIndex, 6);
+			Assert.isIndexInBounds(slotIndex, 6);
 			this.mcEntity.setItemStackToSlot(equipmentSlot.indexToEnum(slotIndex), stack.getMcStack());
 			this.mcEntity.inventoryContainer.detectAndSendChanges();
 		}
@@ -1347,14 +1364,14 @@ public class entity {
 		@PythonFunction
 		@PythonDocString("Returns an itemStack in the player's main inventory.  slotIndex is 0-35 inclusive.")
 		public itemStack getInventoryStack(int slotIndex) {
-			this.throwIfNotInBounds(slotIndex, 36);
+			Assert.isIndexInBounds(slotIndex, 36);
 			return itemStack.make(this.mcEntity.inventory.mainInventory.get(slotIndex));
 		}
 
 		@PythonFunction
 		@PythonDocString("Sets an itemStack in the player's main inventory.  slotIndex is 0-35 inclusive.")
 		public void setInventoryStack(int slotIndex, itemStack stack) {
-			this.throwIfNotInBounds(slotIndex, 36);
+			Assert.isIndexInBounds(slotIndex, 36);
 			this.mcEntity.inventory.mainInventory.set(slotIndex, stack.getMcStack());
 			this.mcEntity.inventoryContainer.detectAndSendChanges();
 		}
@@ -1406,19 +1423,19 @@ public class entity {
 
 		private static final long serialVersionUID = 7640215810890520120L;
 
-		@PythonField
+		@PythonFieldGenerated
 		public static final int TYPE_BROWN = 0;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int TYPE_WHITE = 1;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int TYPE_BLACK = 2;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int TYPE_BLACK_WHITE = 3;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int TYPE_GOLD = 4;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int TYPE_SALT_PEPPER = 5;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int TYPE_KILLER = 99;
 
 		public Rabbit(EntityRabbit entity) {
@@ -1600,44 +1617,44 @@ public class entity {
 
 		private Field field;
 
-		@PythonField
+		@PythonFieldGenerated
 		public static final int PROFESSION_FARMER = 0;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int PROFESSION_LIBRARIAN = 1;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int PROFESSION_PRIEST = 2;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int PROFESSION_BLACKSMITH = 3;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int PROFESSION_BUTCHER = 4;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int PROFESSION_NITWIT = 5;
 
-		@PythonField
+		@PythonFieldGenerated
 		public static final int CAREER_FARMER = 1;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int CAREER_FISHERMAN = 2;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int CAREER_SHEPHERD = 3;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int CAREER_FLETCHER = 4;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int CAREER_LIBRARIAN = 1;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int CAREER_CARTOGRAPHER = 2;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int CAREER_CLERIC = 1;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int CAREER_ARMORER = 1;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int CAREER_WEAPON_SMITH = 2;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int CAREER_TOOL_SMITH = 3;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int CAREER_BUTCHER = 1;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int CAREER_LEATHERWORKER = 2;
-		@PythonField
+		@PythonFieldGenerated
 		public static final int CAREER_NITWIT = 1;
 
 		public Villager(EntityVillager entity) {
@@ -1702,16 +1719,16 @@ public class entity {
 			// TODO give XP
 
 			// Parse args:
-			if(buy instanceof itemStack) {
+			if (buy instanceof itemStack) {
 				buy1 = ((itemStack) buy).getMcStack();
 				buy2 = ItemStack.EMPTY;
-			} else if(buy instanceof PyTuple) {
-				PyTuple buyTuple = ((PyTuple)buy);
+			} else if (buy instanceof PyTuple) {
+				PyTuple buyTuple = ((PyTuple) buy);
 				if (buyTuple.__len__() <= 0 || buyTuple.__len__() > 2) {
 					throw Py.ValueError("Buy list may only contain 1 or 2 items");
 				}
-				
-				buy1 = ((itemStack)buyTuple.get(0)).getMcStack();
+
+				buy1 = ((itemStack) buyTuple.get(0)).getMcStack();
 				if (buyTuple.size() > 1) {
 					buy2 = ((itemStack) buyTuple.get(1)).getMcStack();
 				} else {

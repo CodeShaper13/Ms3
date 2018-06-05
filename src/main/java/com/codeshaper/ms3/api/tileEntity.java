@@ -17,7 +17,7 @@ import org.python.core.PyTuple;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeExclude;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 import com.codeshaper.ms3.util.NbtHelper;
 import com.mojang.authlib.GameProfile;
@@ -253,19 +253,19 @@ public class tileEntity {
 
 		private static final long serialVersionUID = -4501498464782181069L;
 
-		@PythonField
+		@PythonFieldGenerated
 		@PythonDocString("Numeric constant with the left slot ID.")
 		public static final int ID_LEFT = 0;
-		@PythonField
+		@PythonFieldGenerated
 		@PythonDocString("Numeric constant with the middle slot ID.")
 		public static final int ID_MIDDLE = 1;
-		@PythonField
+		@PythonFieldGenerated
 		@PythonDocString("Numeric constant with the right slot ID.")
 		public static final int ID_RIGHT = 2;
-		@PythonField
+		@PythonFieldGenerated
 		@PythonDocString("Numeric constant with the ingredient slot ID.")
 		public static final int ID_INGREDIENT = 3;
-		@PythonField
+		@PythonFieldGenerated
 		@PythonDocString("Numeric constant with the fuel slot ID.")
 		public static final int ID_FUEL = 4;
 
@@ -353,13 +353,13 @@ public class tileEntity {
 
 		private static final long serialVersionUID = 7367812229820446548L;
 
-		@PythonField
+		@PythonFieldGenerated
 		@PythonDocString("Numeric constant with the ingredient slot ID.")
 		public static final int ID_SMELT = 0;
-		@PythonField
+		@PythonFieldGenerated
 		@PythonDocString("Numeric constant with the fuel slot ID.")
 		public static final int ID_FUEL = 1;
-		@PythonField
+		@PythonFieldGenerated
 		@PythonDocString("Numeric constant with the result slot ID.")
 		public static final int ID_RESULT = 2;
 
@@ -538,89 +538,89 @@ public class tileEntity {
 
 		private static final long serialVersionUID = -4226105205783622653L;
 
-		@PythonField
+		@PythonFieldGenerated
 		public static final String ALEX = "MHF_Alex";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String BLAZE = "MHF_Blaze";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String CAVE_SPIDER = "MHF_CaveSpider";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String CHICKEN = "MHF_Chicken";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String COW = "MHF_Cow";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String CREEPER = "MHF_Creeper";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String ENDERMAN = "MHF_Enderman";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String GHAST = "MHF_Ghast";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String GOLEM = "MHF_Golem";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String HEROBRINE = "MHF_Herobrine";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String MAGMA_CUBE = "MHF_LavaSlime";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String MUSHROOM_COW = "MHF_MushroomCow";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String OCELOT = "HF_Ocelot";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String PIG = "MHF_Pig";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String PIG_ZOMBIE = "MHF_PigZombie";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String SHEEP = "MHF_Sheep";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String SKELETON = "MHF_Skeleton";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String SLIME = "MHF_Slime";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String SPIDER = "MHF_Spider";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String SQUID = "MHF_Squid";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String STEVE = "MHF_Steve";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String VILLAGER = "MHF_Villager";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String WITHER_SKELETON = "MHF_WSkeleton";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String ZOMBIE = "MHF_Zombie";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String CACTUS = "MHF_Cactus";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String CAKE = "MHF_Cake";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String CHEST = "MHF_Chest";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String COCONUT_BROWN = "MHF_CoconutB";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String COCONUT_GREEN = "MHF_CoconutG";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String MELON = "MHF_Melon";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String OAK_LOG = "MHF_OakLog";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String PRESENT_1 = "MHF_Present1";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String PRESENT_2 = "MHF_Present2";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String PUMPKIN = "MHF_Pumpkin";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String TNT = "MHF_TNT";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String TNT2 = "MHF_TNT2";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String ARROW_UP = "MHF_ArrowUp";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String ARROW_DOWN = "MHF_ArrowDown";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String ARROW_LEFT = "MHF_ArrowLeft";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String ARROW_RIGHT = "MHF_ArrowRight";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String EXCLAMATION = "MHF_Exclamation";
-		@PythonField
+		@PythonFieldGenerated
 		public static final String QUESTION = "MHF_Question";
 
 		public Skull(TileEntitySkull tileEntity) {

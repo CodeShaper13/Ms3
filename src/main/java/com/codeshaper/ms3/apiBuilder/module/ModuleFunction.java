@@ -4,33 +4,64 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import com.codeshaper.ms3.apiBuilder.BuildUtils;
 import com.codeshaper.ms3.util.Util;
 
 /**
- * Represents a function within a Python module, either in global or class scope
+ * Represents a function within a Python module, either in global or class
+ * scope.
+ * 
+ * @author CodeShaper.
  */
 public class ModuleFunction extends BaseAttribute {
 
 	private final FunctionParam[] paramArray;
+	/**
+	 * Holds the class of the return type. If this method returns nothing, this is
+	 * equal to {@link Void.type}
+	 */
+	private Class<?> returnType;
 
 	/**
 	 * Creates a Python function based on a method
 	 */
 	public ModuleFunction(Executable exec) {
 		this(func01(exec), Util.getPydValue(exec), ModuleFunction.func(exec.getParameters()));
+		Object o = ObjectUtils.NULL;
+
+		if (exec instanceof Method) {
+			Class<?> c = ((Method) exec).getReturnType();
+			if (c.equals(Void.TYPE)) {
+				this.returnType = Void.TYPE;
+			} else {
+				this.returnType = c;
+			}
+		} else {
+			// This is a constructor, it returns nothing.
+			this.returnType = Void.TYPE;
+		}
 	}
 
 	public ModuleFunction(String name, FunctionParam... params) {
-		this(name, StringUtils.EMPTY, params);
+		this(name, StringUtils.EMPTY, null, params);
 	}
 
 	public ModuleFunction(String name, String docString, FunctionParam... params) {
 		super(name, docString);
 		this.paramArray = params;
+		this.returnType = Void.TYPE;
+	}
+
+	public ModuleFunction(String name, String docString, Class<?> returnType, FunctionParam... params) {
+		super(name, docString);
+		this.paramArray = params;
+		this.returnType = returnType;
 	}
 
 	/**
@@ -47,7 +78,7 @@ public class ModuleFunction extends BaseAttribute {
 	public String getArg(int index) {
 		return this.paramArray[index].getParamAsString();
 	}
-	
+
 	@Override
 	public void write(String indent, BufferedWriter br) throws IOException {
 		StringBuilder args = new StringBuilder();
@@ -63,13 +94,22 @@ public class ModuleFunction extends BaseAttribute {
 		if (this.hasDocString()) {
 			br.write(indent + "    " + this.getFormatedDocString() + "\n");
 		}
-		
-		// All functions have no body.
-		br.write(indent + "    pass\n\n");		
+
+		// Add the body of the function.
+		if (this.returnType == void.class) {//.equals(Void.TYPE)) {
+			br.write(indent + "    pass");
+		} else {
+			br.write(indent + "    return " + BuildUtils.getDefaultValueFromType(this.returnType));
+		}
+		br.write("\n\n");
 	}
-	
+
+	/**
+	 * Returns the name of the passed executable, or __init__ if the executable is a
+	 * constructor.
+	 */
 	private static String func01(Executable exec) {
-		if(exec instanceof Constructor<?>) {
+		if (exec instanceof Constructor<?>) {
 			return "__init__";
 		} else {
 			return exec.getName();

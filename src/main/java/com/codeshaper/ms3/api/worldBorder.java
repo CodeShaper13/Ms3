@@ -5,7 +5,7 @@ import org.python.core.PyTuple;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 
 import net.minecraft.world.border.WorldBorder;
@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 @PythonDocString("Module for working with the World Border.")
 public class worldBorder {
 	
-	@PythonField
+	@PythonFieldGenerated
 	public static final int DEFAULT_SIZE = 29999984;
 
 	@PythonFunction

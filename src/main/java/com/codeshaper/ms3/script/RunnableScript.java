@@ -6,8 +6,6 @@ import java.util.Collections;
 import javax.annotation.Nullable;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyList;
@@ -31,13 +29,14 @@ public class RunnableScript {
 	public RunnableScript(String pathToScript, @Nullable String[] args) throws PyException {
 		this(pathToScript, args != null ? RunnableScript.stringArgsToPyType(args) : null);
 	}
-	
+
 	/**
 	 * @param pathToScript
 	 *            Path from the scripts folder to the file. If there is no
 	 *            extension, .py is assumed.
 	 * @param args
-	 * @throws PyException If {@code args} contains an invalid data type.
+	 * @throws PyException
+	 *             If {@code args} contains an invalid data type.
 	 */
 	public RunnableScript(String pathToScript, @Nullable PyList args) throws PyException {
 		// Assume the extension if it is not there.
@@ -53,7 +52,6 @@ public class RunnableScript {
 			Object obj;
 			for (int i = 0; i < args.size(); i++) {
 				obj = args.get(i);
-				System.out.println(obj + " " + obj.getClass());
 				if (!(obj instanceof String || obj instanceof Boolean || obj instanceof Integer
 						|| obj instanceof Double)) {
 					throw Py.ValueError("args must all be of type string, boolean, int or float!");
@@ -63,7 +61,7 @@ public class RunnableScript {
 		} else {
 			this.scriptArgs = new PyList();
 		}
-		
+
 		// Make the first arg the path to this script.
 		this.scriptArgs.insert(0, new PyString(this.getFile().getAbsolutePath()));
 	}
@@ -71,17 +69,17 @@ public class RunnableScript {
 	public RunnableScript(NBTTagCompound tag) {
 		this.scriptFile = new File(tag.getString("path"));
 		this.scriptArgs = new PyList();
-		
+
 		Integer i = 0;
-		NBTTagCompound compound  = tag.getCompoundTag("args");
+		NBTTagCompound compound = tag.getCompoundTag("args");
 		while (true) {
 			String key = i.toString();
-			if(compound.hasKey(key)) {
+			if (compound.hasKey(key)) {
 				this.scriptArgs.add(NbtHelper.nbtToObject(compound.getTag(key)));
-				i++;	
+				i++;
 			} else {
 				break;
-			}			
+			}
 		}
 	}
 
@@ -124,16 +122,17 @@ public class RunnableScript {
 	}
 
 	/**
-	 * Returns the script file.  Note, the file may not exist, so use {@link RunnableScript#exists()} to verify.
+	 * Returns the script file. Note, the file may not exist, so use
+	 * {@link RunnableScript#exists()} to verify.
 	 */
 	public File getFile() {
 		return this.scriptFile;
 	}
-	
+
 	public String getScriptName() {
 		return FilenameUtils.removeExtension(this.scriptFile.getName());
 	}
-	
+
 	public PyList getArgs() {
 		return this.scriptArgs;
 	}
@@ -161,7 +160,8 @@ public class RunnableScript {
 
 		String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
 		if (!(extension.equalsIgnoreCase("py"))) {
-			throw exception.instance.new MissingScriptException("Script file is not of type .py", this.scriptFile.getPath());
+			throw exception.instance.new MissingScriptException("Script file is not of type .py",
+					this.scriptFile.getPath());
 		}
 	}
 
@@ -173,7 +173,7 @@ public class RunnableScript {
 		// Write args to NBT.
 		NBTTagCompound compound = new NBTTagCompound();
 		Integer i = 0;
-		for(Object obj : this.scriptArgs) {
+		for (Object obj : this.scriptArgs) {
 			compound.setTag(i.toString(), NbtHelper.objToNbt(obj));
 			i++;
 		}

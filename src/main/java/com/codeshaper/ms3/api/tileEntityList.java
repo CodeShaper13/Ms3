@@ -1,7 +1,7 @@
 package com.codeshaper.ms3.api;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
 
 @PythonDocString("Constants for all the vanilla TileEntity names.")
 public class tileEntityList {
@@ -9,52 +9,52 @@ public class tileEntityList {
 	private tileEntityList() {
 	}
 
-	@PythonField
+	@PythonFieldGenerated
 	public static final String FURNACE = "furnace";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String CHEST = "chest";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String ENDER_CHEST = "ender_chest";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String JUKEBOX = "jukebox";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String DISPENSER = "dispenser";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String DROPPER = "dropper";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String SIGN = "sign";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String MOB_SPAWNER = "mob_spawner";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String NOTE_BLOCK = "note_block";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String BREWING_STAND = "brewing_stand";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String ENCHANTING_TABLE = "enchanting_table";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String END_PORTAL = "end_portal";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String BEACON = "beacon";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String SKULL = "skull";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String DAYLIGHT_DETECTOR = "daylight_detector";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String HOPPER = "hopper";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String COMPARATOR = "comparator";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String FLOWER_POT = "flower_pot";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String BANNER = "banner";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String STRUCTURE_BLOCK = "structure_block";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String END_GATEWAY = "end_gateway";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String COMMAND_BLOCK = "command_block";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String SHULKER_BOX = "shulker_box";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String BED = "bed";
 }

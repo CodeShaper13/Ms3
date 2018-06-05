@@ -6,8 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks the annotated element to be included in the __init__ file of the ms3
- * api module.
+ * Marks the annotated element to be included in the __init__ file of the Ms3
+ * api module instead of in a separate source file.
+ * 
+ * @author CodeShaper
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({

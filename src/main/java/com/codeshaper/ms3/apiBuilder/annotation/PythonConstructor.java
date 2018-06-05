@@ -7,6 +7,8 @@ import java.lang.annotation.Target;
 
 /**
  * Marks a constructor that should be added to the module.  Used in module generation.
+ * 
+ * @author CodeShaper
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.CONSTRUCTOR)

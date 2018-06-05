@@ -2,7 +2,7 @@ package com.codeshaper.ms3.api;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 
 import net.minecraft.util.EnumParticleTypes;
@@ -14,117 +14,117 @@ public class particleType {
 	private particleType() {
 	}
 
-	@PythonField
+	@PythonFieldGenerated
 	public static final String EXPLOSION_NORMAL = EnumParticleTypes.EXPLOSION_NORMAL.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String EXPLOSION_LARGE = EnumParticleTypes.EXPLOSION_LARGE.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String EXPLOSION_HUGE = EnumParticleTypes.EXPLOSION_HUGE.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String FIREWORKS_SPARK = EnumParticleTypes.FIREWORKS_SPARK.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String WATER_BUBBLE = EnumParticleTypes.WATER_BUBBLE.getParticleName(); 
-	@PythonField
+	@PythonFieldGenerated
 	public static final String WATER_SPLASH = EnumParticleTypes.WATER_SPLASH.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String WATER_WAKE = EnumParticleTypes.WATER_WAKE.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	@PythonDocString("Underwater.")
 	public static final String SUSPENDED = EnumParticleTypes.SUSPENDED.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String SUSPENDED_DEPTH = EnumParticleTypes.SUSPENDED_DEPTH.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	@PythonDocString("Critical hits, bows and evocation fangs.")
 	public static final String CRIT = EnumParticleTypes.CRIT.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	@PythonDocString("Caused by Swords or Axes enchanted with Sharpness, Smite, or Bane of Arthropods.")
 	public static final String CRIT_MAGIC = EnumParticleTypes.CRIT_MAGIC.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String SMOKE_NORMAL = EnumParticleTypes.SMOKE_NORMAL.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String SMOKE_LARGE = EnumParticleTypes.SMOKE_LARGE.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String SPELL = EnumParticleTypes.SPELL.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String SPELL_INSTANT = EnumParticleTypes.SPELL_INSTANT.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String SPELL_MOB = EnumParticleTypes.SPELL_MOB.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String SPELL_MOB_AMBIENT = EnumParticleTypes.SPELL_MOB_AMBIENT.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String SPELL_WITCH = EnumParticleTypes.SPELL_WITCH.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	@PythonDocString("Rain.")
 	public static final String DRIP_WATER = EnumParticleTypes.DRIP_WATER.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String DRIP_LAVA = EnumParticleTypes.DRIP_LAVA.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String VILLAGER_ANGRY = EnumParticleTypes.VILLAGER_ANGRY.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String VILLAGER_HAPPY = EnumParticleTypes.VILLAGER_HAPPY.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	@PythonDocString("Caused by Mycelium.")
 	public static final String TOWN_AURA = EnumParticleTypes.TOWN_AURA.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String NOTE = EnumParticleTypes.NOTE.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String PORTAL = EnumParticleTypes.PORTAL.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String ENCHANTMENT_TABLE = EnumParticleTypes.ENCHANTMENT_TABLE.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String FLAME = EnumParticleTypes.FLAME.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String LAVA = EnumParticleTypes.LAVA.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	@PythonDocString("Planned to be removed in Minecraft 1.13")
 	public static final String FOOTSTEP = EnumParticleTypes.FOOTSTEP.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	@PythonDocString("Spawned by Illusion Illagers.")
 	public static final String CLOUD = EnumParticleTypes.CLOUD.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String REDSTONE = EnumParticleTypes.REDSTONE.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String SNOWBALL = EnumParticleTypes.SNOWBALL.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String SNOW_SHOVEL = EnumParticleTypes.SNOW_SHOVEL.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String SLIME = EnumParticleTypes.SLIME.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String HEART = EnumParticleTypes.HEART.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String BARRIER = EnumParticleTypes.BARRIER.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	@PythonDocString("Takes two args, 1st for the block/item id, 2nd for data value.")
 	public static final String ITEM_CRACK = EnumParticleTypes.ITEM_CRACK.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	@PythonDocString("Takes a single arg, the number for a combined block and meta.  Use particleType.getParam() for the number.")
 	public static final String BLOCK_CRACK = EnumParticleTypes.BLOCK_CRACK.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	@PythonDocString("Takes a single arg, the number for a combined block and meta.  Use particleType.getParam() for the number.")
 	public static final String BLOCK_DUST = EnumParticleTypes.BLOCK_DUST.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	@PythonDocString("Rain.")
 	public static final String WATER_DROP = EnumParticleTypes.WATER_DROP.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String ITEM_TAKE = EnumParticleTypes.ITEM_TAKE.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	@PythonDocString("Caused by Elder Guardians when they give effects.")
 	public static final String MOB_APPEARANCE = EnumParticleTypes.MOB_APPEARANCE.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String DRAGON_BREATH = EnumParticleTypes.DRAGON_BREATH.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String END_ROD = EnumParticleTypes.END_ROD.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String DAMAGE_INDICATOR = EnumParticleTypes.DAMAGE_INDICATOR.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String SWEEP_ATTACK = EnumParticleTypes.SWEEP_ATTACK.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	@PythonDocString("Takes a single arg, the number for a combined block and meta.  Use particleType.getParam() for the number.")
 	public static final String FALLING_DUST = EnumParticleTypes.FALLING_DUST.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	@PythonDocString("Totem of Undying effect.")
 	public static final String TOTEM = EnumParticleTypes.TOTEM.getParticleName();
-	@PythonField
+	@PythonFieldGenerated
 	public static final String SPIT = EnumParticleTypes.SPIT.getParticleName();
 
 	@PythonFunction

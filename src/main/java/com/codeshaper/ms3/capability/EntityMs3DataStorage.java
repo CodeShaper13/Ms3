@@ -51,7 +51,7 @@ public class EntityMs3DataStorage implements IStorage<IEntityMs3Data> {
 			} else if (value instanceof Double) {
 				nbtCompound.setDouble(key, (double) value);
 			} else if (value instanceof entity.Base) {
-				nbtCompound.setUniqueId(key, ((entity.Base) value).mcEntity.getUniqueID());
+				nbtCompound.setUniqueId(key, ((entity.Base<?>) value).mcEntity.getUniqueID());
 			} else {
 				throw new Error("Unknown type: " + value.getClass());
 			}

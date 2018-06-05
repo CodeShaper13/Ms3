@@ -30,10 +30,11 @@ commands.script.noHelpText=No doc string found
 commands.script.helpTextHeader=Doc string:
 
 # /bindscript command:
-commands.bindScript.usage=/bindscript <add|remove|check> [scriptName] [args...]
-commands.bindScript.useStickCheck=Click on an Entity to check it's Bound Scripts
-commands.bindScript.useStickAdd=Script set, Click on an Entity to bind this script to it
+commands.bindScript.usage=/bindscript <add|remove|check|clear> [scriptName] [args...]
+commands.bindScript.useStickCheck=Click on an Entity to check it's bound scripts
+commands.bindScript.useStickAdd=Script set, click on an Entity to bind this script to it
 commands.bindScript.useStickRemove=Click on an Entity to remove this script from it.
+commands.bindScript.useStickClear=Click on an Entity to remove all bound scripts.
 
 # Using the Script Binder:
 ms3.stick.useBindscriptFirst=Use /bindscript first
@@ -41,9 +42,11 @@ ms3.stick.cantAddDuplicate=Can not add duplicate scripts to the same Entity
 ms3.stick.successfulBind=Successfully bound script
 ms3.stick.bindingError=Script not Bound, as there was an error binding it
 ms3.stick.noScriptOnEntity=Script not on Entity, can not remove
+ms3.stick.allScriptsCleared=All bound scripts cleared from Entity
 
-ms3.stick.noScripts=No Bound Scripts
-ms3.stick.totalScriptCount=%s Bound Script%s found:
+ms3.stick.noScripts=No bound scripts
+ms3.stick.totalScriptCount=%s Bound script%s found:
+ms3.stick.successfulBind=Successfully bound script!
 
 pycraft.notImplemented=This is not yet implemented!
 pycraft.scheduledScript.noExecuteFunction=Something scheduled "%s" to run, but no function with the name "execute" could be found in the global scope

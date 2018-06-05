@@ -8,37 +8,22 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.python.core.Py;
 import org.python.core.PyBoolean;
+import org.python.core.PyClass;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.python.core.PyTuple;
+import org.python.core.PyType;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
-import com.codeshaper.ms3.util.textBuilder.TextBuilder;
-
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class Util {
 
 	public static final char SECTION_SIGN = '§';
 
 	private Util() {
-	}
-
-	/**
-	 * @deprecated use {@link TextBuilder}
-	 */
-	@Deprecated
-	public static ITextComponent withColor(String text, TextFormatting format, Object... args) {
-		ITextComponent textcomponent = new TextComponentTranslation(text, args);
-		textcomponent.getStyle().setColor(format);
-		GameRegistry.getFuelValue(null);
-		return textcomponent;
 	}
 
 	/**
@@ -138,5 +123,20 @@ public class Util {
 		} else {
 			return new PyString(string);
 		}
+	}
+	
+	/**
+	 * Returns the type name from objectType.
+	 * @param objectType The type of a Python class, accepts new or old style class.
+	 * @return The type name of the class.
+	 */
+	public static String getTypeName(PyObject objectType) {
+		PyType type;
+		if(objectType instanceof PyClass) {
+			type = ((PyClass)objectType).getType();
+		} else {
+			type = (PyType)objectType;
+		}
+		return type.getName();
 	}
 }

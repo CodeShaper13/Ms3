@@ -5,7 +5,7 @@ import org.python.core.PyTuple;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
 import com.codeshaper.ms3.util.Util;
 
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -17,20 +17,20 @@ public class equipmentSlot {
 	private equipmentSlot() {
 	}
 
-	@PythonField
+	@PythonFieldGenerated
 	public static final int MAINHAND = 0;
-	@PythonField
+	@PythonFieldGenerated
 	public static final int OFFHAND = 1;
-	@PythonField
+	@PythonFieldGenerated
 	public static final int FEET = 2;
-	@PythonField
+	@PythonFieldGenerated
 	public static final int LEGS = 3;
-	@PythonField
+	@PythonFieldGenerated
 	public static final int CHEST = 4;
-	@PythonField
+	@PythonFieldGenerated
 	public static final int HEAD = 5;
 
-	@PythonField
+	@PythonFieldGenerated
 	@PythonDocString("Indices of all the armor slots, feet, legs, chest and head.")
 	public static PyTuple ARMOR_SLOTS = Util.makeTuple(FEET, LEGS, CHEST, HEAD);
 

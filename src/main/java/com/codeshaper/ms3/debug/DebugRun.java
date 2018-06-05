@@ -1,10 +1,16 @@
-package com.codeshaper.ms3;
+package com.codeshaper.ms3.debug;
 
 import java.io.File;
 
+import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.apiBuilder.ApiBuilder;
 import com.codeshaper.ms3.util.Logger;
 
+/**
+ * Builds the api files.  Used for debugging the build process.
+ * 
+ * @author CodeShaper
+ */
 public class DebugRun {
 
 	public static void main(String[] args) {

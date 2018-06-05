@@ -151,7 +151,7 @@ public class world {
 			} else if (entityIdentifier instanceof String) {
 				entityStringName = (String) entityIdentifier;
 			} else if (entityIdentifier instanceof entity.Base) {
-				entityStringName = this.entityToStringName(((entity.Base) entityIdentifier).mcEntity);
+				entityStringName = this.entityToStringName(((entity.Base<?>) entityIdentifier).mcEntity);
 			}
 
 			BlockPos pos = new BlockPos(x, y, z);

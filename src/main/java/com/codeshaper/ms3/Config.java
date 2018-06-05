@@ -5,7 +5,7 @@ import java.io.File;
 import net.minecraftforge.common.config.Configuration;
 
 /**
- * Loads and reads from the config file.
+ * Manages the config file and provides getters to check the config values.
  */
 public class Config {
 	public static final String NULL_PY_PATH = "NONE";
@@ -20,6 +20,8 @@ public class Config {
 	private String pythonPath;
 	private boolean alwaysRebuild;
 	private boolean hideInitFiles;
+	// TODO packet system to send errors and exceptions to players?
+	private boolean seeGlobalErrors;
 
 	public Config(File configFile) {
 		Configuration config = new Configuration(configFile);
@@ -38,6 +40,8 @@ public class Config {
 				"Path to the installed Python location, for adding the site-packages directory.  Example: \"C:\\Python27\"");
 		this.hideInitFiles = config.getBoolean("Hide __init__ files", Configuration.CATEGORY_GENERAL, true,
 				"When TRUE, __init__.py files will not show up in any auto complete.  When FALSE, they show up.");
+		this.seeGlobalErrors = config.getBoolean("See global errors", Configuration.CATEGORY_GENERAL, true,
+				"When TRUE, you will see error messages that are sent to all players.  When FALSE they are hidden.");
 
 		// Not needed, as the API is not dynamically created with third party mods.
 		// this.alwaysRebuild = config.getBoolean("Always Rebuild",
@@ -67,6 +71,10 @@ public class Config {
 		return this.alwaysRebuild;
 	}
 
+	/**
+	 * Returns {@code true} if __init__.py files should be hidden when commands
+	 * bring up lists of files.
+	 */
 	public boolean hideInitFiles() {
 		return hideInitFiles;
 	}

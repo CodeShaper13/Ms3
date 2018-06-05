@@ -11,9 +11,15 @@ import org.python.core.PySequenceList;
 import org.python.core.PyTuple;
 import org.python.expose.ExposedType;
 
+import com.codeshaper.ms3.apiBuilder.BuildUtils;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeExclude;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeName;
 
+/**
+ * Represents a single parameter from a method or constructor.
+ * 
+ * @author CodeShaper
+ */
 public class FunctionParam {
 
 	private final String name;
@@ -39,7 +45,7 @@ public class FunctionParam {
 		if (type == null) {
 			this.typeName = null;
 		} else {
-			String className = this.getTypeName(type);
+			String className = BuildUtils.getTypeName(type);
 			// Remove the package prefix on the type name.
 			this.typeName = className.substring(className.lastIndexOf('.') + 1);
 
@@ -55,42 +61,6 @@ public class FunctionParam {
 			return this.name;
 		} else {
 			return this.typeName + "_" + this.name;
-		}
-	}
-
-	/**
-	 * Takes in a class and returns a name to use to represent it in parameter
-	 * names.
-	 */
-	private String getTypeName(Class<?> clazz) {
-		if (clazz == boolean.class) {
-			return "bool";
-			// In there are no floats, only doubles but they are called floats.
-		} else if (clazz == double.class || clazz == float.class) {
-			return "float";
-		} else if (clazz == String.class) {
-			return "str";
-		} else if (clazz == PyList.class) {
-			return "list";
-		} else if (clazz == Object.class || clazz == PyObject.class) {
-			return "object";
-		} else if (clazz == PyTuple.class) {
-			return "tuple";
-		} else if (clazz == PySequenceList.class) {
-			return "list";
-		} else if (clazz == PyDictionary.class) {
-			return "dict";
-		} else if (clazz.isAnnotationPresent(ExposedType.class)) {
-			return clazz.getAnnotation(ExposedType.class).name(); // Tries to find the right name.
-		} else {
-			String className = clazz.getName();
-			if (className.contains(";")) {
-				className = className.replace(";", "") + "_ARRAY";
-			} else if (className.contains("$")) {
-				className = className.substring(className.lastIndexOf('$') + 1);
-			}
-
-			return className;
 		}
 	}
 }

@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import javax.annotation.Nullable;
 
@@ -64,7 +63,7 @@ public class CommandScript extends CommandBase {
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if (args.length < 2) {
-			if (args[0].equals("run")) {
+			if(args.length >= 1 && args[0].equals("run")) {
 				throw new WrongUsageException(this.ranByHostPlayer(sender) ? "commands.script.usageRun"
 						: "commands.script.usageRunRemoteClient");
 			} else {
@@ -174,10 +173,11 @@ public class CommandScript extends CommandBase {
 				RunnableScript rs = new RunnableScript(scriptName,
 						args.length > 2 ? Arrays.copyOfRange(args, 2, args.length) : null);
 				if (rs.exists()) {
-					String[] results = interpreter.runGetArgs(rs, sender);
-					if (results != null) {
-						return getListOfStringsMatchingLastWord(args, results);
+					String[] result = interpreter.runGetArgs(rs, sender);					
+					if (result != null) {
+						return getListOfStringsMatchingLastWord(args, result);
 					}
+					// Null means don't hint anything.
 				}
 			} catch (InvalidReturnedArgumentException e) {
 				sender.sendMessage(new TextBuilder("Error calling getArgs()").color(TextFormatting.RED).get());

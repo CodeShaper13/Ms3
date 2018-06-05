@@ -30,6 +30,8 @@ import com.codeshaper.ms3.api.world;
 /**
  * A list of classes to build into Python modules.  Moved to a different class
  * so we wouldn't bloat the import section of ModuleBuilder.
+ * 
+ * @author CodeShaper
  */
 public class BuildList {
 	
@@ -40,6 +42,7 @@ public class BuildList {
 		this.classList = new Class[] {
 				biomes.class,
 				blockUtils.class,
+				BoundObject.class,
 				blocks.class,
 				colors.class,
 				effectList.class,

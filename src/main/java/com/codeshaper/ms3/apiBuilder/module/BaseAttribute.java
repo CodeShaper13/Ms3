@@ -7,7 +7,9 @@ import org.apache.commons.lang3.StringUtils;
 import com.codeshaper.ms3.util.Util;
 
 /**
- * Base class for any attribute that would contain a name and doc string.
+ * Abstract base class for any attribute that would contain both a name and doc string.
+ * 
+ * @author CodeShaper
  */
 public abstract class BaseAttribute implements IWritable {
 

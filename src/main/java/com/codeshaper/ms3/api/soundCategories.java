@@ -2,7 +2,7 @@ package com.codeshaper.ms3.api;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
 
 @PythonClass
 @PythonDocString("Constants of all the Sound Categories for use with world.playsound()")
@@ -11,24 +11,24 @@ public class soundCategories {
 	private soundCategories() {
 	}
 
-	@PythonField
+	@PythonFieldGenerated
 	public static final String MASTER = "master";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String MUSIC = "music";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String RECORDS = "record";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String WEATHER = "weather";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String BLOCKS = "block";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String HOSTILE = "hostile";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String NEUTRAL = "neutral";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String PLAYERS = "player";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String AMBIENT = "ambient";
-	@PythonField
+	@PythonFieldGenerated
 	public static final String VOICE = "voice";
 }

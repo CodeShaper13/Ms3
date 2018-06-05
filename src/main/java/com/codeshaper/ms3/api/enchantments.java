@@ -9,7 +9,7 @@ import org.python.core.PyTuple;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeExclude;
 import com.codeshaper.ms3.util.Util;
@@ -23,65 +23,65 @@ public class enchantments {
 	private enchantments() {
 	}
 
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple PROTECTION = Util.makeTuple(0, "protection");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple FIRE_PROTECTION = Util.makeTuple(1, "fire_protection");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple FEATHER_FALLING = Util.makeTuple(2, "feather_falling");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple BLAST_PROTECTION = Util.makeTuple(3, "blast_protection");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple PROJECTILE_PROTECTION = Util.makeTuple(4, "projectile_protection");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple RESPIRATION = Util.makeTuple(5, "respiration");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple AQUA_INFINITY = Util.makeTuple(6, "aqua_affinity");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple THORNS = Util.makeTuple(7, "thorns");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple DEPTH_STRIDER = Util.makeTuple(8, "depth_strider");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple FROST_WALKER = Util.makeTuple(9, "frost_walker");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple BINDING_CURSE = Util.makeTuple(10, "binding_curse");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple SHARPNESS = Util.makeTuple(16, "sharpness");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple SMITE = Util.makeTuple(17, "smite");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple BANE_OF_ARTHROPODS = Util.makeTuple(18, "bane_of_arthropods");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple KNOCKBACK = Util.makeTuple(19, "knockback");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple FIRE_ASPECT = Util.makeTuple(20, "fire_aspect");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple LOOTING = Util.makeTuple(21, "looting");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple SWEEPING = Util.makeTuple(22, "sweeping");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple EFFICIENCY = Util.makeTuple(32, "efficiency");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple SILK_TOUCH = Util.makeTuple(33, "silk_touch");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple UNBREAKING = Util.makeTuple(34, "unbreaking");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple FORTUNE = Util.makeTuple(35, "fortune");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple POWER = Util.makeTuple(48, "power");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple PUNCH = Util.makeTuple(49, "punch");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple FLAME = Util.makeTuple(50, "flame");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple INFINITY = Util.makeTuple(51, "infinity");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple LUCK_OF_THE_SEA = Util.makeTuple(61, "luck_of_the_sea");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple LURE = Util.makeTuple(62, "lure");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple MENDING = Util.makeTuple(70, "mending");
-	@PythonField
+	@PythonFieldGenerated
 	public static final PyTuple VANISHING_CURSE = Util.makeTuple(71, "vanishing_curse");
 
 	@PythonFunction

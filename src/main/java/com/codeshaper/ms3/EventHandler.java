@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.codeshaper.ms3.api.BoundObject;
 import com.codeshaper.ms3.api.executor;
 import com.codeshaper.ms3.api.util;
 import com.codeshaper.ms3.bindScriptAction.BSAction;
@@ -17,6 +18,7 @@ import com.codeshaper.ms3.script.RunnableScript;
 import com.codeshaper.ms3.script.ScheduledScript;
 import com.codeshaper.ms3.update.UpdateChecker;
 import com.codeshaper.ms3.util.Logger;
+import com.codeshaper.ms3.util.MessageUtil;
 import com.codeshaper.ms3.util.textBuilder.TextBuilder;
 import com.codeshaper.ms3.util.textBuilder.TextBuilderTrans;
 
@@ -32,9 +34,11 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
@@ -58,7 +62,7 @@ public class EventHandler {
 				if (bsa != null) {
 					if (bsa.getAction() == BSAction.CHECK) {
 						this.boundScriptCheck(player, capData);
-					} else if(bsa.getAction() == BSAction.CLEAR) {
+					} else if (bsa.getAction() == BSAction.CLEAR) {
 						this.boundScriptClear(player, capData);
 					} else {
 						RunnableScript runnableScript = bsa.getRunnableScript();
@@ -76,11 +80,12 @@ public class EventHandler {
 						}
 					}
 				} else {
-					player.sendMessage(new TextBuilderTrans("ms3.stick.useBindscriptFirst").color(TextFormatting.RED).get());
+					player.sendMessage(
+							new TextBuilderTrans("ms3.stick.useBindscriptFirst").color(TextFormatting.RED).get());
 				}
 				event.setCancellationResult(EnumActionResult.FAIL);
 			} else {
-				capData.runAllOnClick(clickedEntity, player);
+				capData.runCallback(EnumCallbackType.ON_CLICK, clickedEntity, player);
 				// TODO cancel event based on function return value?
 				event.setCancellationResult(EnumActionResult.FAIL);
 			}
@@ -102,49 +107,82 @@ public class EventHandler {
 		}
 	}
 
+	/**
+	 * Calls the onLoad callback on every {@link BoundObject} that is bound to a
+	 * loaded Entity.
+	 */
+	@SubscribeEvent
+	public void worldLoadEvent(WorldEvent.Load event) {
+		World world = event.getWorld();
+		if (!world.isRemote) {
+			for (Entity entity : world.loadedEntityList) {
+//				IEntityMs3Data ms3Data = entity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
+//				if (ms3Data != null) {
+//					ms3Data.runCallback(EnumCallbackType.ON_LOAD);
+//				} else {
+//					this.warnNoCapability();
+//				}
+			}
+		}
+	}
+
+	/**
+	 * Calls the onSave callback on every {@link BoundObject} that is bound to a
+	 * loaded Entity.
+	 */
+	@SubscribeEvent
+	public void worldSaveEvent(WorldEvent.Save event) {
+		World world = event.getWorld();
+		if (!world.isRemote) {
+			for (Entity entity : world.loadedEntityList) {
+//				IEntityMs3Data ms3Data = entity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
+//				if (ms3Data != null) {
+//					ms3Data.runCallback(EnumCallbackType.ON_SAVE);
+//				} else {
+//					this.warnNoCapability();
+//				}
+			}
+		}
+	}
+
 	@SubscribeEvent
 	public void worldTickEvent(WorldTickEvent event) {
-		if (event.side == Side.SERVER) {
-			if (event.phase == Phase.END) {
-
-				// Update Entities with bound scripts.
-				Entity entity;
-				IEntityMs3Data ms3Data;
-				List<Entity> entityList = event.world.getLoadedEntityList();
-				for (int i = 0; i < entityList.size(); i++) {
-					entity = entityList.get(i);
-					ms3Data = entity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
-					if (ms3Data != null) {
-						ms3Data.runAllExecute(entity);
-					} else {
-						Logger.err("No Capability on Entity!!!"); // This should never happen!
-					}
+		if (event.side == Side.SERVER && event.phase == Phase.END) {
+			// Update Entities with bound scripts.
+			IEntityMs3Data ms3Data;
+			for (Entity entity : event.world.loadedEntityList) {
+				ms3Data = entity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
+				if (ms3Data != null) {
+					ms3Data.runAllExecute(entity);					
+					//ms3Data.runCallback(EnumCallbackType.ON_TICK);
+				} else {
+					this.warnNoCapability();
 				}
+			}
 
-				// Update scheduled scripts.
-				ScheduledScript scheduledScript;
-				for (int i = util.scripts.size() - 1; i >= 0; i--) {
-					scheduledScript = util.scripts.get(i);
+			// Update scheduled scripts.
+			ScheduledScript scheduledScript;
+			for (int i = util.scripts.size() - 1; i >= 0; i--) {
+				scheduledScript = util.scripts.get(i);
 
-					if (scheduledScript.reduceTime()) {
-						executor.Executor executor = scheduledScript.getExecutor();
-						PyInterpreter interpreter = Ms3.getInterpreter();
+				if (scheduledScript.reduceTime()) {
+					executor.Executor executor = scheduledScript.getExecutor();
+					PyInterpreter interpreter = Ms3.getInterpreter();
 
-						// TODO who should the error be printed to?
-						if (!scheduledScript.exists()) {
-							executor.sendMessage(new TextComponentTranslation("pycraft.scheduledScript.scriptNotFound",
-									scheduledScript.getFile().getPath()));
-						}
-
-						try {
-							interpreter.runExecute(scheduledScript, executor.getSenderObj());
-						} catch (CommandException exception) {
-							executor.sendMessage(new TextComponentTranslation(
-									"pycraft.scheduledScript.noExecuteFunction", scheduledScript.getFile().getPath()));
-						}
-
-						util.scripts.remove(i);
+					// TODO who should the error be printed to?
+					if (!scheduledScript.exists()) {
+						executor.sendMessage(new TextComponentTranslation("pycraft.scheduledScript.scriptNotFound",
+								scheduledScript.getFile().getPath()));
 					}
+
+					try {
+						interpreter.runExecute(scheduledScript, executor.getSenderObj());
+					} catch (CommandException exception) {
+						executor.sendMessage(new TextComponentTranslation("pycraft.scheduledScript.noExecuteFunction",
+								scheduledScript.getFile().getPath()));
+					}
+
+					util.scripts.remove(i);
 				}
 			}
 		}
@@ -166,16 +204,20 @@ public class EventHandler {
 		if (list.size() == 0) {
 			player.sendMessage(new TextBuilderTrans("ms3.stick.noScripts").color(TextFormatting.YELLOW).get());
 		} else {
-			player.sendMessage(new TextBuilderTrans("ms3.stick.totalScriptCount", list.size(), list.size() > 1 ? "" : "s").color(TextFormatting.YELLOW).get());
+			player.sendMessage(
+					new TextBuilderTrans("ms3.stick.totalScriptCount", list.size(), list.size() > 1 ? "" : "s")
+							.color(TextFormatting.YELLOW).get());
 			for (RunnableScript rs : list) {
-				player.sendMessage(new TextBuilderTrans("> " + rs.getFile().getPath()).color(TextFormatting.YELLOW).get());
+				player.sendMessage(
+						new TextBuilderTrans("> " + rs.getFile().getPath()).color(TextFormatting.YELLOW).get());
 			}
 		}
 	}
-	
+
 	private void boundScriptClear(ICommandSender player, IEntityMs3Data capabilityData) {
 		capabilityData.getScriptList().clear();
-		this.safeSendMessage(player, new TextBuilderTrans("ms3.stick.allScriptsCleared").color(TextFormatting.YELLOW).get());
+		MessageUtil.sendMessage(player,
+				new TextBuilderTrans("ms3.stick.allScriptsCleared").color(TextFormatting.YELLOW));
 	}
 
 	/**
@@ -192,21 +234,22 @@ public class EventHandler {
 	private void addBoundScript(@Nullable ICommandSender player, IEntityMs3Data capabilityData,
 			RunnableScript runnableScript, Entity clickedEntity) {
 		if (capabilityData.getScriptList().contains(runnableScript)) {
-			this.safeSendMessage(player, new TextBuilder("ms3.stick.cantAddDuplicate").color(TextFormatting.RED).get());
+			MessageUtil.sendMessage(player, new TextBuilder("ms3.stick.cantAddDuplicate").color(TextFormatting.RED));
 		} else {
 			// Try to bind the script.
-			PyInterpreter i = Ms3.getInterpreter();			
+			PyInterpreter i = Ms3.getInterpreter();
 			boolean flag = i.runOnBind(runnableScript, player, clickedEntity);
 			if (flag) {
 				capabilityData.addScript(runnableScript);
-				
-				this.safeSendMessage(player, new TextBuilder("ms3.stick.successfulBind").color(TextFormatting.GREEN).get());
+
+				MessageUtil.sendMessage(player,
+						new TextBuilder("ms3.stick.successfulBind").color(TextFormatting.GREEN));
 			} else {
 				// More code because it must be in bold.
 				ITextComponent itc = new TextComponentTranslation("ms3.stick.bindingError");
 				itc.getStyle().setBold(true).setColor(TextFormatting.RED);
-				
-				this.safeSendMessage(player, itc);
+
+				MessageUtil.sendMessage(player, itc);
 			}
 		}
 	}
@@ -227,16 +270,16 @@ public class EventHandler {
 		if (list.contains(runnableScript)) {
 			list.remove(runnableScript);
 		} else {
-			this.safeSendMessage(player, new TextBuilder("ms3.stick.noScriptOnEntity").color(TextFormatting.RED).get());
+			MessageUtil.sendMessage(player, new TextBuilder("ms3.stick.noScriptOnEntity").color(TextFormatting.RED));
 		}
 	}
 
 	/**
-	 * Sends a message to the sender, as long as sender is not null.
+	 * Calls {@link Logger#warn(String)} to alert the user that the
+	 * {@link IEntityMs3Data} capability was missing.
 	 */
-	private void safeSendMessage(@Nullable ICommandSender sender, ITextComponent component) {
-		if (sender != null) {
-			sender.sendMessage(component);
-		}
+	private void warnNoCapability() {
+		Logger.warn(
+				"Error looking up data about Entity!  Internally this means the IEntityMs3Data capability could not be found!");
 	}
 }

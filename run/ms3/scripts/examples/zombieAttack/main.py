@@ -56,7 +56,7 @@ def execute(world, sender):
                         zombie.setNoAi(True)
                         zombie.setInvulnerable(True)
                         zombie.setIsBaby(False) # Make sure they're all adults.
-                        zombie.bindScript("zombieAttack/risingZombie.py", [])
+                        zombie.bindScript("examples/zombieAttack/risingZombie.py", [])
                         zombie.setRotation(pos[2], 0) # Face the player
                                 
                         zombie.setProperty("zombieAttackTimer", 40)

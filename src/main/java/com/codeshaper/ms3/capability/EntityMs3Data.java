@@ -8,9 +8,12 @@ import javax.annotation.Nullable;
 
 import org.python.core.PyException;
 import org.python.core.PyList;
+import org.python.core.PyType;
 
+import com.codeshaper.ms3.EnumCallbackType;
 import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.api.BoundObject;
+import com.codeshaper.ms3.api.entity;
 import com.codeshaper.ms3.api.exception.MissingScriptException;
 import com.codeshaper.ms3.interpreter.PyInterpreter;
 import com.codeshaper.ms3.script.RunnableScript;
@@ -23,8 +26,10 @@ public class EntityMs3Data implements IEntityMs3Data {
 
 	private List<RunnableScript> scripts = new ArrayList<RunnableScript>();
 	private HashMap<String, Object> properties = new HashMap<>();
-	
+
 	private boolean clearMethodCall;
+
+	private HashMap<String, BoundObject> boundObjects = new HashMap<>();
 
 	@Override
 	public void addScript(String pathToScript, @Nullable PyList args) throws PyException, MissingScriptException {
@@ -67,8 +72,8 @@ public class EntityMs3Data implements IEntityMs3Data {
 				}
 			}
 		}
-		
-		if(this.clearMethodCall) {
+
+		if (this.clearMethodCall) {
 			this.scripts.clear();
 			this.clearMethodCall = false;
 		}
@@ -102,5 +107,26 @@ public class EntityMs3Data implements IEntityMs3Data {
 	@Override
 	public void setClearMethodCall() {
 		this.clearMethodCall = true;
+	}
+
+	@Override
+	public void runCallback(EnumCallbackType type, Object... args) {
+		Ms3.getInterpreter().runObjectCallback(this.boundObjects.values(), type, args);
+	}
+
+	@Override
+	public boolean addObject(BoundObject obj) {
+		String identifer = obj.getClass().getName(); // .getType().getName();
+		if(this.boundObjects.containsKey(identifer)) {
+			return false;
+		} else {		
+			this.boundObjects.put(identifer, obj);
+			return true;
+		}
+	}
+
+	@Override
+	public BoundObject getObject(PyType typeName) {
+		return this.boundObjects.get(typeName.getName());
 	}
 }

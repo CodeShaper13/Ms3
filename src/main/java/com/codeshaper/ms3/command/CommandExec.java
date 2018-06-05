@@ -53,7 +53,7 @@ public class CommandExec extends CommandBase {
 				sb.append(" ");
 			}
 			PyInterpreter interpreter = Ms3.getInterpreter();
-			boolean noError = interpreter.runSingleLine(sb.toString());
+			boolean noError = false; // interpreter.runSingleLine(sb.toString());
 			if (noError) {
 				CommandBase.notifyCommandListener(sender, this, "commands.exec.codeOk");
 			}

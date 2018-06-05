@@ -2,9 +2,6 @@ package com.codeshaper.ms3.interpreter;
 
 import org.python.core.PyStringMap;
 
-import com.codeshaper.ms3.stream.ChatErrorStream;
-import com.codeshaper.ms3.stream.ChatOutputStream;
-
 public class InterpreterState {
 	
 	public boolean useStandardIn;
