@@ -7,6 +7,8 @@ import java.io.IOException;
 
 /**
  * Static methods for writing out the contents of a new script.
+ * 
+ * @author CodeShaper
  */
 public class NewScriptHelper {
 

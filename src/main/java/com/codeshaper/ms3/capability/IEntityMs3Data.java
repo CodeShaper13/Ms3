@@ -44,14 +44,41 @@ public interface IEntityMs3Data {
 	public void runAllExecute(Entity entity);
 
 	/**
-	 * Returns all {@link RunnableScript}s on the entity in a {@link List}
+	 * Gets a list of all the {@link RunnableScript}s on the entity.
+	 * 
+	 * @return The list.
 	 */
 	public List<RunnableScript> getScriptList();
 
+	/**
+	 * Sets a custom property on the Entity.
+	 * 
+	 * @param identifier
+	 *            A {@link String} that acts as the unique key for the data.
+	 * @param value
+	 *            A {@link Object} that is the data. See
+	 *            {@link com.codeshaper.ms3.api.entity#setProperty} for the
+	 *            validator of what types work.
+	 */
 	public void setCustomProperty(String identifier, Object value);
 
+	/**
+	 * Gets a custom property from the Entity. Returns Null if there was no value
+	 * assigned to the key.
+	 * 
+	 * @param identifier
+	 *            A {@link String} that acts as the unique key for the data.
+	 * @return The value, or null if there is no value associated with the key.
+	 */
+	@Nullable
 	public Object getCustomProperty(String identifier);
 
+	/**
+	 * Removes a custom property from the Entity.
+	 * 
+	 * @param identifer
+	 *            A {@link String} that acts as the unique key for the data.
+	 */
 	public void removeCustomProperty(String identifer);
 
 	public HashMap<String, Object> getPropertyMap();

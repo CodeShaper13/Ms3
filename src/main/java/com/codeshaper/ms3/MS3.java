@@ -16,6 +16,7 @@ import com.codeshaper.ms3.interpreter.PyInterpreter;
 import com.codeshaper.ms3.items.ItemScriptBinder;
 import com.codeshaper.ms3.proxy.ProxyCommon;
 import com.codeshaper.ms3.update.Release;
+import com.codeshaper.ms3.update.Version;
 
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -30,26 +31,36 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 /*
+ * DEVELOPER NOTE:
  * If the parameter names are arg followed by a number in the generated Python files,
  * you need to setX under Project -> Properties -> Java Compiler -> Store information
  * about method parameters.
  */
 
-@Mod(modid = Ms3.MOD_ID, name = "Ms3", version = Ms3.VERSION, dependencies = "after:*")
+/**
+ * Main class for the Ms3 mod.
+ * 
+ * @author CodeShaper
+ */
+@Mod(modid = Ms3.MOD_ID, name = Ms3.MOD_ID, version = Ms3.MOD_VERSION, dependencies = "after:*")
 public class Ms3 {
 
 	public static boolean DEBUG_MODE = true;
 
+	public static final String MOD_NAME = "Ms3";
 	public static final String MOD_ID = "ms3";
+	public static final String AUTHOR = "codeshaper";
+
 	/**
 	 * String identifier for the version. Changes with every update. Make sure to
 	 * update mcmod.info
 	 */
-	public static final String VERSION = "0.1.0";
-	public static final String AUTHOR = "codeshaper";
-	public static final Release RELEASE = new Release(Ms3.VERSION, null, null, null);
+	public static final String MOD_VERSION = "0.1.0";
+	public static final Version API_VERSION = new Version(1, 0, 0);
 
-	@Mod.Instance(MOD_ID)
+	public static final Release RELEASE = new Release(Ms3.MOD_VERSION, null, null, "www.mediafire.com"); // TODO this won't work?
+
+	@Mod.Instance(Ms3.MOD_ID)
 	public static Ms3 instance;
 
 	@SidedProxy(clientSide = "com.codeshaper.ms3.proxy.ProxyClient", serverSide = "com.codeshaper.ms3.proxy.ProxyCommon")
@@ -121,7 +132,7 @@ public class Ms3 {
 		event.registerServerCommand(new CommandBindScript());
 		event.registerServerCommand(new CommandScript());
 	}
-
+	
 	public static PyInterpreter getInterpreter() {
 		return Ms3.instance.interpreter;
 	}

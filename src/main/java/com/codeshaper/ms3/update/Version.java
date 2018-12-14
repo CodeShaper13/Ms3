@@ -3,7 +3,9 @@ package com.codeshaper.ms3.update;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * An abstract version identifier, with a major, minor and patch number.
+ * A version identifier with a major, minor and patch number.
+ * 
+ * @author CodeShaper
  */
 public class Version implements Comparable<Version> {
 
@@ -79,5 +81,17 @@ public class Version implements Comparable<Version> {
 			return 1;
 		}
 		return -1;
+	}
+
+	public int getMajorVersion() {
+		return majorVersion;
+	}
+
+	public int getMinorVersion() {
+		return minorVersion;
+	}
+
+	public int getPatchVersion() {
+		return patchVersion;
 	}
 }

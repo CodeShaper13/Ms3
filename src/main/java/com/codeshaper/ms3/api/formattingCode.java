@@ -8,50 +8,49 @@ public class formattingCode {
 
 	@PythonFieldGenerated
 	@PythonDocString("Formatting code prefix character.  It is recomended to use this instead of hard coding it into strings.")
-	public static final char __PREFIX = '&';
-	
+	public static final char PREFIX = '&';	
 	@PythonFieldGenerated
-	public static final String BLACK = formattingCode.__PREFIX + "0";
+	public static final String BLACK = formattingCode.PREFIX + "0";
 	@PythonFieldGenerated
-	public static final String DARK_BLUE = formattingCode.__PREFIX + "1";
+	public static final String DARK_BLUE = formattingCode.PREFIX + "1";
 	@PythonFieldGenerated
-	public static final String DARK_GREEN = formattingCode.__PREFIX + "2";
+	public static final String DARK_GREEN = formattingCode.PREFIX + "2";
 	@PythonFieldGenerated
-	public static final String DARK_AQUA = formattingCode.__PREFIX + "3";
+	public static final String DARK_AQUA = formattingCode.PREFIX + "3";
 	@PythonFieldGenerated
-	public static final String DARK_RED = formattingCode.__PREFIX + "4";
+	public static final String DARK_RED = formattingCode.PREFIX + "4";
 	@PythonFieldGenerated
-	public static final String DARK_PURPLE = formattingCode.__PREFIX + "5";
+	public static final String DARK_PURPLE = formattingCode.PREFIX + "5";
 	@PythonFieldGenerated
-	public static final String GOLD = formattingCode.__PREFIX + "6";
+	public static final String GOLD = formattingCode.PREFIX + "6";
 	@PythonFieldGenerated
-	public static final String GRAY = formattingCode.__PREFIX + "7";
+	public static final String GRAY = formattingCode.PREFIX + "7";
 	@PythonFieldGenerated
-	public static final String DARK_GRAY = formattingCode.__PREFIX + "8";
+	public static final String DARK_GRAY = formattingCode.PREFIX + "8";
 	@PythonFieldGenerated
-	public static final String BLUE = formattingCode.__PREFIX + "9";
+	public static final String BLUE = formattingCode.PREFIX + "9";
 	@PythonFieldGenerated
-	public static final String GREEN = formattingCode.__PREFIX + "a";
+	public static final String GREEN = formattingCode.PREFIX + "a";
 	@PythonFieldGenerated
-	public static final String AQUA = formattingCode.__PREFIX + "b";
+	public static final String AQUA = formattingCode.PREFIX + "b";
 	@PythonFieldGenerated
-	public static final String RED = formattingCode.__PREFIX + "c";
+	public static final String RED = formattingCode.PREFIX + "c";
 	@PythonFieldGenerated
-	public static final String LIGHT_PURPLE = formattingCode.__PREFIX + "d";
+	public static final String LIGHT_PURPLE = formattingCode.PREFIX + "d";
 	@PythonFieldGenerated
-	public static final String YELLOW = formattingCode.__PREFIX + "e";
+	public static final String YELLOW = formattingCode.PREFIX + "e";
 	@PythonFieldGenerated
-	public static final String WHITE = formattingCode.__PREFIX + "f";
+	public static final String WHITE = formattingCode.PREFIX + "f";
 	@PythonFieldGenerated
-	public static final String OBFUSCATED = formattingCode.__PREFIX + "k";
+	public static final String OBFUSCATED = formattingCode.PREFIX + "k";
 	@PythonFieldGenerated
-	public static final String BOLD = formattingCode.__PREFIX + "l";
+	public static final String BOLD = formattingCode.PREFIX + "l";
 	@PythonFieldGenerated
-	public static final String STRIKETHROUGH = formattingCode.__PREFIX + "m";
+	public static final String STRIKETHROUGH = formattingCode.PREFIX + "m";
 	@PythonFieldGenerated
-	public static final String UNDERLINE = formattingCode.__PREFIX + "n";
+	public static final String UNDERLINE = formattingCode.PREFIX + "n";
 	@PythonFieldGenerated
-	public static final String ITALIC = formattingCode.__PREFIX + "o";
+	public static final String ITALIC = formattingCode.PREFIX + "o";
 	@PythonFieldGenerated
-	public static final String RESET = formattingCode.__PREFIX + "r";
+	public static final String RESET = formattingCode.PREFIX + "r";
 }

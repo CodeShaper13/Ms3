@@ -44,6 +44,7 @@ public class ApiBuilder {
 
 	private ApiPackage apiPackage;
 
+	@SuppressWarnings("unused")
 	public ApiBuilder(File apiFolder) {
 		this.buildList = new BuildList();
 		this.apiFolder = apiFolder;

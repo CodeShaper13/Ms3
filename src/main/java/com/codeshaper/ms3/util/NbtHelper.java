@@ -19,6 +19,8 @@ import net.minecraft.nbt.NBTTagString;
 
 /**
  * Helper class for working with NBT objects.
+ * 
+ * @author CodeShaper
  */
 public class NbtHelper {
 

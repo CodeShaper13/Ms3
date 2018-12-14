@@ -4,6 +4,8 @@ import com.codeshaper.ms3.Ms3;
 
 /**
  * Helper methods for messages, errors and warning, with a prefix.
+ * 
+ * @author CodeShaper
  */
 public class Logger {
 	

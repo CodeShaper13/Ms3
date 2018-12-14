@@ -5,16 +5,6 @@
 import com.codeshaper.ms3.api as ms3
 import com.codeshaper.ms3.api.formattingCode as cc
 import sys
-
-
-# Used to initialize an entity or set properties.
-# Called whenever a script is bound to an entity with the command
-# /bindScript or when the bindScript function is called on an entity.
-def onBind(world, theEntity):
-    assert isinstance(world, ms3.world.World)
-    assert isinstance(theEntity, ms3.entity.EntityBase)
-    
-    print ms3.formattingCode.ITALIC + "onBind()"
     
     
 # Used to perform the main logic of the script.
@@ -27,16 +17,32 @@ def execute(world, sender):
     print ms3.formattingCode.ITALIC + "execute()"
     
 
+# Used to initialize an entity or set properties.
+# Called whenever a script is bound to an entity with the command
+# /bindScript or when the bindScript function is called on an entity.
+def onBind(world, theEntity):
+    assert isinstance(world, ms3.world.World)
+    assert isinstance(theEntity, ms3.entity.Base)
+    
+    print ms3.formattingCode.ITALIC + "onBind()"
+    
+
 # Called when an entity is clicked on and this script has been bound to it.
-def onClick(world, clickedEntity, player):
+def onClick(world, entity, player):
     assert isinstance(world, ms3.world.World)
     # Clicked entity will refer to the entity that is clicked, thus the entity
     # that this script is bound to.
-    assert isinstance(clickedEntity, ms3.entity.EntityBase)
+    assert isinstance(entity, ms3.entity.Base)
     assert isinstance(player, ms3.entity.Player)
     
     print ms3.formattingCode.ITALIC + "onClick()"
     
+    
+def onTick(world, entity):
+    assert isinstance(world, ms3.world.World)
+    assert isinstance(entity, ms3.entity.Base)
+
+    print ms3.formattingCode.ITALIC + "onTick()"
     
 # Returns arguments to suggest with tab when executing the script
 # with /script run <name>.

@@ -16,6 +16,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+/**
+ * @author CodeShaper
+ */
 public class UpdateChecker {
 	
 	private static URL VERSIONS_JSON_URL;

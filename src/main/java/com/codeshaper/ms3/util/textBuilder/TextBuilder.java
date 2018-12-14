@@ -7,6 +7,8 @@ import net.minecraft.util.text.TextFormatting;
 
 /**
  * Helper class for building formatted text strings.
+ * 
+ * @author CodeShaper
  */
 public class TextBuilder {
 

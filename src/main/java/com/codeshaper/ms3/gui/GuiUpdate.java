@@ -51,7 +51,7 @@ public class GuiUpdate extends GuiScreen {
 	protected void actionPerformed(GuiButton button) throws IOException {
 		if (button.enabled) {
 			if (button.id == 0) {
-                GuiConfirmOpenLink guiconfirmopenlink = new GuiConfirmOpenLink(this, "www.google.com", 0, true);
+                GuiConfirmOpenLink guiconfirmopenlink = new GuiConfirmOpenLink(this, "www.minecraftforum.com", 0, true);
                 guiconfirmopenlink.disableSecurityWarning();
                 Ms3.ms3Props.setPromptDownload(false);
                 this.mc.displayGuiScreen(guiconfirmopenlink);
@@ -59,5 +59,31 @@ public class GuiUpdate extends GuiScreen {
 				this.mc.displayGuiScreen(this.mainMenuGui);
 			}
 		}
+	}
+	
+	/**
+	 * Draws the screen and all the components in it. Args : mouseX, mouseY,
+	 * renderPartialTicks
+	 */
+	@Override
+	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+		int WHITE = 16777215;
+
+		this.drawDefaultBackground();
+		this.drawCenteredString(this.fontRenderer, I18n.format("ms3.warning.warning", new Object[0]), this.width / 2,
+				20, WHITE);
+
+		for (int i = 1; i <= 4; i++) {
+			this.drawCenteredString(this.fontRenderer, I18n.format("ms3.warning.line" + i, new Object[0]),
+					this.width / 2, 60 + ((i - 1) * 15), WHITE);
+		}
+
+		this.drawCenteredString(this.fontRenderer, I18n.format("ms3.warning.notAgain", new Object[0]), this.width / 2,
+				130, WHITE);
+
+		// this.drawString(this.fontRendererObj, I18n.format("selectWorld.enterName",
+		// new Object[0]), this.width / 2 - 100, 47, 10526880);
+		// this.textField.drawTextBox();
+		super.drawScreen(mouseX, mouseY, partialTicks);
 	}
 }

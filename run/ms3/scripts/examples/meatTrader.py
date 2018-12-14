@@ -1,3 +1,4 @@
+import sys
 import random
 
 import com.codeshaper.ms3.api as ms3
@@ -40,7 +41,7 @@ def onBind(world, theEntity):
     pickRandomTrade(theEntity)
     
 
-def execute(world, sender):
+def XXexecute(world, sender):
     '@type world: ms3.world.World'
     '@type sender: ms3.executor.Executor'
 
@@ -51,7 +52,7 @@ def execute(world, sender):
     else :
         zombie = world.spawnEntity(ms3.entityList.ZOMBIE, float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3]), None)
     
-    zombie.bindScript("")
+    zombie.bindScript("examples/meatTrader.py")
     
 
 def onClick(world, clickedEntity, player):

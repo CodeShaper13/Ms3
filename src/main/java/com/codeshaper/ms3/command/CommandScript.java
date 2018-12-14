@@ -214,7 +214,7 @@ public class CommandScript extends CommandBase {
 		if(Ms3.configManager.hideInitFiles()) {
 			Iterator<File> iter = scripts.iterator();
 			while(iter.hasNext()){
-			    if(iter.next().getName().equals("__init__")){
+			    if(iter.next().getName().startsWith("__init__")){
 			        iter.remove();
 			    }
 			}

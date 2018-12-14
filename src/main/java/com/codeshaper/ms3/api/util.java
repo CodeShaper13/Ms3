@@ -31,8 +31,8 @@ public class util {
 
 	@PythonFunction
 	@PythonDocString("Returns the Ms3 version as a string.")
-	public static PyString getMstVersion() {
-		return new PyString(Ms3.VERSION);
+	public static PyString getMs3Version() {
+		return new PyString(Ms3.RELEASE.modVersion.toString());
 	}
 
 	@PythonFunction

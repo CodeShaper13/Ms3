@@ -7,6 +7,9 @@ import javax.annotation.Nullable;
 
 import net.minecraftforge.common.ForgeVersion;
 
+/**
+ * @author CodeShaper
+ */
 public class Release {
 
 	public final Version modVersion;

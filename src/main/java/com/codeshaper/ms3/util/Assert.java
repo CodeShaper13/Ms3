@@ -9,6 +9,8 @@ import org.python.core.PyType;
 /**
  * A collection of static methods that validate data, throwing a ValueError
  * exception if the data is invalid.
+ * 
+ * @author CodeShaper
  */
 public class Assert {
 

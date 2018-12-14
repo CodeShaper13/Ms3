@@ -19,8 +19,16 @@ import org.python.core.PyType;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 
+/**
+ * General utility methods that don't fall into any category.
+ * 
+ * @author CodeShaper
+ */
 public class Util {
 
+	/**
+	 * Constant for the section sign character
+	 */
 	public static final char SECTION_SIGN = '§';
 
 	private Util() {
@@ -108,6 +116,17 @@ public class Util {
 		}
 	}
 	
+	/**
+	 * Takes in a string and returns it as a PyObject.
+	 * 
+	 * <li>"true" and "True" becomes {@link Py.True}.</li>
+	 * <li>"false" and "False" becomes {@link Py.False}.</li>
+	 * <li>Whole and floating point numbers become {@link PyInteger} and {@link PyFloat} respectively.</li>
+	 * <li>Strings become {@link PyString}.</li>
+	 
+	 * @param string
+	 * @return
+	 */
 	public static PyObject stringToPyObject(String string) {
 		if (NumberUtils.isCreatable(string)) {
 			float f = NumberUtils.createFloat(string);
@@ -127,6 +146,7 @@ public class Util {
 	
 	/**
 	 * Returns the type name from objectType.
+	 * 
 	 * @param objectType The type of a Python class, accepts new or old style class.
 	 * @return The type name of the class.
 	 */

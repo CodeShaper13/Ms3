@@ -92,7 +92,7 @@ public class EventHandler {
 		}
 	}
 
-	private boolean flag;
+	private boolean flag = false;
 
 	@SubscribeEvent
 	public void initGui(GuiScreenEvent.InitGuiEvent.Pre event) {
@@ -100,7 +100,7 @@ public class EventHandler {
 			Minecraft mc = Minecraft.getMinecraft();
 			if (Ms3.ms3Props.showWarning()) {
 				mc.displayGuiScreen(new GuiWarning(event.getGui()));
-			} else if (!flag && Ms3.ms3Props.promptDownload() && UpdateChecker.isOutdated(Ms3.RELEASE)) {
+			} else if (!flag && Ms3.ms3Props.promptDownload()) { // && UpdateChecker.isOutdated(Ms3.RELEASE)) {
 				flag = false;
 				mc.displayGuiScreen(new GuiUpdate(event.getGui()));
 			}

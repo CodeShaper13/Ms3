@@ -6,6 +6,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+/**
+ * Class to manage the application properties that are saved in the
+ * settings.properties file.
+ * 
+ * @author CodeShaper
+ */
 public class Ms3Properties {
 
 	private File file;
@@ -33,22 +39,25 @@ public class Ms3Properties {
 			try (FileInputStream fs = new FileInputStream(this.file)) {
 				this.props.load(fs);
 
-				this.showWarning = func((String)this.props.get("showWarning"), true);
-				this.promptDownload = func((String)this.props.get("promptDownload"), true);
+				this.showWarning = func((String) this.props.get("showWarning"), true);
+				this.promptDownload = func((String) this.props.get("promptDownload"), true);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	private boolean func(String s, boolean defaultValue) {
-		if(s == null) {
+		if (s == null) {
 			return defaultValue;
 		} else {
 			return s.equals("true");
 		}
 	}
 
+	/**
+	 * Saves all of the properties, writing them to a file.
+	 */
 	private void save() {
 		try (FileOutputStream fs = new FileOutputStream(this.file)) {
 			this.props.setProperty("showWarning", String.valueOf(this.showWarning));
@@ -64,18 +73,22 @@ public class Ms3Properties {
 	}
 
 	public boolean promptDownload() {
-		return false; // this.promptDownload;  Debug until gui works
+		return true; // this.promptDownload; // Debug until gui works
 	}
 
-	//TODO only save if value changes
-	
 	public void setShowWarning(boolean showWarning) {
+		boolean save = (this.showWarning != showWarning);
 		this.showWarning = showWarning;
-		this.save();
+		if (save) {
+			this.save();
+		}
 	}
 
 	public void setPromptDownload(boolean promptDownload) {
+		boolean save = (this.promptDownload != promptDownload);
 		this.promptDownload = promptDownload;
-		this.save();
+		if (save) {
+			this.save();
+		}
 	}
 }

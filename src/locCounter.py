@@ -45,4 +45,7 @@ def LOC(root='.', recurse=True):
     return count_mini, count_maxi
 
 lines = LOC()
-print("LOC: \n\tReal Lines: " + str(lines[0]) + "\n\tTotal Lines: " + str(lines[1]))
+print "LOC: \n\tReal Lines: " + str(lines[0]) + "\n\tTotal Lines: " + str(lines[1])
+
+print "\nPress ENTER to close"
+input()

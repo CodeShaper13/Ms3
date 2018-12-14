@@ -31,7 +31,7 @@ public class DirectoryManager {
     	this.ms3Folder = this.createFolder(this.dotMinecraftDir, Ms3.MOD_ID);
     	this.scriptFolder = this.createFolder(this.ms3Folder, "scripts");
     	this.compiledScriptFolder = this.createFolder(this.ms3Folder, ".compiledScripts");
-    	this.apiFolder = new File(this.ms3Folder, "api-" + Ms3.VERSION);
+    	this.apiFolder = new File(this.ms3Folder, "api-" + Ms3.API_VERSION);
     	this.internalFolder = this.createFolder(this.ms3Folder, ".internal");
     	this.scriptDataFolder = this.createFolder(this.ms3Folder, "scriptData");
     	    	

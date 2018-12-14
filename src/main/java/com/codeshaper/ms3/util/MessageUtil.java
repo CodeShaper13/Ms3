@@ -13,6 +13,8 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 
 /**
  * Static methods for sending messages, including errors, to users.
+ * 
+ * @author CodeShaper
  */
 public class MessageUtil {
 

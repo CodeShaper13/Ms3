@@ -305,6 +305,7 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns True if the entity has the glowing effect.")
 		public boolean isGlowing() {
 			return this.mcEntity.isGlowing();
 		}
@@ -351,6 +352,11 @@ public class entity {
 		public void sendChatMessage(String message) {
 			this.mcEntity.sendMessage(new TextComponentString(Util.correctColorCode(message)));
 		}
+		
+		@PythonFunction
+		public void bindScript(String scriptPath) {
+			this.bindScript(scriptPath, null);
+		}
 
 		@PythonFunction
 		@PythonDocString("Binds a script to this Entity, so it will execute every tick.")
@@ -359,6 +365,7 @@ public class entity {
 			bs.addScript(scriptPath, args);
 		}
 
+		/*
 		@PythonFunction
 		@PythonDocString("Binds an object to the entity")
 		public void bindObject(PyObject type) {
@@ -379,6 +386,7 @@ public class entity {
 				throw Py.ValueError("Entity already has an object bound with the same type!");
 			}
 		}
+		*/
 
 		@PythonFunction
 		@PythonDocString("")
@@ -395,6 +403,8 @@ public class entity {
 			IEntityMs3Data bs = this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
 			// TODO
 		}
+		
+		//TODO way to clear specific scripts.
 
 		@PythonFunction
 		@PythonDocString("Removes all scripts that are bound to this Entity.")

@@ -54,7 +54,7 @@ public class RunnableScript {
 				obj = args.get(i);
 				if (!(obj instanceof String || obj instanceof Boolean || obj instanceof Integer
 						|| obj instanceof Double)) {
-					throw Py.ValueError("args must all be of type string, boolean, int or float!");
+					throw Py.ValueError("args must all be of type str, bool, int or float");
 				}
 			}
 			this.scriptArgs = args;
