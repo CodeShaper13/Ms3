@@ -31,10 +31,14 @@ commands.script.helpTextHeader=Doc string:
 
 # /bindscript command:
 commands.bindScript.usage=/bindscript <add|remove|check|clear> [scriptName] [args...]
-commands.bindScript.useStickCheck=Click on an Entity to check it's bound scripts
-commands.bindScript.useStickAdd=Script set, click on an Entity to bind this script to it
-commands.bindScript.useStickRemove=Click on an Entity to remove this script from it.
-commands.bindScript.useStickClear=Click on an Entity to remove all bound scripts.
+commands.bindScript.useStickCheck=Use the stick on an Entity to check it's bound scripts
+commands.bindScript.useStickAdd=Script set, Use the stick on an Entity to bind this script to it
+commands.bindScript.useStickRemove=Use the stick on an Entity to remove this script from it.
+commands.bindScript.useStickClear=Use the stick on an Entity to remove all bound scripts.
+
+# /exec command:
+commands.exec.usage=/exec [code...]
+commands.exec.codeOk=Code ran without any problems.
 
 # Using the Script Binder:
 ms3.stick.useBindscriptFirst=Use /bindscript first
@@ -60,14 +64,10 @@ ms3.warning.line2=your operating system!  YOU are responsible for your own compu
 ms3.warning.line3=Do not allow players onto your game you do not trust, as they have access to
 ms3.warning.line4=your operating system via the /exec command, allowing file access and deleting.
 ms3.warning.notAgain=You will not see this again.
-ms3.warning.line1=MS3 is capable of running Python code including libraries that deal with
-ms3.warning.line2=the operating system!  YOU are responsible for your own computer's wellbeing!
-ms3.warning.line3=Do not allow players onto your game you do not trust, as they have access to
-ms3.warning.line4=your operating system via the /exec command, allowing file access and deleting.
 
+ms3.update.newUpdate=New Update Available
 ms3.update.downloadNow=Download Now
 ms3.update.titleScreen=Title Screen
-ms3.update.notAgain
 
 # Items:
 item.script_binder.name=Script Binder Stick

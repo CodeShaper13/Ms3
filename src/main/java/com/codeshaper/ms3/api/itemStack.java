@@ -119,6 +119,7 @@ public class itemStack extends PyObject {
 		return this.stack.getMetadata();
 	}
 
+	//TODO does this work?
 	@PythonFunction
 	@PythonDocString("Splits this stack in two, pulling off the passed amount of Items into a new Stack before returning it.")
 	public void spilt(int amount) {
@@ -178,7 +179,8 @@ public class itemStack extends PyObject {
 	@Override
 	public PyObject __eq__(PyObject other) {
 		if (other instanceof itemStack) {
-			return new PyBoolean(((itemStack) other).stack.equals(this.stack));
+			itemStack otherStack = (itemStack) other;
+			return new PyBoolean(otherStack.stack.equals(this.stack));
 		} else {
 			return Py.False;
 		}

@@ -6,6 +6,8 @@ import net.minecraftforge.common.config.Configuration;
 
 /**
  * Manages the config file and provides getters to check the config values.
+ * 
+ * @author CodeShaper
  */
 public class Config {
 	public static final String NULL_PY_PATH = "NONE";

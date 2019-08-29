@@ -63,7 +63,7 @@ public class CommandScript extends CommandBase {
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if (args.length < 2) {
-			if(args.length >= 1 && args[0].equals("run")) {
+			if (args.length >= 1 && args[0].equals("run")) {
 				throw new WrongUsageException(this.ranByHostPlayer(sender) ? "commands.script.usageRun"
 						: "commands.script.usageRunRemoteClient");
 			} else {
@@ -75,15 +75,21 @@ public class CommandScript extends CommandBase {
 			File scriptFile = new File(Ms3.dirManager.getScriptFolder(), scriptName);
 
 			if (args[0].equals("run")) {
-				RunnableScript rs = new RunnableScript(scriptName,
-						args.length > 2 ? Arrays.copyOfRange(args, 2, args.length) : null);
+				/*
+				 * Runs the script.
+				 */
+				String[] scriptArgs = args.length > 2 ? Arrays.copyOfRange(args, 2, args.length) : null;
+				RunnableScript rs = new RunnableScript(scriptName, scriptArgs);
 				if (!rs.exists()) {
 					throw new CommandException("commands.scriptNotFound", scriptName);
 				}
-				if(!Ms3.getInterpreter().runExecute(rs, sender)) {
+				if (!rs.runExecuteFunction(Ms3.getDefaultInterpreter(), sender)) {
 					throw new CommandException("commands.script.noExecuteFunction");
 				}
 			} else if (args[0].equals("new")) {
+				/*
+				 * Creates a new script file and fills it with the default contents.
+				 */
 				if (!scriptName.endsWith(".py")) {
 					scriptName += ".py";
 				}
@@ -104,6 +110,9 @@ public class CommandScript extends CommandBase {
 					}
 				}
 			} else if (args[0].equals("edit")) {
+				/*
+				 * Open the script in the file editor defined by the operating system.
+				 */
 				if (this.ranByHostPlayer(sender)) {
 					try {
 						Desktop.getDesktop().edit(scriptFile);
@@ -114,18 +123,31 @@ public class CommandScript extends CommandBase {
 					throw new CommandException("commands.script.ranByInvalidError", "edit");
 				}
 			} else if (args[0].equals("about")) {
+				/*
+				 * Print info about the script.
+				 */
 				try {
-					BasicFileAttributes attributes = Files.readAttributes(scriptFile.toPath(), BasicFileAttributes.class);
+					BasicFileAttributes attributes = Files.readAttributes(scriptFile.toPath(),
+							BasicFileAttributes.class);
 					final TextFormatting color = TextFormatting.YELLOW;
 					sender.sendMessage(new TextBuilderTrans("commands.script.about0", scriptName).color(color).get());
-					sender.sendMessage(new TextBuilderTrans("commands.script.about1", scriptFile.getAbsolutePath()).color(color).get());;
-					sender.sendMessage(new TextBuilderTrans("commands.script.about2", attributes.size()).color(color).get());;
-					sender.sendMessage(new TextBuilderTrans("commands.script.about3", attributes.creationTime().toString()).color(color).get());;
-					sender.sendMessage(new TextBuilderTrans("commands.script.about4", attributes.lastModifiedTime().toString()).color(color).get());;
+					sender.sendMessage(new TextBuilderTrans("commands.script.about1", scriptFile.getAbsolutePath())
+							.color(color).get());
+					sender.sendMessage(
+							new TextBuilderTrans("commands.script.about2", attributes.size()).color(color).get());
+					sender.sendMessage(
+							new TextBuilderTrans("commands.script.about3", attributes.creationTime().toString())
+									.color(color).get());
+					sender.sendMessage(
+							new TextBuilderTrans("commands.script.about4", attributes.lastModifiedTime().toString())
+									.color(color).get());
 				} catch (IOException e) {
 					throw new CommandException("commands.script.aboutError", scriptName);
 				}
 			} else if (args[0].equals("openLocation")) {
+				/*
+				 * Open the location fo the script file in the File Explorer.
+				 */
 				if (this.ranByHostPlayer(sender)) {
 					try {
 						Desktop.getDesktop().open(scriptFile.getParentFile());
@@ -136,13 +158,16 @@ public class CommandScript extends CommandBase {
 					throw new CommandException("commands.script.ranByInvalidError", "openLocation");
 				}
 			} else if (args[0].equals("help")) {
-				PyInterpreter interpreter = Ms3.getInterpreter();
+				/*
+				 * Show the help text that the script provides.
+				 */
+				PyInterpreter interpreter = Ms3.getDefaultInterpreter();
 				RunnableScript rs = new RunnableScript(scriptName,
 						args.length > 2 ? Arrays.copyOfRange(args, 2, args.length) : null);
 				if (!rs.exists()) {
 					throw new CommandException("commands.scriptNotFound", scriptName);
 				}
-				interpreter.runHelp(rs, sender);
+				rs.printDocString(interpreter, sender);
 			} else {
 				throw new WrongUsageException(this.getUsage(sender));
 			}
@@ -167,15 +192,15 @@ public class CommandScript extends CommandBase {
 				CommandBase.notifyCommandListener(sender, this, "commands.scriptNotFound", scriptName);
 			}
 
-			PyInterpreter interpreter = Ms3.getInterpreter();
+			PyInterpreter interpreter = Ms3.getDefaultInterpreter();
 
 			try {
 				RunnableScript rs = new RunnableScript(scriptName,
 						args.length > 2 ? Arrays.copyOfRange(args, 2, args.length) : null);
 				if (rs.exists()) {
-					String[] result = interpreter.runGetArgs(rs, sender);					
+					String[] result = rs.runGetArgsFunction(interpreter, sender);
 					if (result != null) {
-						return getListOfStringsMatchingLastWord(args, result);
+						return CommandBase.getListOfStringsMatchingLastWord(args, result);
 					}
 					// Null means don't hint anything.
 				}
@@ -209,17 +234,17 @@ public class CommandScript extends CommandBase {
 	protected String[] getAllScripts() {
 		ArrayList<File> scripts = new ArrayList<File>(
 				FileUtils.listFiles(Ms3.dirManager.getScriptFolder(), new String[] { "py" }, true));
-		
+
 		// Remove init files if the config says so.
-		if(Ms3.configManager.hideInitFiles()) {
+		if (Ms3.configManager.hideInitFiles()) {
 			Iterator<File> iter = scripts.iterator();
-			while(iter.hasNext()){
-			    if(iter.next().getName().startsWith("__init__")){
-			        iter.remove();
-			    }
+			while (iter.hasNext()) {
+				if (iter.next().getName().startsWith("__init__")) {
+					iter.remove();
+				}
 			}
 		}
-		
+
 		String[] s = new String[scripts.size()];
 		int j = Ms3.dirManager.getScriptFolder().getAbsolutePath().length() + 1;
 		for (int i = 0; i < scripts.size(); i++) {

@@ -21,6 +21,7 @@ import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonMoveToInit;
 import com.codeshaper.ms3.apiBuilder.classGenerator.ClassGeneratorRegisteredNamespace;
 import com.codeshaper.ms3.apiBuilder.module.AttributeHolder;
+import com.codeshaper.ms3.apiBuilder.module.ClassFunction;
 import com.codeshaper.ms3.apiBuilder.module.Module;
 import com.codeshaper.ms3.apiBuilder.module.ModuleClass;
 import com.codeshaper.ms3.apiBuilder.module.ModuleConstructor;
@@ -181,10 +182,10 @@ public class ApiBuilder {
 			}
 		}
 
-		// Add methods.
+		// Add functions.
 		for (Method method : classOfHolder.getDeclaredMethods()) {
 			if (method.isAnnotationPresent(PythonFunction.class)) {
-				ModuleFunction mfunc = new ModuleFunction(method);
+				ModuleFunction mfunc = (parentHolder == null ? new ModuleFunction(method) : new ClassFunction(method));
 				if (method.isAnnotationPresent(PythonMoveToInit.class)) {
 					this.apiPackage.addFunction(mfunc);
 				} else {

@@ -24,10 +24,9 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 public class util {
 
 	/** Static list of all the scheduled scripts. */
-	public static final List<ScheduledScript> scripts = new ArrayList<>();
+	public static final List<ScheduledScript> scheduledScripts = new ArrayList<>();
 
-	private util() {
-	}
+	private util() { }
 
 	@PythonFunction
 	@PythonDocString("Returns the Ms3 version as a string.")
@@ -58,13 +57,13 @@ public class util {
 		ScheduledScript scheduledScript = new ScheduledScript(pathToScript, e, ticksUntil, args);
 		scheduledScript.tryThrowMissingScript();
 
-		util.scripts.add(scheduledScript);
+		util.scheduledScripts.add(scheduledScript);
 	}
 
 	@PythonFunction
 	@PythonDocString("Checks if a variable is defined in the global scope.")
 	public static boolean isDefined(String variableName) {
-		return Ms3.getInterpreter().exists(variableName);
+		return Ms3.getDefaultInterpreter().exists(variableName);
 	}
 
 	@PythonFunction

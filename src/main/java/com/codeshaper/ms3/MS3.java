@@ -11,8 +11,10 @@ import com.codeshaper.ms3.api.sounds;
 import com.codeshaper.ms3.apiBuilder.ApiBuilder;
 import com.codeshaper.ms3.bindScriptAction.BindScriptAction;
 import com.codeshaper.ms3.command.CommandBindScript;
+import com.codeshaper.ms3.command.CommandExec;
 import com.codeshaper.ms3.command.CommandScript;
 import com.codeshaper.ms3.interpreter.PyInterpreter;
+import com.codeshaper.ms3.interpreter.PyInterpreterManager;
 import com.codeshaper.ms3.items.ItemScriptBinder;
 import com.codeshaper.ms3.proxy.ProxyCommon;
 import com.codeshaper.ms3.update.Release;
@@ -83,7 +85,7 @@ public class Ms3 {
 	/**
 	 * Single reference to the Python Interpreter. Note, null on the client side.
 	 */
-	public PyInterpreter interpreter;
+	public PyInterpreterManager interpreterManager;
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
@@ -91,7 +93,8 @@ public class Ms3 {
 		Ms3.ms3Props = new Ms3Properties();
 		Ms3.configManager = new Config(new File(Ms3.dirManager.getMs3Folder(), "config.cfg"));
 		Ms3.apiBuilder = new ApiBuilder(Ms3.dirManager.getApiFolder());
-		this.interpreter = new PyInterpreter("default");
+		
+		this.interpreterManager = new PyInterpreterManager();
 
 		// Make sure the classes are loaded by the class loader before Jython tries to
 		// look up a field with reflection.
@@ -131,10 +134,11 @@ public class Ms3 {
 	public void serverLoad(FMLServerStartingEvent event) {
 		event.registerServerCommand(new CommandBindScript());
 		event.registerServerCommand(new CommandScript());
+		event.registerServerCommand(new CommandExec());
 	}
 	
-	public static PyInterpreter getInterpreter() {
-		return Ms3.instance.interpreter;
+	public static PyInterpreter getDefaultInterpreter() {
+		return Ms3.instance.interpreterManager.getInterpreter(PyInterpreterManager.DEFAULT_NAME);
 	}
 
 	// ClassLoader cl = Loader.instance().getModClassLoader();

@@ -5,9 +5,11 @@ import java.util.Collections;
 
 import javax.annotation.Nullable;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.python.core.Py;
 import org.python.core.PyBoolean;
+import org.python.core.PyClass;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
@@ -18,6 +20,7 @@ import org.python.core.PyObject;
 import org.python.core.PySequenceList;
 import org.python.core.PyString;
 import org.python.core.PySystemState;
+import org.python.core.PyType;
 import org.python.util.PythonInterpreter;
 
 import com.codeshaper.ms3.EnumCallbackType;
@@ -30,6 +33,7 @@ import com.codeshaper.ms3.exception.InvalidReturnedArgumentException;
 import com.codeshaper.ms3.script.RunnableScript;
 import com.codeshaper.ms3.stream.ChatErrorStream;
 import com.codeshaper.ms3.stream.ChatOutputStream;
+import com.codeshaper.ms3.util.Assert;
 import com.codeshaper.ms3.util.MessageUtil;
 import com.codeshaper.ms3.util.textBuilder.TextBuilder;
 import com.codeshaper.ms3.util.textBuilder.TextBuilderTrans;
@@ -60,7 +64,7 @@ public class PyInterpreter {
 
 	/**
 	 * Creates a new interpreter.
-	 * 
+	 *
 	 * @param interpreterName The name of the interpreter.
 	 */
 	public PyInterpreter(String interpreterName) {
@@ -93,92 +97,15 @@ public class PyInterpreter {
 
 	/**
 	 * Gets the name of the interpreter.
-	 * 
-	 * @return The name.
 	 */
 	public String getName() {
 		return this.interpreterName;
 	}
 
-	/**
-	 * Tries to run the execute function in a script.
-	 * 
-	 * @param runnableScript
-	 * @param sender
-	 * @return False if no function can be found, thus it was not run.
-	 * @throws CommandException
-	 */
-	public boolean runExecute(RunnableScript runnableScript, ICommandSender sender) throws CommandException {
-		try {
-			this.primeScript(runnableScript);
-
-			executor.Executor e = new executor.Executor(sender);
-			if (!this.callFunction("execute", e.getSenderWorld(), e)) {
-				return false;
-			}
-		} catch (PyException e) {
-			MessageUtil.sendErrorMessage(sender, "Error calling execute()", e);
-		}
-		return true;
-	}
-
-	/**
-	 * Runs the getArgs function in a script if it exists and returns the next arg
-	 * to auto complete.
-	 * 
-	 * @param runnableScript
-	 * @param sender
-	 * @return An object representing the returned value, either a single string or
-	 *         an array of strings.
-	 * @throws InvalidReturnedArgumentException
-	 *             If one of the values is not a string or sequence containing
-	 *             strings, or None.
-	 */
-	@Nullable
-	public String[] runGetArgs(RunnableScript runnableScript, ICommandSender sender)
-			throws InvalidReturnedArgumentException {
-		try {
-			this.primeScript(runnableScript);
-			// pysystemstate.add_classdir
-
-			PyObject function = this.pythonInterpreter.get("getArgs");
-			if (function != null) {
-				executor.Executor e = new executor.Executor(sender);
-				PyObject result = function.__call__(e.getSenderWorld(), e);
-
-				// Make sure the returned type is valid, throw an exception if it is not.
-				if (result instanceof PyString || result instanceof PyInteger || result instanceof PyLong
-						|| result instanceof PyFloat || result instanceof PyBoolean) {
-					return new String[] { result.toString() };
-				} else if (result instanceof PyNone) {
-					return null;
-				} else if (result instanceof PySequenceList) {
-					PySequenceList list = (PySequenceList) result;
-					String[] returnValue = new String[list.size()];
-
-					// Validate all elements are strings, and add them to the return list.
-					for (int i = 0; i < list.size(); i++) {
-						if (!(list.get(i) instanceof String)) {
-							throw new InvalidReturnedArgumentException(result,
-									"Returned sequence contains a non-string element.");
-						}
-						returnValue[i] = (String) list.get(i);
-					}
-					return returnValue;
-				} else {
-					throw new InvalidReturnedArgumentException(result,
-							"Object is not of a valid type (bool, string, int, long, float, tuple, list or None).");
-				}
-			}
-		} catch (PyException e) {
-			MessageUtil.sendErrorMessage(sender, "Error calling getArgs()", e);
-		}
-		return null;
-	}
 
 	/**
 	 * Calls the onBind function, if there is one.
-	 * 
+	 *
 	 * @param runnableScript
 	 * @param sender
 	 * @param e
@@ -195,34 +122,23 @@ public class PyInterpreter {
 			return false;
 		}
 	}
-
-	/**
-	 * Gets the doc string from a script and returns it to provide the help text for
-	 * a script.
-	 * 
-	 * @param runnableScript
-	 * @param sender
-	 */
-	public void runHelp(RunnableScript runnableScript, ICommandSender sender) {
-		final String NAME = "__doc__";
+	
+	// This seems to try to get a class in a script with the same name as the file.
+	// Unused, moved to AttachedScript.java
+	public PyObject func(RunnableScript runnableScript, ICommandSender sender) {
 		try {
 			this.primeScript(runnableScript);
-			PyObject docString = this.pythonInterpreter.get(NAME);
-			if (docString != Py.None) {
-				if (docString instanceof PyString) {
-					sender.sendMessage(new TextBuilderTrans("commands.script.helpTextHeader").bold()
-							.color(TextFormatting.GREEN).get());
-					sender.sendMessage(new TextBuilder(docString.toString()).color(TextFormatting.GREEN).get());
-					this.pythonInterpreter.set(NAME, Py.None);
-				} else {
-					MessageUtil.sendErrorMessage(sender, "__doc__ attribute is not of type string!");
-				}
+			String targetTypeName = StringUtils.capitalize(runnableScript.getScriptName());
+			PyObject type = this.getVariable(targetTypeName);
+
+			if (type != null && (type instanceof PyType || type instanceof PyClass)) {
+				return type;
 			} else {
-				sender.sendMessage(
-						new TextBuilderTrans("commands.script.noHelpText").bold().color(TextFormatting.GREEN).get());
+				return null;
 			}
 		} catch (PyException exception) {
-			MessageUtil.sendErrorMessage(sender, "Error getting __doc__ attribute()", exception);
+			MessageUtil.sendErrorMessage(sender, "Error running func", exception);
+			return null;
 		}
 	}
 
@@ -232,50 +148,24 @@ public class PyInterpreter {
 			this.callFunction("onClick", new world.World((WorldServer) player.getEntityWorld()),
 					com.codeshaper.ms3.api.entity.getWrapperClassForEntity(entity),
 					com.codeshaper.ms3.api.entity.getWrapperClassForEntity(player));
-		} catch (PyException e) {
-			MessageUtil.sendErrorMessage(player, "Error calling onClick()", e);
-		}
-	}
-	
-	public void runObjectCallback(Collection<BoundObject> collection, EnumCallbackType type, Object... args) {
-		try {
-			for (BoundObject obj : collection) {
-				switch (type) {
-				case ON_CONSTRUCT:
-					obj.onConstruct();
-					break;
-				case ON_TICK:
-					obj.onTick();
-					break;
-				case ON_LOAD:
-					obj.onLoad();
-					break;
-				case ON_SAVE:
-					obj.onSave();
-					break;
-				case ON_CLICK:
-					obj.onClick(entity.getWrapperClassForEntity((Entity) args[0]), (entity.Player) entity.getWrapperClassForEntity((Entity) (args[1])));
-					break;
-				}
-			}
-		} catch (PyException e) {
-			MessageUtil.sendErrorMessageToAll("Error calling " + type.getName() + "()", e);
+		} catch (PyException exception) {
+			MessageUtil.sendErrorMessage(player, "Error calling onClick()", exception);
 		}
 	}
 
 	/**
-	 * Calls a function within the global namespace if it can be found.
-	 * 
-	 * @param functionName
-	 *            The name of the function.
+	 * Calls a function within the global namespace.
+	 *
+	 * @param functionName The name of the function.
 	 * @param args
-	 * @return True if the function was found and called, false otherwise.
+	 * @return True if the function was found and called, false if it can't be
+	 *         found.
 	 */
-	private boolean callFunction(String functionName, PyObject... args) {
-		PyObject function = this.pythonInterpreter.get(functionName);
+	public boolean callFunction(String functionName, @Nullable PyObject... args) {
+		PyObject function = this.getVariable(functionName);
 		if (function != null) {
 			@SuppressWarnings("unused")
-			PyObject returnValue = function.__call__(args);
+			PyObject returnValue = function.__call__(args != null ? args : new PyObject[0]);
 			return true;
 		} else {
 			return false;
@@ -284,18 +174,29 @@ public class PyInterpreter {
 
 	/**
 	 * Checks if a variable is defined in the global scope.
-	 * 
+	 *
 	 * @return true if the variable is defined.
 	 */
 	public boolean exists(String name) {
-		return this.pythonInterpreter.get(name) != null;
+		return this.getVariable(name) != null;
 	}
 
 	/**
+	 * Gets a variable from the global namespace.
+	 */
+	@Nullable
+	public PyObject getVariable(String name) {
+		return this.pythonInterpreter.get(name);
+	}
+	
+	public void setVariable(String name, PyObject value) {
+		this.pythonInterpreter.set(name, Py.None);
+	}
+	
+	/**
 	 * Deletes a variable from the global scope.
-	 * 
-	 * @param name
-	 *            Name of the variable.
+	 *
+	 * @param name Name of the variable.
 	 * @return True if the variable was found and deleted, false otherwise.
 	 */
 	public boolean delIfExists(String name) {
@@ -304,6 +205,21 @@ public class PyInterpreter {
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	/**
+	 * Executes a single string of code.
+	 * @param code
+	 * @return True if the code ran without error, false otherwise.
+	 * @throws PyException If there was an error running the code.
+	 */
+	public boolean executeLine(String code) throws PyException {
+		try {
+			this.pythonInterpreter.exec(code);
+			return true;
+		} catch(PyException exception) {
+			throw exception;
 		}
 	}
 
@@ -324,14 +240,13 @@ public class PyInterpreter {
 	}
 
 	/**
-	 * Runs a script to load the functions into the namespace.
-	 * 
+	 * Runs a script on the interpreter to load the functions into the namespace.
+	 *
 	 * @param runnableScript
-	 * @throws PyException
-	 *             if there was an error running the script, including a syntax
-	 *             error.
+	 * @throws PyException if there was an error running the script, including a
+	 *                     syntax error.
 	 */
-	private void primeScript(RunnableScript runnableScript) throws PyException {
+	public void primeScript(RunnableScript runnableScript) throws PyException {
 		// Cleanup the old functions.
 		this.delIfExists("onBind");
 		this.delIfExists("execute");

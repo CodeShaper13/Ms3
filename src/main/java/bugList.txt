@@ -1,5 +1,0 @@
-1. Arguments with the same first letter cause problems.
-
-2. Scheduled scripts are not saved upon exiting the world.
-
-3.  Print a nicer error message on an access error

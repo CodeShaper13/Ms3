@@ -10,37 +10,37 @@ import com.codeshaper.ms3.util.Logger;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 /**
- * Manages the various folders and files that Ms3 uses, creating
- * config files and startup scripts, among other things.
+ * Manages the various folders and files that Ms3 uses, creating config files
+ * and startup scripts, among other things.
  */
 public class DirectoryManager {
-	
+
 	private File dotMinecraftDir;
-	
+
 	private File ms3Folder;
 	private File scriptFolder;
 	private File compiledScriptFolder;
 	private File apiFolder;
 	private File internalFolder;
 	private File scriptDataFolder;
-		
+
 	public DirectoryManager(FMLPreInitializationEvent event) {
 		this.dotMinecraftDir = event.getModConfigurationDirectory().getParentFile();
-		
+
 		// Folders:
-    	this.ms3Folder = this.createFolder(this.dotMinecraftDir, Ms3.MOD_ID);
-    	this.scriptFolder = this.createFolder(this.ms3Folder, "scripts");
-    	this.compiledScriptFolder = this.createFolder(this.ms3Folder, ".compiledScripts");
-    	this.apiFolder = new File(this.ms3Folder, "api-" + Ms3.API_VERSION);
-    	this.internalFolder = this.createFolder(this.ms3Folder, ".internal");
-    	this.scriptDataFolder = this.createFolder(this.ms3Folder, "scriptData");
-    	    	
-    	this.createObfuscatedWarningFile();
-    }
-	
+		this.ms3Folder = this.createFolder(this.dotMinecraftDir, Ms3.MOD_ID);
+		this.scriptFolder = this.createFolder(this.ms3Folder, "scripts");
+		this.compiledScriptFolder = this.createFolder(this.ms3Folder, ".compiledScripts");
+		this.apiFolder = new File(this.ms3Folder, "api-" + Ms3.API_VERSION);
+		this.internalFolder = this.createFolder(this.ms3Folder, ".internal");
+		this.scriptDataFolder = this.createFolder(this.ms3Folder, "scriptData");
+
+		this.createObfuscatedWarningFile();
+	}
+
 	private void createObfuscatedWarningFile() {
 		File f = new File(this.compiledScriptFolder, "WARNING.txt");
-		if(!f.exists()) {
+		if (!f.exists()) {
 			try {
 				BufferedWriter br = new BufferedWriter(new FileWriter(f));
 				br.write("NOTICE!");
@@ -63,30 +63,30 @@ public class DirectoryManager {
 	}
 
 	public File getDotMinecraftDir() {
-		return dotMinecraftDir;
+		return this.dotMinecraftDir;
 	}
 
 	public File getMs3Folder() {
-		return ms3Folder;
+		return this.ms3Folder;
 	}
 
 	public File getScriptFolder() {
-		return scriptFolder;
+		return this.scriptFolder;
 	}
 
 	public File getCompiledScriptFolder() {
-		return compiledScriptFolder;
+		return this.compiledScriptFolder;
 	}
 
 	public File getApiFolder() {
-		return apiFolder;
+		return this.apiFolder;
 	}
 
 	public File getInternalFolder() {
-		return internalFolder;
+		return this.internalFolder;
 	}
 
 	public File getScriptDataFolder() {
-		return scriptDataFolder;
+		return this.scriptDataFolder;
 	}
 }

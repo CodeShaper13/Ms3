@@ -20,6 +20,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 
+/**
+ * Command used to set the current script to bind with the Script Binder item.
+ *
+ * @author CodeShaper
+ */
 public class CommandBindScript extends CommandScript {
 
 	/**
@@ -48,40 +53,45 @@ public class CommandBindScript extends CommandScript {
 	 */
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		Entity e = sender.getCommandSenderEntity();
-		if (!(e instanceof EntityPlayer)) {
+		Entity cmdSender = sender.getCommandSenderEntity();
+		if (!(cmdSender instanceof EntityPlayer)) {
 			throw new CommandException("commands.bindScript.onlyByPlayer");
 		}
-		
+
 		boolean checkArg = args[0].equals("check");
 		boolean clearArg = args[0].equals("clear");
-		
-		if(args.length >= 1 && (checkArg || clearArg)) {
-			if(checkArg) {
-				this.storeAction(e, new BindScriptAction(BSAction.CHECK));
-				CommandBase.notifyCommandListener(sender, this, "commands.bindScript.useStickCheck");	
+
+		if (args.length >= 1 && (checkArg || clearArg)) {
+			if (checkArg) {
+				this.storeAction(cmdSender, new BindScriptAction(BSAction.CHECK));
+				CommandBase.notifyCommandListener(sender, this, "commands.bindScript.useStickCheck");
 			} else { // checkArg
-				this.storeAction(e, new BindScriptAction(BSAction.CLEAR));
+				this.storeAction(cmdSender, new BindScriptAction(BSAction.CLEAR));
 				CommandBase.notifyCommandListener(sender, this, "commands.bindScript.useStickClear");
 			}
-		}
-		else if (args.length < 2 || !(args[0].equals("add") || args[0].equals("remove"))) {
+		} else if (args.length < 2 || !(args[0].equals("add") || args[0].equals("remove"))) {
 			throw new WrongUsageException("commands.bindScript.usage");
-		}
-		else {
+		} else {
 			RunnableScript rs = new RunnableScript(args[1],
 					args.length > 1 ? Arrays.copyOfRange(args, 2, args.length) : null);
 
 			boolean flag = args[0].equals("add");
-			this.storeAction(e, new BindScriptAction(rs, flag ? BSAction.ADD : BSAction.REMOVE));
-			CommandBase.notifyCommandListener(sender, this, flag ? "commands.bindScript.useStickAdd" : "commands.bindScript.useStickRemove");
+			this.storeAction(cmdSender, new BindScriptAction(rs, flag ? BSAction.ADD : BSAction.REMOVE));
+			CommandBase.notifyCommandListener(sender, this,
+					flag ? "commands.bindScript.useStickAdd" : "commands.bindScript.useStickRemove");
 		}
 	}
-	
-	private void storeAction(Entity e, BindScriptAction action) {
-		EntityPlayer player = (EntityPlayer) e;
-		Ms3.players.put(player.getUniqueID(), action);
 
+	/**
+	 * Stores the passed action with the passed Player. This will replace the
+	 * previous stored one.
+	 * 
+	 * @param cmdSender
+	 * @param action
+	 */
+	private void storeAction(Entity cmdSender, BindScriptAction action) {
+		EntityPlayer player = (EntityPlayer) cmdSender;
+		Ms3.players.put(player.getUniqueID(), action);
 	}
 
 	@Override

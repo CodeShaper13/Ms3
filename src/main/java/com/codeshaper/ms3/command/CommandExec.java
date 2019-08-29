@@ -5,8 +5,11 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.python.core.PyException;
+
 import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.interpreter.PyInterpreter;
+import com.codeshaper.ms3.util.MessageUtil;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -15,7 +18,6 @@ import net.minecraft.command.WrongUsageException;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 
-@Deprecated
 public class CommandExec extends CommandBase {
 
 	/**
@@ -52,10 +54,15 @@ public class CommandExec extends CommandBase {
 				sb.append(args[i]);
 				sb.append(" ");
 			}
-			PyInterpreter interpreter = Ms3.getInterpreter();
-			boolean noError = false; // interpreter.runSingleLine(sb.toString());
-			if (noError) {
-				CommandBase.notifyCommandListener(sender, this, "commands.exec.codeOk");
+			PyInterpreter interpreter = Ms3.getDefaultInterpreter();
+			
+			try {
+				boolean noError = interpreter.executeLine(sb.toString());				
+				if(noError) {
+					CommandBase.notifyCommandListener(sender, this, "commands.exec.codeOk");
+				}
+			} catch(PyException exception) {
+				MessageUtil.sendErrorMessage(sender, "Error calling execute()", exception);
 			}
 		}
 	}

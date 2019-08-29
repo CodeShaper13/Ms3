@@ -27,16 +27,14 @@ public class EntityMs3DataStorage implements IStorage<IEntityMs3Data> {
 	public NBTBase writeNBT(Capability<IEntityMs3Data> capability, IEntityMs3Data instance, EnumFacing side) {
 		NBTTagCompound tag = new NBTTagCompound();
 
+		// Write the attached scripts.
 		NBTTagList nbtList = new NBTTagList();
-		List<RunnableScript> list = instance.getScriptList();
-		RunnableScript rs;
-		for (int i = 0; i < list.size(); i++) {
-			rs = list.get(i);
-			nbtList.appendTag(rs.writeToNbt());
+		for(AttachedScript as : instance.getScriptList()) {
+			nbtList.appendTag(as.script.writeToNbt());
 		}
-
 		tag.setTag("scriptList", nbtList);
 
+		// Write the properties.
 		NBTTagCompound nbtCompound = new NBTTagCompound();
 		HashMap<String, Object> map = instance.getPropertyMap();
 		for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -56,7 +54,6 @@ public class EntityMs3DataStorage implements IStorage<IEntityMs3Data> {
 				throw new Error("Unknown type: " + value.getClass());
 			}
 		}
-
 		tag.setTag("properties", nbtCompound);
 
 		return tag;
@@ -66,13 +63,14 @@ public class EntityMs3DataStorage implements IStorage<IEntityMs3Data> {
 	public void readNBT(Capability<IEntityMs3Data> capability, IEntityMs3Data instance, EnumFacing side, NBTBase nbt) {
 		NBTTagCompound tag = (NBTTagCompound) nbt;
 
+		// Read the attached scripts.
 		NBTTagList nbtList = tag.getTagList("scriptList", 10);
-
-		List<RunnableScript> list = instance.getScriptList();
+		AttachedScriptList list = instance.getScriptList();
 		for (int i = 0; i < nbtList.tagCount(); i++) {
-			list.add(new RunnableScript(nbtList.getCompoundTagAt(i)));
+			//list.add(new RunnableScript(nbtList.getCompoundTagAt(i)));
 		}
 
+		// Read the properties.
 		NBTTagCompound nbtCompound = tag.getCompoundTag("properties");
 		HashMap<String, Object> map = instance.getPropertyMap();
 
@@ -94,7 +92,6 @@ public class EntityMs3DataStorage implements IStorage<IEntityMs3Data> {
 			} else {
 				throw new Error("Unknown type: " + obj.getClass());
 			}
-
 			map.put(key, value);
 		}
 	}

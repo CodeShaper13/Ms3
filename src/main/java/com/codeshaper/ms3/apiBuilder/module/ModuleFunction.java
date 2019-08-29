@@ -21,7 +21,7 @@ import com.codeshaper.ms3.util.Util;
  */
 public class ModuleFunction extends BaseAttribute {
 
-	private final FunctionParam[] paramArray;
+	private FunctionParam[] paramArray;
 	/**
 	 * Holds the class of the return type. If this method returns nothing, this is
 	 * equal to {@link Void.type}
@@ -54,16 +54,27 @@ public class ModuleFunction extends BaseAttribute {
 
 	public ModuleFunction(String name, String docString, FunctionParam... params) {
 		super(name, docString);
-		this.paramArray = params;
+		this.func(params);
 		this.returnType = Void.TYPE;
 	}
 
 	public ModuleFunction(String name, String docString, Class<?> returnType, FunctionParam... params) {
 		super(name, docString);
-		this.paramArray = params;
+		this.func(params);
 		this.returnType = returnType;
 	}
-
+	
+	private void func(FunctionParam[] params) {
+		if(this instanceof ClassFunction) {
+			FunctionParam[] tempArr = new FunctionParam[params.length + 1];
+			tempArr[0] = new FunctionParam("self");
+			System.arraycopy(params, 0, tempArr, 1, params.length);
+			this.paramArray = tempArr;
+		} else {
+			this.paramArray = params;
+		}
+	}
+	
 	/**
 	 * Returns the number of arguments that the function has.
 	 */
@@ -96,7 +107,7 @@ public class ModuleFunction extends BaseAttribute {
 		}
 
 		// Add the body of the function.
-		if (this.returnType == void.class) {//.equals(Void.TYPE)) {
+		if (this.returnType == void.class) {
 			br.write(indent + "    pass");
 		} else {
 			br.write(indent + "    return " + BuildUtils.getDefaultValueFromType(this.returnType));

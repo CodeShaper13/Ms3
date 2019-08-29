@@ -4,11 +4,16 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.python.core.PyObject;
+
 import com.codeshaper.ms3.api.BoundObject;
+import com.codeshaper.ms3.api.entity;
 import com.codeshaper.ms3.api.executor;
 import com.codeshaper.ms3.api.util;
 import com.codeshaper.ms3.bindScriptAction.BSAction;
 import com.codeshaper.ms3.bindScriptAction.BindScriptAction;
+import com.codeshaper.ms3.capability.AttachedScript;
+import com.codeshaper.ms3.capability.AttachedScriptList;
 import com.codeshaper.ms3.capability.EntityMs3DataProvider;
 import com.codeshaper.ms3.capability.IEntityMs3Data;
 import com.codeshaper.ms3.gui.GuiUpdate;
@@ -48,6 +53,9 @@ public class EventHandler {
 
 	private static final ResourceLocation CAPABILITY_RS = new ResourceLocation(Ms3.MOD_ID, "entityMs3Data");
 
+	/** If true, the update gui has been shown this session. */
+	private boolean flag = false;
+
 	@SubscribeEvent
 	public void onEntityClick(PlayerInteractEvent.EntityInteract event) {
 		Entity clickedEntity = event.getTarget();
@@ -57,42 +65,48 @@ public class EventHandler {
 			IEntityMs3Data capData = clickedEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
 
 			if (event.getItemStack().getItem() == Ms3.itemScriptBinder) {
-				// Bind a script to the entity.
-				BindScriptAction bsa = Ms3.players.get(player.getUniqueID());
-				if (bsa != null) {
-					if (bsa.getAction() == BSAction.CHECK) {
-						this.boundScriptCheck(player, capData);
-					} else if (bsa.getAction() == BSAction.CLEAR) {
-						this.boundScriptClear(player, capData);
-					} else {
-						RunnableScript runnableScript = bsa.getRunnableScript();
-						if (!runnableScript.exists()) {
-							player.sendMessage(new TextBuilder(
-									"Script with name \" + runnableScript.getFile().getPath() + \" could not be found")
-											.color(TextFormatting.RED).get());
-						} else {
-							BSAction action = bsa.getAction();
-							if (action == BSAction.ADD) {
-								this.addBoundScript(player, capData, runnableScript, clickedEntity);
-							} else if (action == BSAction.REMOVE) {
-								this.removeBoundScript(player, capData, runnableScript);
-							}
-						}
-					}
-				} else {
-					player.sendMessage(
-							new TextBuilderTrans("ms3.stick.useBindscriptFirst").color(TextFormatting.RED).get());
-				}
+				this.handleScriptBinderStickClick(player, clickedEntity, capData);
 				event.setCancellationResult(EnumActionResult.FAIL);
 			} else {
-				capData.runCallback(EnumCallbackType.ON_CLICK, clickedEntity, player);
+				capData.runCallback(EnumCallbackType.ON_CLICK, player);
 				// TODO cancel event based on function return value?
 				event.setCancellationResult(EnumActionResult.FAIL);
 			}
 		}
 	}
 
-	private boolean flag = false;
+	private void handleScriptBinderStickClick(EntityPlayer player, Entity clickedEntity, IEntityMs3Data ms3Data) {
+		// Bind a script to the entity.
+		BindScriptAction bsa = Ms3.players.get(player.getUniqueID());
+		if (bsa != null) {
+			BSAction bsAction = bsa.getAction();
+			if (bsAction == BSAction.CHECK) {
+				this.boundObjectCheck(player, ms3Data);
+			}
+			else if (bsAction == BSAction.CLEAR) {
+				this.boundScriptClear(player, ms3Data);
+			}
+			else if (bsAction == BSAction.ADD || bsAction == BSAction.REMOVE) {
+				RunnableScript runnableScript = bsa.getRunnableScript();
+				if (!runnableScript.exists()) {
+					player.sendMessage(new TextBuilder(
+							"Script with name \"" + runnableScript.getFile().getPath() + "\" could not be found.")
+									.color(TextFormatting.RED).get());
+				}
+				else {
+					BSAction action = bsa.getAction();
+					if (action == BSAction.ADD) {
+						this.addBoundScript(player, ms3Data, runnableScript, clickedEntity);
+					} else if (action == BSAction.REMOVE) {
+						this.removeBoundScript(player, ms3Data, runnableScript);
+					}
+				}
+			}
+		}
+		else {
+			player.sendMessage(new TextBuilderTrans("ms3.stick.useBindscriptFirst").color(TextFormatting.RED).get());
+		}
+	}
 
 	@SubscribeEvent
 	public void initGui(GuiScreenEvent.InitGuiEvent.Pre event) {
@@ -100,8 +114,8 @@ public class EventHandler {
 			Minecraft mc = Minecraft.getMinecraft();
 			if (Ms3.ms3Props.showWarning()) {
 				mc.displayGuiScreen(new GuiWarning(event.getGui()));
-			} else if (!flag && Ms3.ms3Props.promptDownload()) { // && UpdateChecker.isOutdated(Ms3.RELEASE)) {
-				flag = false;
+			} else if (!flag && UpdateChecker.isOutdated(Ms3.RELEASE)) {
+				flag = true;
 				mc.displayGuiScreen(new GuiUpdate(event.getGui()));
 			}
 		}
@@ -115,14 +129,7 @@ public class EventHandler {
 	public void worldLoadEvent(WorldEvent.Load event) {
 		World world = event.getWorld();
 		if (!world.isRemote) {
-			for (Entity entity : world.loadedEntityList) {
-//				IEntityMs3Data ms3Data = entity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
-//				if (ms3Data != null) {
-//					ms3Data.runCallback(EnumCallbackType.ON_LOAD);
-//				} else {
-//					this.warnNoCapability();
-//				}
-			}
+			this.triggerEventFunction(world, EnumCallbackType.ON_LOAD);
 		}
 	}
 
@@ -134,40 +141,23 @@ public class EventHandler {
 	public void worldSaveEvent(WorldEvent.Save event) {
 		World world = event.getWorld();
 		if (!world.isRemote) {
-			for (Entity entity : world.loadedEntityList) {
-//				IEntityMs3Data ms3Data = entity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
-//				if (ms3Data != null) {
-//					ms3Data.runCallback(EnumCallbackType.ON_SAVE);
-//				} else {
-//					this.warnNoCapability();
-//				}
-			}
+			this.triggerEventFunction(world, EnumCallbackType.ON_SAVE);
 		}
 	}
 
 	@SubscribeEvent
 	public void worldTickEvent(WorldTickEvent event) {
 		if (event.side == Side.SERVER && event.phase == Phase.END) {
-			// Update Entities with bound scripts.
-			IEntityMs3Data ms3Data;
-			for (Entity entity : event.world.loadedEntityList) {
-				ms3Data = entity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
-				if (ms3Data != null) {
-					ms3Data.runAllExecute(entity);					
-					//ms3Data.runCallback(EnumCallbackType.ON_TICK);
-				} else {
-					this.warnNoCapability();
-				}
-			}
+			this.triggerEventFunction(event.world, EnumCallbackType.ON_TICK);
 
 			// Update scheduled scripts.
 			ScheduledScript scheduledScript;
-			for (int i = util.scripts.size() - 1; i >= 0; i--) {
-				scheduledScript = util.scripts.get(i);
+			for (int i = util.scheduledScripts.size() - 1; i >= 0; i--) {
+				scheduledScript = util.scheduledScripts.get(i);
 
 				if (scheduledScript.reduceTime()) {
 					executor.Executor executor = scheduledScript.getExecutor();
-					PyInterpreter interpreter = Ms3.getInterpreter();
+					PyInterpreter interpreter = Ms3.getDefaultInterpreter();
 
 					// TODO who should the error be printed to?
 					if (!scheduledScript.exists()) {
@@ -176,13 +166,13 @@ public class EventHandler {
 					}
 
 					try {
-						interpreter.runExecute(scheduledScript, executor.getSenderObj());
-					} catch (CommandException exception) {
-						executor.sendMessage(new TextComponentTranslation("pycraft.scheduledScript.noExecuteFunction",
+						scheduledScript.runExecuteFunction(interpreter, executor.getSenderObj());
+					} catch (CommandException e) {
+						executor.sendMessage(new TextComponentTranslation("pycraft.scheduledScript.noExecuteFunction", 
 								scheduledScript.getFile().getPath()));
 					}
 
-					util.scripts.remove(i);
+					util.scheduledScripts.remove(i);
 				}
 			}
 		}
@@ -194,28 +184,46 @@ public class EventHandler {
 	}
 
 	/**
-	 * Sends the player messages listing all the scripts bound to the passed entity.
+	 * Calls an event function on all of the loaded entities.
+	 * 
+	 * @param world
+	 * @param type
+	 */
+	private void triggerEventFunction(World world, EnumCallbackType type) {
+		IEntityMs3Data ms3Data;
+		for (Entity entity : world.loadedEntityList) {
+			ms3Data = entity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
+			if (ms3Data != null) {
+				ms3Data.runCallback(type);
+			} else {
+				this.warnNoCapability();
+			}
+		}
+	}
+
+	/**
+	 * Sends the player messages listing all the objects bound to the passed entity.
 	 * 
 	 * @param player
 	 * @param capabilityData
 	 */
-	private void boundScriptCheck(ICommandSender player, IEntityMs3Data capabilityData) {
-		List<RunnableScript> list = capabilityData.getScriptList();
+	private void boundObjectCheck(ICommandSender player, IEntityMs3Data capabilityData) {
+		AttachedScriptList list = capabilityData.getScriptList();
 		if (list.size() == 0) {
 			player.sendMessage(new TextBuilderTrans("ms3.stick.noScripts").color(TextFormatting.YELLOW).get());
 		} else {
 			player.sendMessage(
 					new TextBuilderTrans("ms3.stick.totalScriptCount", list.size(), list.size() > 1 ? "" : "s")
 							.color(TextFormatting.YELLOW).get());
-			for (RunnableScript rs : list) {
+			for (AttachedScript as : list) {
 				player.sendMessage(
-						new TextBuilderTrans("> " + rs.getFile().getPath()).color(TextFormatting.YELLOW).get());
+						new TextBuilder("> " + as.script.getFile().getPath()).color(TextFormatting.YELLOW).get());
 			}
 		}
 	}
 
 	private void boundScriptClear(ICommandSender player, IEntityMs3Data capabilityData) {
-		capabilityData.getScriptList().clear();
+		capabilityData.getScriptList().removeAll();
 		MessageUtil.sendMessage(player,
 				new TextBuilderTrans("ms3.stick.allScriptsCleared").color(TextFormatting.YELLOW));
 	}
@@ -223,27 +231,31 @@ public class EventHandler {
 	/**
 	 * Binds a script to an entity.
 	 * 
-	 * @param player
-	 *            The player who preformed the click.
-	 * @param capabilityData
-	 * @param runnableScript
-	 *            The script to bind.
-	 * @param clickedEntity
-	 *            The entity that was clicked.
+	 * @param player         The player who preformed the click.
+	 * @param ms3EntityData
+	 * @param runnableScript The script to bind.
+	 * @param clickedEntity  The entity that was clicked.
 	 */
-	private void addBoundScript(@Nullable ICommandSender player, IEntityMs3Data capabilityData,
-			RunnableScript runnableScript, Entity clickedEntity) {
-		if (capabilityData.getScriptList().contains(runnableScript)) {
+	private void addBoundScript(@Nullable ICommandSender player, IEntityMs3Data ms3EntityData, RunnableScript runnableScript, Entity clickedEntity) {
+		if (ms3EntityData.getScriptList().containsScript(runnableScript)) {
 			MessageUtil.sendMessage(player, new TextBuilder("ms3.stick.cantAddDuplicate").color(TextFormatting.RED));
 		} else {
 			// Try to bind the script.
-			PyInterpreter i = Ms3.getInterpreter();
-			boolean flag = i.runOnBind(runnableScript, player, clickedEntity);
+			PyInterpreter interpreter = Ms3.getDefaultInterpreter();
+			ms3EntityData.addBoundScript(entity.getWrapperClassForEntity(clickedEntity), runnableScript);
+			
+			/*
+			boolean flag = interpreter.runOnBind(runnableScript, player, clickedEntity);
 			if (flag) {
-				capabilityData.addScript(runnableScript);
-
-				MessageUtil.sendMessage(player,
-						new TextBuilder("ms3.stick.successfulBind").color(TextFormatting.GREEN));
+				PyObject obj = Ms3.getDefaultInterpreter().func(runnableScript, player);
+				if (obj != null) {
+					ms3EntityData.addBoundObject(obj, entity.getWrapperClassForEntity(clickedEntity));
+					MessageUtil.sendMessage(player, new TextBuilderTrans("ms3.stick.successfulBind").color(TextFormatting.GREEN));
+				} else {
+					MessageUtil.sendMessage(player, new TextBuilder("Script must define a class with the same name as the script file.").color(TextFormatting.GREEN));
+				}
+				
+				
 			} else {
 				// More code because it must be in bold.
 				ITextComponent itc = new TextComponentTranslation("ms3.stick.bindingError");
@@ -251,6 +263,7 @@ public class EventHandler {
 
 				MessageUtil.sendMessage(player, itc);
 			}
+			*/
 		}
 	}
 
@@ -258,16 +271,14 @@ public class EventHandler {
 	 * Removes a bound script from an entity, printing out a message to the player
 	 * if the script isn't found.
 	 * 
-	 * @param player
-	 *            The player who performed the click.
+	 * @param player         The player who performed the click.
 	 * @param capabilityData
-	 * @param runnableScript
-	 *            The script to try and remove.
+	 * @param runnableScript The script to try and remove.
 	 */
 	private void removeBoundScript(@Nullable ICommandSender player, IEntityMs3Data capabilityData,
 			RunnableScript runnableScript) {
-		List<RunnableScript> list = capabilityData.getScriptList();
-		if (list.contains(runnableScript)) {
+		AttachedScriptList list = capabilityData.getScriptList();
+		if (list.containsScript(runnableScript)) {
 			list.remove(runnableScript);
 		} else {
 			MessageUtil.sendMessage(player, new TextBuilder("ms3.stick.noScriptOnEntity").color(TextFormatting.RED));

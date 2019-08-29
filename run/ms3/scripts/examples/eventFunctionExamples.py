@@ -3,46 +3,18 @@
 
 # Import the api
 import com.codeshaper.ms3.api as ms3
-import com.codeshaper.ms3.api.formattingCode as cc
+import com.codeshaper.ms3.api.formattingCode as fc
 import sys
     
     
 # Used to perform the main logic of the script.
-# Called from /script run <name> util.executeDelayedScript() or repeatedly
-# after a script has been bound with.
+# Called from /script run <name> or util.executeDelayedScript()
 def execute(world, sender):
     assert isinstance(world, ms3.world.World)
     assert isinstance(sender, ms3.executor.Executor)
     
-    print ms3.formattingCode.ITALIC + "execute()"
+    print fc.ITALIC + "execute()"
     
-
-# Used to initialize an entity or set properties.
-# Called whenever a script is bound to an entity with the command
-# /bindScript or when the bindScript function is called on an entity.
-def onBind(world, theEntity):
-    assert isinstance(world, ms3.world.World)
-    assert isinstance(theEntity, ms3.entity.Base)
-    
-    print ms3.formattingCode.ITALIC + "onBind()"
-    
-
-# Called when an entity is clicked on and this script has been bound to it.
-def onClick(world, entity, player):
-    assert isinstance(world, ms3.world.World)
-    # Clicked entity will refer to the entity that is clicked, thus the entity
-    # that this script is bound to.
-    assert isinstance(entity, ms3.entity.Base)
-    assert isinstance(player, ms3.entity.Player)
-    
-    print ms3.formattingCode.ITALIC + "onClick()"
-    
-    
-def onTick(world, entity):
-    assert isinstance(world, ms3.world.World)
-    assert isinstance(entity, ms3.entity.Base)
-
-    print ms3.formattingCode.ITALIC + "onTick()"
     
 # Returns arguments to suggest with tab when executing the script
 # with /script run <name>.
@@ -50,7 +22,7 @@ def getArgs(world, sender):
     assert isinstance(world, ms3.world.World)
     assert isinstance(sender, ms3.executor.Executor)
     
-    print ms3.formattingCode.ITALIC + "getArgs()"
+    print fc.ITALIC + "getArgs()"
     
     # Use sys.argv to access the scripts arguments.
     i = len(sys.argv)

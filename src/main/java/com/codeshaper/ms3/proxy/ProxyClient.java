@@ -8,6 +8,8 @@ import net.minecraftforge.client.model.ModelLoader;
 
 /**
  * Client side proxy.
+ * 
+ * @author CodeShaper
  */
 public class ProxyClient extends ProxyCommon {
 

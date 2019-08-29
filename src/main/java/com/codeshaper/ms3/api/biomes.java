@@ -142,7 +142,7 @@ public class biomes {
     public static final String MUTATED_MESA_CLEAR_ROCK = func("minecraft:mutated_mesa_clear_rock");
 
     @PythonFunction
-    @PythonDocString("Returns a list of all the vanilla Biomess.")
+    @PythonDocString("Returns a list of all the vanilla Biomes.")
     public static PyList getAllBiomes() {
         return names;
     }

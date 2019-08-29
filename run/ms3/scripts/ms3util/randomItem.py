@@ -29,15 +29,19 @@ HELMETS = [ms3.items.LEATHER_HELMET,
          ms3.items.DIAMOND_HELMET]
 
 def randomBoots():
+    """Returns a random pair of boots."""
     return random.choice(BOOTS)
     
 def randomLeggings():
+    """Returns a random pair of leggings."""
     return random.choice(LEGGINGS)
     
 def randomChestplate():
+    """Returns a random chestplate."""
     return random.choice(CHESTPLATES)
     
 def randomHelmet():
+    """Returns a random helmet."""
     return random.choice(HELMETS)
     
     

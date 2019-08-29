@@ -207,13 +207,11 @@ public class world {
 		@PythonDocString("Returns the closest Entity of type entityFilterName to (x, y, z) within the radius, or None if none are found.  Pass None for all entity types.")
 		@Nullable
 		public entity.Base<? extends Entity> getClosestEntity(double x, double y, double z, float maxRadius,
-				@Nullable String entityFilterName) {
+				@Nullable String entityFilterName) {			
 			double closestDistance = maxRadius + 1;
 			Entity closestEntity = null;
-			Entity temp;
-			for (int i = 0; i < this.worldObj.loadedEntityList.size(); i++) {
-				temp = this.worldObj.loadedEntityList.get(i);
-				double d = temp.getDistanceSq(x, y, z);
+			for (Entity temp : this.worldObj.loadedEntityList) {
+				double d = temp.getDistance(x, y, z);
 				if (d <= maxRadius && d < closestDistance) {
 					// This entity is closer, make sure it's the right type.
 					if (this.checkEntityType(temp, entityFilterName)) {
@@ -358,9 +356,9 @@ public class world {
 		/**
 		 * Checks if the passed filter name matches the passed entity.
 		 */
-		private boolean checkEntityType(Entity entity, String entityFilterName) {
+		private boolean checkEntityType(Entity entity, @Nullable String entityFilterName) {
 			if (entityFilterName != null) {
-				if ((entity instanceof EntityPlayer && entityFilterName.endsWith("player"))) {
+				if ((entity instanceof EntityPlayer && entityFilterName.endsWith(entityList.PLAYER))) {
 					return true;
 				} else {
 					ResourceLocation location = EntityList.getKey(entity);

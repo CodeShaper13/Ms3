@@ -7,25 +7,46 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.io.FilenameUtils;
 import org.python.core.Py;
+import org.python.core.PyBoolean;
 import org.python.core.PyException;
+import org.python.core.PyFloat;
+import org.python.core.PyInteger;
 import org.python.core.PyList;
+import org.python.core.PyLong;
+import org.python.core.PyNone;
+import org.python.core.PyObject;
+import org.python.core.PySequenceList;
 import org.python.core.PyString;
 
 import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.api.exception;
+import com.codeshaper.ms3.api.executor;
+import com.codeshaper.ms3.exception.InvalidReturnedArgumentException;
+import com.codeshaper.ms3.interpreter.PyInterpreter;
+import com.codeshaper.ms3.util.MessageUtil;
 import com.codeshaper.ms3.util.NbtHelper;
 import com.codeshaper.ms3.util.Util;
+import com.codeshaper.ms3.util.textBuilder.TextBuilder;
+import com.codeshaper.ms3.util.textBuilder.TextBuilderTrans;
 
+import net.minecraft.command.CommandException;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.text.TextFormatting;
 
 /**
  * Represents a script and it's arguments that can be run at a later time.
+ * 
+ * @author CodeShaper
  */
-public class RunnableScript {
+public class RunnableScript extends PythonScript {
 
-	private File scriptFile;
 	private PyList scriptArgs;
 
+	public RunnableScript(String pathToScript) {
+		this(pathToScript, new PyList());
+	}
+	
 	public RunnableScript(String pathToScript, @Nullable String[] args) throws PyException {
 		this(pathToScript, args != null ? RunnableScript.stringArgsToPyType(args) : null);
 	}
@@ -39,13 +60,8 @@ public class RunnableScript {
 	 *             If {@code args} contains an invalid data type.
 	 */
 	public RunnableScript(String pathToScript, @Nullable PyList args) throws PyException {
-		// Assume the extension if it is not there.
-		if (!pathToScript.endsWith(".py")) {
-			pathToScript += ".py";
-		}
-
-		this.scriptFile = new File(Ms3.dirManager.getScriptFolder(), pathToScript);
-
+		super(pathToScript);
+		
 		// Validate that the args and throw an exception if they are not of the correct
 		// type.
 		if (args != null) {
@@ -67,7 +83,8 @@ public class RunnableScript {
 	}
 
 	public RunnableScript(NBTTagCompound tag) {
-		this.scriptFile = new File(tag.getString("path"));
+		super(tag);
+		
 		this.scriptArgs = new PyList();
 
 		Integer i = 0;
@@ -121,48 +138,8 @@ public class RunnableScript {
 		return true;
 	}
 
-	/**
-	 * Returns the script file. Note, the file may not exist, so use
-	 * {@link RunnableScript#exists()} to verify.
-	 */
-	public File getFile() {
-		return this.scriptFile;
-	}
-
-	public String getScriptName() {
-		return FilenameUtils.removeExtension(this.scriptFile.getName());
-	}
-
 	public PyList getArgs() {
 		return this.scriptArgs;
-	}
-
-	/**
-	 * Checks if the RunnableScript refers to a real file on the hard drive.
-	 */
-	public boolean exists() {
-		return this.scriptFile.exists();
-	}
-
-	/**
-	 * Checks if the RunnableScript refers to an actual file and is of type .py.
-	 * 
-	 * @throws exception.MissingScriptException
-	 *             If the script can't be found in the event of the file being
-	 *             moved/deleted or if the file is not in a valid format.
-	 */
-	public void tryThrowMissingScript() throws exception.MissingScriptException {
-		if (!this.exists()) {
-			throw Py.ValueError("Script with name " + this.scriptFile.toString()
-					+ " could not be found!  Was it moved, renamed or deleted?");
-		}
-		String fileName = this.scriptFile.getName();
-
-		String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
-		if (!(extension.equalsIgnoreCase("py"))) {
-			throw exception.instance.new MissingScriptException("Script file is not of type .py",
-					this.scriptFile.getPath());
-		}
 	}
 
 	public NBTTagCompound writeToNbt() {
@@ -182,10 +159,120 @@ public class RunnableScript {
 		return tag;
 	}
 
+	/**
+	 * Run the execute function in a script if it exists.
+	 *
+	 * @param runnableScript
+	 * @param sender
+	 * @return False if no function can be found, thus it was not run.
+	 * @throws CommandException
+	 */
+	public boolean runExecuteFunction(PyInterpreter interpreter, ICommandSender sender) throws CommandException {
+		try {
+			interpreter.primeScript(this);
+
+			executor.Executor e = new executor.Executor(sender);
+			if (!interpreter.callFunction("execute", e.getSenderWorld(), e)) {
+				return false;
+			}
+		} catch (PyException e) {
+			MessageUtil.sendErrorMessage(sender, "Error calling execute()", e);
+		}
+		return true;
+	}
+	
+	/**
+	 * Runs the getArgs function in a script if it exists and returns the next arg
+	 * to auto complete.
+	 *
+	 * @param runnableScript
+	 * @param sender
+	 * @return An object representing the returned value, either a single string or
+	 *         an array of strings.
+	 * @throws InvalidReturnedArgumentException If one of the values is not a string
+	 *                                          or sequence containing strings, or
+	 *                                          None.
+	 */
+	@Nullable
+	public String[] runGetArgsFunction(PyInterpreter interpreter, ICommandSender sender)
+			throws InvalidReturnedArgumentException {
+		try {
+			interpreter.primeScript(this);
+			// pysystemstate.add_classdir
+
+			PyObject function = interpreter.getVariable("getArgs");
+			if (function != null) {
+				executor.Executor e = new executor.Executor(sender);
+				PyObject result = function.__call__(e.getSenderWorld(), e);
+
+				// Make sure the returned type is valid, throw an exception if it is not.
+				if (result instanceof PyString || result instanceof PyInteger || result instanceof PyLong
+						|| result instanceof PyFloat || result instanceof PyBoolean) {
+					return new String[] { result.toString() };
+				} else if (result instanceof PyNone) {
+					return null;
+				} else if (result instanceof PySequenceList) {
+					PySequenceList list = (PySequenceList) result;
+					String[] returnValue = new String[list.size()];
+
+					// Validate all elements are strings, and add them to the return list.
+					for (int i = 0; i < list.size(); i++) {
+						if (!(list.get(i) instanceof String)) {
+							throw new InvalidReturnedArgumentException(result,
+									"Returned sequence contains a non-string element.");
+						}
+						returnValue[i] = (String) list.get(i);
+					}
+					return returnValue;
+				} else {
+					throw new InvalidReturnedArgumentException(result,
+							"Object is not of a valid type (bool, string, int, long, float, tuple, list or None).");
+				}
+			}
+		} catch (PyException e) {
+			MessageUtil.sendErrorMessage(sender, "Error calling getArgs()", e);
+		}
+		return null;
+	}
+	
+	
+	/**
+	 * Gets the doc string from a script and returns it to provide the help text for
+	 * a script.
+	 *
+	 * @param runnableScript
+	 * @param sender
+	 */
+	public void printDocString(PyInterpreter interpreter, ICommandSender sender) {
+		final String NAME = "__doc__";
+		try {
+			interpreter.primeScript(this);
+			PyObject docString = interpreter.getVariable(NAME);
+			if (docString != Py.None) {
+				if (docString instanceof PyString) {
+					sender.sendMessage(new TextBuilderTrans("commands.script.helpTextHeader").bold()
+							.color(TextFormatting.GREEN).get());
+					sender.sendMessage(new TextBuilder(docString.toString()).color(TextFormatting.GREEN).get());
+					interpreter.setVariable(NAME, Py.None); // Reset the value of __doc__ so the next script won't
+															// think it has this field.
+				} else {
+					MessageUtil.sendErrorMessage(sender, "__doc__ attribute is not of type string!");
+				}
+			} else {
+				sender.sendMessage(
+						new TextBuilderTrans("commands.script.noHelpText").bold().color(TextFormatting.GREEN).get());
+			}
+		} catch (PyException exception) {
+			MessageUtil.sendErrorMessage(sender, "Error getting __doc__ attribute()", exception);
+		}
+	}
+	
+	
 	private static PyList stringArgsToPyType(String[] args) {
 		PyList list = new PyList();
 		for (String s : args) {
-			list.add(Util.stringToPyObject(s));
+			list.add(s);
+			//list.add(Util.stringToPyObject(s));
 		}
 
 		// Empty strings are added to the end of args sometimes from commands, remove

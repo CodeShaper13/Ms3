@@ -6,7 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * Static methods for writing out the contents of a new script.
+ * Static helper methods for writing out the contents of a new script.
  * 
  * @author CodeShaper
  */
@@ -52,7 +52,7 @@ public class NewScriptHelper {
 			br.write("    assert isinstance(world, ms3.world.World)\n");
 			br.write("    assert isinstance(sender, ms3.executor.Executor)\n");
 			br.write("\n");
-			br.write("index = len(sys.argv\n");
+			br.write("    index = len(sys.argv\n");
 			br.write("\n");
 		}
 	}

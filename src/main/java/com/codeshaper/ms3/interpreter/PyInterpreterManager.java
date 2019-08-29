@@ -10,6 +10,9 @@ public class PyInterpreterManager {
 	
 	private HashMap<String, PyInterpreter> interpreterMap;
 
+	/**
+	 * Creates a new InterpreterManager and a default interpreter, named "default".
+	 */
 	public PyInterpreterManager() {
 		PyInterpreterManager.instance = this;
 		
@@ -68,9 +71,9 @@ public class PyInterpreterManager {
 			return null;
 		}
 	}
-	
+		
 	/**
-	 * @return An array with all the interpreterNames
+	 * Gets an array with all the interpreter names
 	 */
 	public String[] getAllInterpreterNames() {
 		Set<String> keys = this.interpreterMap.keySet();

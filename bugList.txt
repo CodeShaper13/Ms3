@@ -1,0 +1,8 @@
+1. Arguments with the same first letter cause problems.
+
+2. Scheduled scripts are not saved upon exiting the world.
+
+3.  Print a nicer error message on an access error
+
+
+assert to check if a variable is an item stack fails when the stack is empty (it's null internally)

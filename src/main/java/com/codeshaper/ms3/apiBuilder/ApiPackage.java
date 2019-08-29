@@ -24,16 +24,27 @@ public class ApiPackage {
 		this.initModule = new Module("__init__");
 	}
 
+	/**
+	 * Adds a class to the package.
+	 */
 	public void addClass(ModuleClass clazz) {
 		this.set(clazz.getClass().getName(), PyJavaType.fromClass(clazz.getClass()));
 		this.initModule.addClass(clazz);
 	}
 
+	/**
+	 * Adds a stand alone function to the field.
+	 */
+	//TODO does this work?
 	public void addFunction(ModuleFunction function) {
 		this.set(function.getName(), null);
 		this.initModule.addFunction(function);
 	}
 
+	/**
+	 * Adds a field to the package.
+	 */
+	//TODO does this work?
 	public void addField(ModuleField mf) {
 		this.set(mf.getName(), null);
 		// this.set(fieldName, new JavaFunc(method));
@@ -46,10 +57,5 @@ public class ApiPackage {
 
 	private void set(String key, PyObject value) {
 		this.pack.__dict__.__setitem__(key.intern(), value);
-	}
-
-	public void addField(Class<?> classOfHolder, String name) {
-		// TODO Auto-generated method stub
-
 	}
 }

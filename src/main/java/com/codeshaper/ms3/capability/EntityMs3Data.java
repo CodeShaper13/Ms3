@@ -2,86 +2,77 @@ package com.codeshaper.ms3.capability;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.python.antlr.PythonParser.return_stmt_return;
+import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyList;
+import org.python.core.PyObject;
 import org.python.core.PyType;
+import org.python.core.util.FileUtil;
 
 import com.codeshaper.ms3.EnumCallbackType;
 import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.api.BoundObject;
 import com.codeshaper.ms3.api.entity;
+import com.codeshaper.ms3.api.entity.Base;
+import com.codeshaper.ms3.api.interpreter;
 import com.codeshaper.ms3.api.exception.MissingScriptException;
 import com.codeshaper.ms3.interpreter.PyInterpreter;
+import com.codeshaper.ms3.script.PythonScript;
 import com.codeshaper.ms3.script.RunnableScript;
+import com.codeshaper.ms3.util.MessageUtil;
+import com.codeshaper.ms3.util.Util;
 
+import it.unimi.dsi.fastutil.io.InspectableFileCachedInputStream;
 import net.minecraft.command.CommandException;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 
-public class EntityMs3Data implements IEntityMs3Data {
-
-	private List<RunnableScript> scripts = new ArrayList<RunnableScript>();
-	private HashMap<String, Object> properties = new HashMap<>();
-
+public class EntityMs3Data implements IEntityMs3Data {	
+	
+	/** A HashMap of all of the properties saved to this Entity. */
+	private HashMap<String, Object> properties = new HashMap<>();	
+	private AttachedScriptList attachedScripts = new AttachedScriptList();
+	
 	private boolean clearMethodCall;
-
-	private HashMap<String, BoundObject> boundObjects = new HashMap<>();
-
+	
 	@Override
-	public void addScript(String pathToScript, @Nullable PyList args) throws PyException, MissingScriptException {
+	public boolean addBoundScript(entity.Base<? extends Entity> entity, String pathToScript, @Nullable PyList args) throws PyException, MissingScriptException {
 		RunnableScript runnableScript = new RunnableScript(pathToScript, args);
-		runnableScript.tryThrowMissingScript();
-		this.addScript(runnableScript);
+		//runnableScript.tryThrowMissingScript();		
+		return this.addBoundScript(entity, runnableScript);
 	}
 
 	@Override
-	public void addScript(RunnableScript runnableScript) {
-		this.scripts.add(runnableScript);
+	public boolean addBoundScript(entity.Base<? extends Entity> entity, RunnableScript runnableScript) {
+		return this.attachedScripts.add(entity, runnableScript); //TODO handle error
+	}
+	
+	@Override
+	public void removeBoundScript(String scriptPath) {
+		this.attachedScripts.remove(new RunnableScript(scriptPath));		
+	}
+	
+	@Override
+	public void removeAllBoundScripts() {
+		this.attachedScripts.removeAll();	
+	}
+	
+	@Override
+	@Nullable
+	public AttachedScript getBoundScript(String scriptPath) {
+		RunnableScript script = new RunnableScript(scriptPath);
+		return this.attachedScripts.getScript(script);
 	}
 
 	@Override
-	public void runAllOnClick(Entity entity, EntityPlayer player) {
-		PyInterpreter interpreter = Ms3.getInterpreter();
-		for (RunnableScript runnableScript : this.scripts) {
-			// TODO print error message if the script can't be found.
-			if (!runnableScript.exists()) {
-				System.out.println("script not found!");
-			} else {
-				interpreter.runOnClick(runnableScript, entity, player);
-			}
-		}
-	}
-
-	@Override
-	public void runAllExecute(Entity entity) {
-		PyInterpreter interpreter = Ms3.getInterpreter();
-		for (RunnableScript runnableScript : this.scripts) {
-			// TODO print error message if the script can't be found.
-			if (!runnableScript.exists()) {
-				System.out.println(runnableScript.getFile().toString());
-				System.out.println("script not found!");
-			} else {
-				try {
-					interpreter.runExecute(runnableScript, entity);
-				} catch (CommandException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		if (this.clearMethodCall) {
-			this.scripts.clear();
-			this.clearMethodCall = false;
-		}
-	}
-
-	@Override
-	public List<RunnableScript> getScriptList() {
-		return this.scripts;
+	public AttachedScriptList getScriptList() {
+		return this.attachedScripts;
 	}
 
 	@Override
@@ -105,28 +96,32 @@ public class EntityMs3Data implements IEntityMs3Data {
 	}
 
 	@Override
-	public void setClearMethodCall() {
-		this.clearMethodCall = true;
-	}
-
-	@Override
 	public void runCallback(EnumCallbackType type, Object... args) {
-		Ms3.getInterpreter().runObjectCallback(this.boundObjects.values(), type, args);
-	}
-
-	@Override
-	public boolean addObject(BoundObject obj) {
-		String identifer = obj.getClass().getName(); // .getType().getName();
-		if(this.boundObjects.containsKey(identifer)) {
-			return false;
-		} else {		
-			this.boundObjects.put(identifer, obj);
-			return true;
+		PyInterpreter interpreter = Ms3.getDefaultInterpreter();
+		
+		try {
+		    for (int i = this.attachedScripts.size() - 1; i >= 0; i--) {
+				BoundObject instance = this.attachedScripts.get(i).getInstance();
+				switch (type) {
+				case ON_CONSTRUCT:
+					instance.onConstruct();
+					break;
+				case ON_TICK:
+					instance.onTick();
+					break;
+				case ON_LOAD:
+					instance.onLoad();
+					break;
+				case ON_SAVE:
+					instance.onSave();
+					break;
+				case ON_CLICK:
+					instance.onClick((entity.Player) entity.getWrapperClassForEntity((Entity)args[0]));
+					break;
+				}
+			}
+		} catch (PyException e) {
+			MessageUtil.sendErrorMessageToAll("Error calling " + type.getName() + "()", e);
 		}
-	}
-
-	@Override
-	public BoundObject getObject(PyType typeName) {
-		return this.boundObjects.get(typeName.getName());
 	}
 }

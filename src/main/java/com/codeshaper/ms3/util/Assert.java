@@ -17,10 +17,10 @@ public class Assert {
 	private Assert() {
 	}
 
-	public static void isClassType(PyObject objectType) throws PyException {
+	public static void isClassType(PyObject type) throws PyException {
 		// Depending on if the class is old style or new style, the type will be
 		// different.
-		if (!(objectType instanceof PyType || objectType instanceof PyClass)) {
+		if (!(type instanceof PyType || type instanceof PyClass)) {
 			throw Py.ValueError("objectType must be a type of a class!");
 		}
 	}

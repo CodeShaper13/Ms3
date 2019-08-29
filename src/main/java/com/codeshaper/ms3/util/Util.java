@@ -69,7 +69,7 @@ public class Util {
 		} else {
 			flag = false; // It is not a valid value, set flag to true so it is inversed to be false.
 		}
-		return !flag ? Py.True : Py.False;
+		return  flag ? Py.True : Py.False;
 	}
 
 	/**
@@ -98,19 +98,29 @@ public class Util {
 	public static PyObject primitiveToPyObject(@Nullable Object obj) throws IllegalArgumentException {
 		if (obj == null) {
 			return Py.None;
-		} else if (obj instanceof String) {
+		}
+		else if (obj instanceof String) {
 			return new PyString(((String) obj));
-		} else if (obj instanceof Character) {
+		}
+		else if (obj instanceof Character) {
 			return new PyString(((Character) obj));
-		} else if (obj instanceof Integer || obj instanceof Short || obj instanceof Byte) {
+		}
+		else if (obj instanceof Integer || obj instanceof Short || obj instanceof Byte) {
 			return new PyInteger(((Integer) obj));
-		} else if (obj instanceof Long) {
+		}
+		else if (obj instanceof Long) {
 			return new PyLong(((Long) obj));
-		} else if (obj instanceof Float || obj instanceof Double) {
-			return new PyFloat(((Float) obj));
-		} else if (obj instanceof Boolean) {
+		}
+		else if (obj instanceof Float) {
+			return new PyFloat(((float) obj));
+		}
+		else if(obj instanceof Double) {
+			return new PyFloat(((Double)obj).floatValue());
+		}
+		else if (obj instanceof Boolean) {
 			return ((Boolean) obj) ? Py.True : Py.False;
-		} else {
+		}
+		else {
 			throw new IllegalArgumentException(
 					"Parameter was of type " + obj.getClass().toString() + "!  It must be a primitive type or null");
 		}
@@ -150,6 +160,7 @@ public class Util {
 	 * @param objectType The type of a Python class, accepts new or old style class.
 	 * @return The type name of the class.
 	 */
+	// This doesn't work
 	public static String getTypeName(PyObject objectType) {
 		PyType type;
 		if(objectType instanceof PyClass) {

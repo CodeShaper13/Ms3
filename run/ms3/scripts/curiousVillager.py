@@ -1,4 +1,4 @@
-# A script that prints out a friendly message about what the player is holding.  Maybe a village would say this when a player get's close...
+"""A script that prints out a friendly message about what the player is holding.  Maybe a village would say this when a player get's close..."""
 
 import random
 
@@ -29,7 +29,7 @@ def getCount(count):
 def execute(world, sender):
     assert isinstance(world, ms3.world.World)
     assert isinstance(sender, ms3.executor.Executor)
-    
+        
     player = world.getClosestEntity(sender.getX(), sender.getY(), sender.getZ(), 6, ms3.entityList.PLAYER)
     if player != None:
         assert isinstance(player, ms3.entity.Player)

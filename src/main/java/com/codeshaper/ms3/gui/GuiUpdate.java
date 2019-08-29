@@ -1,6 +1,8 @@
 package com.codeshaper.ms3.gui;
 
+import java.awt.Desktop;
 import java.io.IOException;
+import java.net.URI;
 
 import org.lwjgl.input.Keyboard;
 
@@ -34,9 +36,9 @@ public class GuiUpdate extends GuiScreen {
 		int p_73969_2_ = 24;
 
 		this.btn1 = this.addButton(new GuiButton(0, this.width / 2 + 2, p_73969_1_ + p_73969_2_ * 2, 98, 20,
-				I18n.format("ms3.update.downloadNow")));
-		this.btn2 = this.addButton(new GuiButton(1, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 2, 98, 20,
 				I18n.format("ms3.update.titleScreen")));
+		this.btn2 = this.addButton(new GuiButton(1, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 2, 98, 20,
+				I18n.format("ms3.update.downloadNow")));
 	}
 
 	/**
@@ -50,12 +52,18 @@ public class GuiUpdate extends GuiScreen {
 	@Override
 	protected void actionPerformed(GuiButton button) throws IOException {
 		if (button.enabled) {
-			if (button.id == 0) {
-                GuiConfirmOpenLink guiconfirmopenlink = new GuiConfirmOpenLink(this, "www.minecraftforum.com", 0, true);
-                guiconfirmopenlink.disableSecurityWarning();
+			if (button.id == 1) {
                 Ms3.ms3Props.setPromptDownload(false);
-                this.mc.displayGuiScreen(guiconfirmopenlink);
-			} else if (button.id == 1) {
+
+                Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+                if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+                    try {
+                        desktop.browse(new URI("www.google.com")); // TODO link
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+			} else if (button.id == 0) {
 				this.mc.displayGuiScreen(this.mainMenuGui);
 			}
 		}
@@ -70,20 +78,12 @@ public class GuiUpdate extends GuiScreen {
 		int WHITE = 16777215;
 
 		this.drawDefaultBackground();
-		this.drawCenteredString(this.fontRenderer, I18n.format("ms3.warning.warning", new Object[0]), this.width / 2,
-				20, WHITE);
-
-		for (int i = 1; i <= 4; i++) {
-			this.drawCenteredString(this.fontRenderer, I18n.format("ms3.warning.line" + i, new Object[0]),
-					this.width / 2, 60 + ((i - 1) * 15), WHITE);
-		}
+		this.drawCenteredString(this.fontRenderer, I18n.format("ms3.update.newUpdate", new Object[0]), this.width / 2,
+				40, WHITE);
 
 		this.drawCenteredString(this.fontRenderer, I18n.format("ms3.warning.notAgain", new Object[0]), this.width / 2,
 				130, WHITE);
 
-		// this.drawString(this.fontRendererObj, I18n.format("selectWorld.enterName",
-		// new Object[0]), this.width / 2 - 100, 47, 10526880);
-		// this.textField.drawTextBox();
 		super.drawScreen(mouseX, mouseY, partialTicks);
 	}
 }

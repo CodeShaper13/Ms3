@@ -3,6 +3,7 @@ package com.codeshaper.ms3.api;
 import org.python.core.PyType;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonConstructor;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonMoveToInit;
@@ -20,16 +21,17 @@ public class BoundObject {
 	private final world.World world;
 	private final PyType type;
 	
-	public BoundObject(entity.Base<Entity> e) {
-		this.entity = e;
-		this.world = new world.World((WorldServer) e.mcEntity.getEntityWorld());
+	@PythonConstructor
+	public BoundObject(entity.Base<Entity> entity) {
+		this.entity = entity;
+		this.world = new world.World((WorldServer) entity.mcEntity.getEntityWorld());
 		this.type = PyType.fromClass(this.getClass());
 
 		this.onConstruct();
 	}
 
 	@PythonFunction
-	@PythonDocString("")
+	@PythonDocString("Called when this object is bound to an Entity.  This should be used for initialization.")
 	public void onConstruct() {
 
 	}
@@ -53,12 +55,13 @@ public class BoundObject {
 	}
 	
 	@PythonFunction
-	@PythonDocString("")
-	public void onClick(entity.Base<?> entity, entity.Player player) {
+	@PythonDocString("Called when the Entity is clicked by a player.")
+	public void onClick(entity.Player player) {
 		
 	}
 
 	@PythonFunction
+	@PythonDocString("Returns the Entity that this script is bound to.")
 	public entity.Base<Entity> getEntity() {
 		return this.entity;
 	}
@@ -71,13 +74,13 @@ public class BoundObject {
 
 	@PythonFunction
 	@PythonDocString("Calls self.entity.setProperty and prefixs propertyName with the type name of this object.")
-	protected final void setProperty(String propertyName, @PythonTypeExclude Object value) {
+	protected void setProperty(String propertyName, @PythonTypeExclude Object value) {
 		this.entity.setProperty(this.getPrefix() + "." + propertyName, value);
 	}
 
 	@PythonFunction
-	@PythonDocString("")
-	protected final Object readProperty(String propertyName) {
+	@PythonDocString("Calls self.entity.readProperty and prefixs propertyName with the type name of this object.")
+	protected Object readProperty(String propertyName) {
 		return this.entity.getProperty(this.getPrefix() + "." + propertyName);
 	}
 

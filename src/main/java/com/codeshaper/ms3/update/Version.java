@@ -17,7 +17,12 @@ public class Version implements Comparable<Version> {
 		String[] s = StringUtils.split(version, '.');
 		this.majorVersion = Integer.parseInt(s[0]);
 		this.minorVersion = Integer.parseInt(s[1]);
-		this.patchVersion = Integer.parseInt(s[2]);
+		
+		if(s.length > 2) {
+			this.patchVersion = Integer.parseInt(s[2]);
+		} else {
+			this.patchVersion = 0;
+		}
 	}
 	
 	public Version(int majorVersion, int minorVersion, int patchVersion) {

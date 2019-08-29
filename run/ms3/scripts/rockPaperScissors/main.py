@@ -1,10 +1,11 @@
 import com.codeshaper.ms3.api as ms3
+import random
 
 # Bind this script to an entity.
 
 def onBind(world, theEntity):
     assert isinstance(world, ms3.world.World)
-    assert isinstance(sender, ms3.entity.EntityBase)
+    assert isinstance(sender, ms3.entity.Base)
     
     if isinstance(theEntity, ms3.entity.Living):
         assert isinstance(theEntity, ms3.entity.Living)

@@ -9,6 +9,8 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 
 /**
  * Server side proxy.
+ * 
+ * @author CodeShaper
  */
 public class ProxyCommon {
 

@@ -19,6 +19,7 @@ import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeExclude;
+import com.codeshaper.ms3.capability.AttachedScript;
 import com.codeshaper.ms3.capability.EntityMs3DataProvider;
 import com.codeshaper.ms3.capability.IEntityMs3Data;
 import com.codeshaper.ms3.util.Assert;
@@ -45,6 +46,7 @@ import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntityEndermite;
 import net.minecraft.entity.monster.EntityGhast;
 import net.minecraft.entity.monster.EntityHusk;
+import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntityMagmaCube;
 import net.minecraft.entity.monster.EntityShulker;
 import net.minecraft.entity.monster.EntitySlime;
@@ -115,8 +117,12 @@ public class entity {
 			return entity.instance.new Ghast((EntityGhast) javaEntity);
 		} else if (javaEntity instanceof EntityHorse || javaEntity instanceof EntityZombieHorse) {
 			return entity.instance.new Horse((EntityHorse) javaEntity);
+		} else if (javaEntity instanceof EntityHusk) {
+			return entity.instance.new Husk((EntityHusk) javaEntity);
 		} else if (javaEntity instanceof EntityItem) {
 			return entity.instance.new ItemEntity((EntityItem) javaEntity);
+		} else if (javaEntity instanceof EntityIronGolem) {
+			return entity.instance.new IronGolem((EntityIronGolem) javaEntity);
 		} else if (javaEntity instanceof EntityOcelot) {
 			return entity.instance.new Ocelot((EntityOcelot) javaEntity);
 		} else if (javaEntity instanceof EntityPainting) {
@@ -145,8 +151,8 @@ public class entity {
 			return entity.instance.new Villager((EntityVillager) javaEntity);
 		} else if (javaEntity instanceof EntityWolf) {
 			return entity.instance.new Wolf((EntityWolf) javaEntity);
-		} else if (javaEntity instanceof EntityZombie || javaEntity instanceof EntityHusk) {
-			return entity.instance.new Zombie<EntityZombie>((EntityZombie) javaEntity);
+		} else if (javaEntity instanceof EntityZombie) {
+			return entity.instance.new Zombie<>((EntityZombie) javaEntity);
 		} else if (javaEntity instanceof EntityZombieVillager) {
 			return entity.instance.new ZombieVillager((EntityZombieVillager) javaEntity);
 		}
@@ -154,17 +160,21 @@ public class entity {
 		// More generic types:
 
 		else if (javaEntity instanceof EntityTameable) {
-			return entity.instance.new Tameable<EntityTameable>((EntityTameable) javaEntity);
+			return entity.instance.new Tameable<>((EntityTameable) javaEntity);
 		} else if (javaEntity instanceof EntityAnimal) {
-			return entity.instance.new Animal<EntityAnimal>((EntityAnimal) javaEntity);
+			return entity.instance.new Animal<>((EntityAnimal) javaEntity);
 		} else if (javaEntity instanceof EntityHanging) {
-			return entity.instance.new Hanging<EntityHanging>((EntityHanging) javaEntity);
+			return entity.instance.new Hanging<>((EntityHanging) javaEntity);
 		} else if (javaEntity instanceof EntityLiving) {
-			return entity.instance.new Living<EntityLiving>((EntityLiving) javaEntity);
+			return entity.instance.new Living<>((EntityLiving) javaEntity);
 		} else if (javaEntity instanceof EntityLivingBase) {
-			return entity.instance.new LivingBase<EntityLivingBase>((EntityLivingBase) javaEntity);
-		} else {
-			return entity.instance.new Base<Entity>(javaEntity);
+			return entity.instance.new LivingBase<>((EntityLivingBase) javaEntity);
+		}
+
+		// Most generic type.
+
+		else {
+			return entity.instance.new Base<>(javaEntity);
 		}
 	}
 
@@ -190,8 +200,9 @@ public class entity {
 
 		@PythonFunction
 		@PythonDocString("Returns the entity's name as a string as seen in entityList.py.")
-		public String getMobName() {
-			return EntityList.getKey(this.mcEntity).getResourcePath();
+		public String getEntityName() {
+			return this instanceof entity.Player ? entityList.PLAYER
+					: EntityList.getKey(this.mcEntity).getResourcePath();
 		}
 
 		@PythonFunction
@@ -213,7 +224,7 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the Entity's position as a tuple.")
+		@PythonDocString("Returns the Entity's position as a tuple of (x, y, z).")
 		public PyTuple getPosition() {
 			return Util.makeTuple(this.getX(), this.getY(), this.getZ());
 		}
@@ -225,7 +236,7 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the Entity's motion as a tuple.")
+		@PythonDocString("Returns the Entity's motion as a tuple of (xMotion, yMotion, zMotion).")
 		public PyTuple getMotion() {
 			return Util.makeTuple(this.mcEntity.motionX, this.mcEntity.motionY, this.mcEntity.motionZ);
 		}
@@ -289,6 +300,7 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the Entity's name.  Color codes can be used.")
 		public void setCustomName(String name) {
 			this.mcEntity.setCustomNameTag(Util.correctColorCode(name));
 		}
@@ -305,7 +317,7 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns True if the entity has the glowing effect.")
+		@PythonDocString("Returns True if the Entity has the glowing effect.")
 		public boolean isGlowing() {
 			return this.mcEntity.isGlowing();
 		}
@@ -316,7 +328,7 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the value of an nbt tag.  If the tag can't be found, None is returned.")
+		@PythonDocString("Returns the value of an NBT tag on this Entity.  If the tag can't be found, None is returned.")
 		@Nullable
 		public Object getTag(String tagKey) {
 			NBTBase tag = CommandBase.entityToNBT(this.mcEntity).getTag(tagKey);
@@ -324,8 +336,12 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Sets an NBT tag for the entity.  For byte tags that represtend boolean values 1/0, \"true\"/\"false\" or True/False will work.  For nested tags type them like you would for the /entitydata command, but without the beginning and ending curly braces {}")
+		@PythonDocString("Sets an NBT tag for the Entity.  For byte tags that represtend boolean values 1/0, \"true\"/\"false\" or True/False will work.  For nested tags type them like you would for the /entitydata command, but without the beginning and ending curly braces {}")
 		public void setTag(String tagKey, @PythonTypeExclude Object value) {
+			if (tagKey.startsWith("{") || tagKey.endsWith("}")) {
+				throw Py.ValueError("tag string can not start or end with curly brackets (\"{\", \"}\")");
+			}
+
 			NBTTagCompound nbttagcompound = CommandBase.entityToNBT(this.mcEntity);
 			NBTTagCompound nbtTagCopy = nbttagcompound.copy();
 			NBTTagCompound nbttagcompound2;
@@ -352,95 +368,90 @@ public class entity {
 		public void sendChatMessage(String message) {
 			this.mcEntity.sendMessage(new TextComponentString(Util.correctColorCode(message)));
 		}
-		
+
 		@PythonFunction
-		public void bindScript(String scriptPath) {
+		@PythonDocString("Binds a script to this Entity, so it will execute every tick.")
+		public void bindScript(String scriptPath) throws PyException, MissingScriptException {
 			this.bindScript(scriptPath, null);
 		}
 
 		@PythonFunction
 		@PythonDocString("Binds a script to this Entity, so it will execute every tick.")
 		public void bindScript(String scriptPath, @Nullable PyList args) throws PyException, MissingScriptException {
-			IEntityMs3Data bs = this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
-			bs.addScript(scriptPath, args);
-		}
-
-		/*
-		@PythonFunction
-		@PythonDocString("Binds an object to the entity")
-		public void bindObject(PyObject type) {
-			Assert.isClassType(type);
-
-			// Instantiate the type.
-			PyObject object = type.__call__(this); // Pass the entity into the constructor.
-			object.getType();
-			Object tempObj = object.__tojava__(BoundObject.class);
-			if (tempObj == Py.NoConversion) {
-				throw Py.ValueError("objectType must inherit from BoundObject");
-			}
-			BoundObject boundObj = (BoundObject) tempObj;
-
-			IEntityMs3Data bs = this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
-			boolean flag = bs.addObject(boundObj);
-			if(!flag) {
-				throw Py.ValueError("Entity already has an object bound with the same type!");
+			IEntityMs3Data entityData = this.getCapability();
+			boolean flag = entityData.addBoundScript(this, scriptPath, args);
+			if (!flag) {
+				throw Py.ValueError("Entity already has an object bound with the same type");
 			}
 		}
-		*/
 
 		@PythonFunction
-		@PythonDocString("")
-		public BoundObject getBoundObject(PyObject objectType) {
-			Assert.isClassType(objectType);
-			IEntityMs3Data bs = this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
-			return bs.getObject(objectType.getType());
+		@PythonDocString("Gets the bound object of the passed type on this Entity.  If the type has not been bound, None is returned.")
+		public BoundObject getBoundScript(String scriptPath) {
+			IEntityMs3Data ms3EntityData = this.getCapability();
+			AttachedScript as = ms3EntityData.getBoundScript(scriptPath);
+			if(as == null) {
+				return null;
+			} else {
+				return as.getInstance();
+			}
+		}
+		
+		@PythonFunction
+		@PythonDocString("Removes a specific script that has been bound to this Entity.")
+		public void removeBoundScript(String scriptPath) {
+			IEntityMs3Data ms3EntityData = this.getCapability();
+			ms3EntityData.removeBoundScript(scriptPath);
+		}
+		
+		@PythonFunction
+		@PythonDocString("Removes all scripts that have been bound to this Entity.")
+		public void removeAllBoundScripts(String scriptPath) {
+			IEntityMs3Data ms3EntityData = this.getCapability();
+			ms3EntityData.removeAllBoundScripts();
 		}
 
 		// @PythonFunction
 		// @PythonDocString("Searches every script bound to this entity and calls all
 		// functions with the passed name with the passed args.")
-		public void call(String functionName, PyObject... args) {
-			IEntityMs3Data bs = this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
-			// TODO
-		}
-		
-		//TODO way to clear specific scripts.
+		// public void call(String functionName, PyObject... args) {
+		// IEntityMs3Data ms3EntityData = this.getCapability();
+		// // TODO
+		// }
 
 		@PythonFunction
-		@PythonDocString("Removes all scripts that are bound to this Entity.")
-		public void clearAllBoundScripts() {
-			IEntityMs3Data bs = this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
-			bs.setClearMethodCall();
-		}
+		@PythonDocString("Returns a custom property, or None if the property can't be found.")
+		public Object getProperty(String propertyName) throws PyException {
+			this.func(propertyName);
 
-		@PythonFunction
-		@PythonDocString("Returns the custom property, or None if the property can't be found.")
-		public Object getProperty(String propertyName) {
-			if (StringUtils.isNullOrEmpty(propertyName)) {
-				throw Py.ValueError("propertyName may not be None or empty");
-			}
-
-			IEntityMs3Data bs = this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
-			return bs.getCustomProperty(propertyName);
+			IEntityMs3Data ms3EntityData = this.getCapability();
+			return ms3EntityData.getCustomProperty(propertyName);
 		}
 
 		@PythonFunction
 		@PythonDocString("Sets a custom property, overriding the previous one if it exists.  Pass None for value to remove the property.")
-		public void setProperty(String propertyName, @PythonTypeExclude Object value) {
-			if (StringUtils.isNullOrEmpty(propertyName)) {
-				throw Py.ValueError("propertyName may not be None or empty");
-			}
+		public void setProperty(String propertyName, @PythonTypeExclude Object value) throws PyException {
+			this.func(propertyName);
 
-			IEntityMs3Data bs = this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
+			IEntityMs3Data ms3EntityData = this.getCapability();
 			if (value == null) {
-				bs.removeCustomProperty(propertyName);
+				ms3EntityData.removeCustomProperty(propertyName);
 			} else {
 				if (value instanceof Number || value instanceof String || value instanceof entity.Base) {
-					bs.setCustomProperty(propertyName, value);
+					ms3EntityData.setCustomProperty(propertyName, value);
 				} else {
-					throw Py.ValueError("value must be a string, number, instance of Base or or None");
+					throw Py.ValueError("value must be a string, number, instance of entity.Base or None");
 				}
 			}
+		}
+
+		@PythonFunction
+		@PythonDocString("Checks if this Entity has the specified property.")
+		public boolean hasProperty(String propertyName) throws PyException {
+			this.func(propertyName);
+
+			IEntityMs3Data ms3EntityData = this.getCapability();
+			return ms3EntityData.getCustomProperty(propertyName) != null;
 		}
 
 		@PythonFunction
@@ -464,6 +475,24 @@ public class entity {
 		@Override
 		public PyObject __ne__(PyObject other) {
 			return Util.pyNotHelper(this.__eq__(other));
+		}
+
+		/**
+		 * Gets the Ms3 Capability on this Entity.
+		 */
+		private IEntityMs3Data getCapability() {
+			return this.mcEntity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
+		}
+
+		/**
+		 * Makes sure a propertyName is valid (not null or an empty String).
+		 *
+		 * @throws PyException In the form of a ValueError if it is not valid.
+		 */
+		private void func(String propName) throws PyException {
+			if (StringUtils.isNullOrEmpty(propName)) {
+				throw Py.ValueError("propertyName may not be None or empty");
+			}
 		}
 	}
 
@@ -503,7 +532,7 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Makes the entity look at the passed position.  yawSpeed and pitchSpeed are how fast the entity will look at the target.")
+		@PythonDocString("Makes the entity look at the passed position.  yawSpeed and pitchSpeed determine how fast the entity will look at the target.")
 		public void lookAt(PyTuple position, float yawSpeed, float pitchSpeed) {
 			this.mcEntity.getLookHelper().setLookPosition((double) position.get(0), (double) position.get(1),
 					(double) position.get(2), yawSpeed, pitchSpeed);
@@ -683,7 +712,7 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Sets the Boat's type.  Defaults to 'oak' if the name is invalid.")
+		@PythonDocString("Sets the Boat's type.  Defaults to \"oak\" if the name is invalid.")
 		public void setBoatType(String type) {
 			this.mcEntity.setBoatType(EntityBoat.Type.getTypeFromString(type));
 		}
@@ -809,7 +838,7 @@ public class entity {
 		@PythonFunction
 		@PythonDocString("Returns the Ender Dragons current attack phase as an int.")
 		public int getPhase() {
-			return this.mcEntity.getPhaseManager().getCurrentPhase().getType().getId();
+			return this.mcEntity.getPhaseManager().getCurrentPhase().getPhaseList().getId();
 		}
 
 		@PythonFunction
@@ -1122,6 +1151,14 @@ public class entity {
 	}
 
 	@PythonClass
+	public class Husk extends Zombie<EntityHusk> {
+
+		public Husk(EntityHusk entity) {
+			super(entity);
+		}
+	}
+
+	@PythonClass
 	public class ChestHorse extends GenericHorse<AbstractChestHorse> {
 
 		private static final long serialVersionUID = 2212092842255803485L;
@@ -1162,6 +1199,23 @@ public class entity {
 		@PythonDocString("Sets the Skeleton Horse to be a trapped horse.")
 		public void setSkeletonTrap(boolean isTrapped) {
 			this.mcEntity.setTrap(isTrapped);
+		}
+	}
+
+	public class IronGolem extends Living<EntityIronGolem> {
+
+		public IronGolem(EntityIronGolem entity) {
+			super(entity);
+		}
+
+		@PythonFunction
+		public boolean isPlayerCreated() {
+			return this.mcEntity.isPlayerCreated();
+		}
+
+		@PythonFunction
+		public void setPlayerCreated(boolean playerCreated) {
+			this.mcEntity.setPlayerCreated(playerCreated);
 		}
 	}
 
@@ -1265,7 +1319,8 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Sets the art on the Painting to the passed name, or to " + KEBAB + " if the name is invalid.")
+		@PythonDocString("Sets the art on the Painting to the passed name, or to " + Painting.KEBAB
+				+ " if the name is invalid.")
 		public void setArt(String artName) {
 			for (EntityPainting.EnumArt art : EntityPainting.EnumArt.values()) {
 				if (art.title.equals(artName)) {
@@ -1311,6 +1366,8 @@ public class entity {
 		}
 	}
 
+	// Phantom
+
 	@PythonClass
 	public class Pig extends Animal<EntityPig> {
 
@@ -1332,6 +1389,8 @@ public class entity {
 			this.mcEntity.setSaddled(saddled);
 		}
 	}
+
+	// Pillager
 
 	@PythonClass
 	public class Player extends LivingBase<EntityPlayerMP> implements IHasEquipment {
@@ -1464,6 +1523,8 @@ public class entity {
 			this.mcEntity.setRabbitType(rabbitType);
 		}
 	}
+
+	// Ravager
 
 	@PythonClass
 	public class Sheep extends Animal<EntitySheep> {
@@ -1620,6 +1681,10 @@ public class entity {
 		}
 	}
 
+	// Turtle
+
+	// Vex
+
 	@PythonClass
 	public class Villager extends Living<EntityVillager> {
 
@@ -1770,6 +1835,8 @@ public class entity {
 			}
 		}
 	}
+
+	// Vindicator
 
 	@PythonClass
 	public class Wolf extends Tameable<EntityWolf> {

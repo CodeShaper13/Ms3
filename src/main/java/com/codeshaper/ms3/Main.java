@@ -5,6 +5,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
 
 import javax.swing.BoxLayout;
@@ -17,6 +18,8 @@ import javax.swing.JTextArea;
 
 import com.codeshaper.ms3.debug.DebugRun;
 import com.codeshaper.ms3.util.Logger;
+
+import net.minecraft.util.StringUtils;
 
 /**
  * Launches a window providing the user with some links, install instructions
@@ -85,10 +88,13 @@ public class Main implements ActionListener { // TODO This is launched when the 
 	public void actionPerformed(ActionEvent e) {
 		Object source = e.getSource();
 		if(source == this.debugBuildButton) {			
-			String s = (String)JOptionPane.showInputDialog("Enter the path to build the API in, this will most likely\nbe the ms3 folder in your .minecraft directory ");
+			String s = (String)JOptionPane.showInputDialog("Enter the path to build the API in, this will most likely\nbe the /ms3 folder in your /.minecraft directory ");
 			try {
-				DebugRun.build(s);
-				JOptionPane.showMessageDialog(null, "API Built");
+				if(!StringUtils.isNullOrEmpty(s)) {
+					DebugRun.build(s);
+					
+					JOptionPane.showMessageDialog(null, "Build MS3 API");	
+				}
 			} catch (FileNotFoundException e1) {
 				JOptionPane.showMessageDialog(null, "Directory \"" + s + "\" does not exist!");
 			}			
