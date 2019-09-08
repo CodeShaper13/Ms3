@@ -1,6 +1,8 @@
 package com.codeshaper.ms3.api;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
@@ -52,6 +54,7 @@ import net.minecraft.entity.monster.EntityMagmaCube;
 import net.minecraft.entity.monster.EntityShulker;
 import net.minecraft.entity.monster.EntitySlime;
 import net.minecraft.entity.monster.EntitySnowman;
+import net.minecraft.entity.monster.EntityVindicator;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.monster.EntityZombieVillager;
 import net.minecraft.entity.passive.AbstractChestHorse;
@@ -150,6 +153,8 @@ public class entity {
 			return entity.instance.new Snowman((EntitySnowman) javaEntity);
 		} else if (javaEntity instanceof EntityVillager) {
 			return entity.instance.new Villager((EntityVillager) javaEntity);
+		} else if(javaEntity instanceof EntityVindicator) {
+			return entity.instance.new Vindicator((EntityVindicator) javaEntity);
 		} else if (javaEntity instanceof EntityWolf) {
 			return entity.instance.new Wolf((EntityWolf) javaEntity);
 		} else if (javaEntity instanceof EntityZombie) {
@@ -1043,7 +1048,6 @@ public class entity {
 		}
 	}
 
-
 	/**
 	 * Equivalent to {@link net.minecraft.entity.EntityHanging}.
 	 */
@@ -1368,7 +1372,6 @@ public class entity {
 		}
 	}
 
-	// Phantom
 
 	@PythonClass
 	public class Pig extends Animal<EntityPig> {
@@ -1838,7 +1841,25 @@ public class entity {
 		}
 	}
 
-	// Vindicator
+	@PythonClass
+	public class Vindicator extends Living<EntityVindicator> {
+
+		private final String[] NAMES = new String[] { "johnny", "field_190643_b" };
+		
+		public Vindicator(EntityVindicator entity) {
+			super(entity);
+		}
+		
+		@PythonFunction
+		public void setJohnny(boolean flag) {
+			ReflectionHelper.setPrivateValue(EntityVindicator.class, this.mcEntity, flag, NAMES);
+		}
+		
+		@PythonFunction
+		public boolean getJohnny() {
+			return ReflectionHelper.getPrivateValue(EntityVindicator.class, this.mcEntity, NAMES);
+		}
+	}
 
 	@PythonClass
 	public class Wolf extends Tameable<EntityWolf> {
