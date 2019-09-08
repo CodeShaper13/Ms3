@@ -23,6 +23,7 @@ import com.codeshaper.ms3.update.Version;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -31,6 +32,8 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /*
  * DEVELOPER NOTE:
@@ -80,6 +83,7 @@ public class Ms3 {
 	 * Hashmap of actions set by players through the bindScript command. Note, null
 	 * on the client side!
 	 */
+	//@SideOnly(Side.SERVER)
 	public static HashMap<UUID, BindScriptAction> players = new HashMap<>();
 
 	/**
@@ -137,6 +141,9 @@ public class Ms3 {
 		event.registerServerCommand(new CommandExec());
 	}
 	
+	/**
+	 * Gets the Default (and currently only) interpreter to use for running scripts.
+	 */
 	public static PyInterpreter getDefaultInterpreter() {
 		return Ms3.instance.interpreterManager.getInterpreter(PyInterpreterManager.DEFAULT_NAME);
 	}

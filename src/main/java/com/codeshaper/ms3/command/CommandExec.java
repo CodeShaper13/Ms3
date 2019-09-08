@@ -18,6 +18,12 @@ import net.minecraft.command.WrongUsageException;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 
+/**
+ * The /exec command is used to execute a single line of code on the default
+ * interpreter.
+ * 
+ * @author CodeShaper
+ */
 public class CommandExec extends CommandBase {
 
 	/**
@@ -55,13 +61,13 @@ public class CommandExec extends CommandBase {
 				sb.append(" ");
 			}
 			PyInterpreter interpreter = Ms3.getDefaultInterpreter();
-			
+
 			try {
-				boolean noError = interpreter.executeLine(sb.toString());				
-				if(noError) {
+				boolean noError = interpreter.executeLine(sb.toString());
+				if (noError) {
 					CommandBase.notifyCommandListener(sender, this, "commands.exec.codeOk");
 				}
-			} catch(PyException exception) {
+			} catch (PyException exception) {
 				MessageUtil.sendErrorMessage(sender, "Error calling execute()", exception);
 			}
 		}
@@ -74,7 +80,7 @@ public class CommandExec extends CommandBase {
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args,
 			@Nullable BlockPos pos) {
 		if (args.length == 1) {
-			return getListOfStringsMatchingLastWord(args, new String[] { "print 'Enter code'" });
+			return getListOfStringsMatchingLastWord(args, new String[] { "print 'Hello World!'" });
 		}
 		return Collections.emptyList();
 	}

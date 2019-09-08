@@ -1,6 +1,5 @@
 package com.codeshaper.ms3.api;
 
-import org.python.antlr.PythonParser.return_stmt_return;
 import org.python.core.PyObject;
 import org.python.core.PyString;
 
@@ -10,7 +9,6 @@ import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class nbt {
-
 	
 	@PythonClass
 	public class NbtCompound extends PyObject {

@@ -19,6 +19,9 @@ import org.python.core.PyType;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+
 /**
  * General utility methods that don't fall into any category.
  * 
@@ -31,7 +34,10 @@ public class Util {
 	 */
 	public static final char SECTION_SIGN = '§';
 
-	private Util() {
+	private Util() { }
+	
+	public static boolean validEntityForMs3Data(Entity entity) {
+		return !(entity instanceof EntityPlayer);
 	}
 
 	/**

@@ -16,10 +16,17 @@ import javax.annotation.Nullable;
 import org.apache.commons.io.FileUtils;
 
 import com.codeshaper.ms3.Ms3;
+import com.codeshaper.ms3.api.entity;
+import com.codeshaper.ms3.api.entity.Base;
+import com.codeshaper.ms3.capability.AttachedScript;
+import com.codeshaper.ms3.capability.AttachedScriptList;
+import com.codeshaper.ms3.capability.EntityMs3DataProvider;
+import com.codeshaper.ms3.capability.IEntityMs3Data;
 import com.codeshaper.ms3.exception.InvalidReturnedArgumentException;
 import com.codeshaper.ms3.interpreter.PyInterpreter;
 import com.codeshaper.ms3.script.RunnableScript;
 import com.codeshaper.ms3.util.NewScriptHelper;
+import com.codeshaper.ms3.util.Util;
 import com.codeshaper.ms3.util.textBuilder.TextBuilder;
 import com.codeshaper.ms3.util.textBuilder.TextBuilderTrans;
 
@@ -146,7 +153,7 @@ public class CommandScript extends CommandBase {
 				}
 			} else if (args[0].equals("openLocation")) {
 				/*
-				 * Open the location fo the script file in the File Explorer.
+				 * Open the location for the script file in the File Explorer.
 				 */
 				if (this.ranByHostPlayer(sender)) {
 					try {
@@ -168,6 +175,36 @@ public class CommandScript extends CommandBase {
 					throw new CommandException("commands.scriptNotFound", scriptName);
 				}
 				rs.printDocString(interpreter, sender);
+			} else if (args[0].equals("reload")) {
+				/*
+				 * Reload script(s).
+				 */
+				sender.sendMessage(new TextBuilder("Started Reloading Scripts...").get());
+
+				IEntityMs3Data capData;
+				for (Entity e : sender.getEntityWorld().loadedEntityList) {
+					if(Util.validEntityForMs3Data(e)) {
+						capData = e.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
+						
+						for (AttachedScript as : capData.getScriptList()) {
+							RunnableScript rs = as.getLocation();
+							
+							// Have the script write it's data to the properties list.
+							as.getInstance().onSave();
+							
+							// Remove the old script instance.
+							capData.removeBoundScript(rs);
+							
+							// Add a new instance of the script to the entity.
+							capData.addBoundScript(entity.getWrapperClassForEntity(e), rs);
+							
+							// Have the script read it's properties
+							capData.getBoundScript(rs).getInstance().onLoad();
+						}
+					}
+				}
+
+				sender.sendMessage(new TextBuilder("Finished Reloading Scripts").get());
 			} else {
 				throw new WrongUsageException(this.getUsage(sender));
 			}
@@ -179,7 +216,7 @@ public class CommandScript extends CommandBase {
 			@Nullable BlockPos pos) {
 		if (args.length == 1) {
 			String[] array = this.ranByHostPlayer(sender)
-					? new String[] { "run", "edit", "new", "about", "openLocation", "help" }
+					? new String[] { "run", "edit", "new", "about", "openLocation", "help", "reload" }
 					: new String[] { "run", "about", "help" };
 			return CommandBase.getListOfStringsMatchingLastWord(args, array);
 		} else if (args.length == 2 && !args[0].equals("new")) {
@@ -214,8 +251,8 @@ public class CommandScript extends CommandBase {
 	}
 
 	/**
-	 * Checks if the command sender is a player, and that player is hosting the
-	 * world.
+	 * Checks if the command sender is a player, and that the player is the one
+	 * hosting the world.
 	 */
 	private boolean ranByHostPlayer(ICommandSender sender) {
 		Entity e = sender.getCommandSenderEntity();
@@ -252,4 +289,5 @@ public class CommandScript extends CommandBase {
 		}
 		return s;
 	}
+
 }

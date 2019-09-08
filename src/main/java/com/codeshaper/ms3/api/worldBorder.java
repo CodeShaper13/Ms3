@@ -5,9 +5,10 @@ import org.python.core.PyTuple;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
@@ -15,13 +16,13 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 @PythonDocString("Module for working with the World Border.")
 public class worldBorder {
 	
-	@PythonFieldGenerated
+	@PythonField
 	public static final int DEFAULT_SIZE = 29999984;
-	@PythonFieldGenerated
+	@PythonField
 	public static final int GROWING = 0;
-	@PythonFieldGenerated
+	@PythonField
 	public static final int SHRINKING = 1;
-	@PythonFieldGenerated
+	@PythonField
 	public static final int STATIONARY = 2;
 
 	@PythonFunction
@@ -32,6 +33,7 @@ public class worldBorder {
 	}
 	
 	@PythonFunction
+	@PythonDocString("Sets the center of the world boarder.")
 	public void setCenter(double x, double z) {
 		this.getWorldBorder().setCenter(x, z);
 	}
@@ -39,6 +41,7 @@ public class worldBorder {
 	@PythonFunction
 	@PythonDocString("Checks if the passed position is within the world border.")
 	public boolean withinBorder(float x, float y, float z) {
+		this.getWorldBorder().contains(new BlockPos(x, y, z));
 		return false;
 	}
 	
@@ -47,6 +50,12 @@ public class worldBorder {
 	public void setSize(double size, long time) {
 		WorldBorder wb = this.getWorldBorder();
 		wb.setTransition(wb.getSize(), size, time);		
+	}
+	
+	@PythonFunction
+	@PythonDocString("Returns the target size of the world boarder.")
+	public double getTargetSize() {
+		return this.getWorldBorder().getTargetSize();
 	}
 	
 	/**

@@ -28,6 +28,7 @@ import com.codeshaper.ms3.util.textBuilder.TextBuilder;
 import com.codeshaper.ms3.util.textBuilder.TextBuilderTrans;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -121,29 +122,33 @@ public class EventHandler {
 		}
 	}
 
-	/**
-	 * Calls the onLoad callback on every {@link BoundObject} that is bound to a
-	 * loaded Entity.
-	 */
-	@SubscribeEvent
-	public void worldLoadEvent(WorldEvent.Load event) {
-		World world = event.getWorld();
-		if (!world.isRemote) {
-			this.triggerEventFunction(world, EnumCallbackType.ON_LOAD);
-		}
-	}
-
-	/**
-	 * Calls the onSave callback on every {@link BoundObject} that is bound to a
-	 * loaded Entity.
-	 */
-	@SubscribeEvent
-	public void worldSaveEvent(WorldEvent.Save event) {
-		World world = event.getWorld();
-		if (!world.isRemote) {
-			this.triggerEventFunction(world, EnumCallbackType.ON_SAVE);
-		}
-	}
+//	/**
+//	 * This event calls the onLoad callback on every {@link BoundObject} that is bound to a
+//	 * loaded Entity when triggered.
+//	 * 
+//	 * @param event
+//	 */
+//	@SubscribeEvent
+//	public void worldLoadEvent(WorldEvent.Load event) {
+//		World world = event.getWorld();
+//		if (!world.isRemote) {
+//			//this.triggerEventFunction(world, EnumCallbackType.ON_LOAD);
+//		}
+//	}
+//
+//	/**
+//	 * This event calls the onSave callback on every {@link BoundObject} that is bound to a
+//	 * loaded Entity when triggered.
+//	 * 
+//	 * @param event
+//	 */
+//	@SubscribeEvent
+//	public void worldSaveEvent(WorldEvent.Save event) {
+//		World world = event.getWorld();
+//		if (!world.isRemote) {
+//			//this.triggerEventFunction(world, EnumCallbackType.ON_SAVE);
+//		}
+//	}
 
 	@SubscribeEvent
 	public void worldTickEvent(WorldTickEvent event) {
@@ -178,13 +183,23 @@ public class EventHandler {
 		}
 	}
 
+	/**
+	 * This event attaches the {@link IEntityMs3Data} capability to an Entity when triggered.
+	 * 
+	 * @param event
+	 */
 	@SubscribeEvent
 	public void attachCapability(AttachCapabilitiesEvent<Entity> event) {
-		event.addCapability(CAPABILITY_RS, new EntityMs3DataProvider());
+		Entity e = event.getObject();
+		if(!(e instanceof EntityPlayer)) {
+			event.addCapability(CAPABILITY_RS, new EntityMs3DataProvider(e));			
+		}
 	}
+	
+	
 
 	/**
-	 * Calls an event function on all of the loaded entities.
+	 * Searches the world for every loaded Entities and calls a specific event function for every {@link BoundObject} bound to the Entity.
 	 * 
 	 * @param world
 	 * @param type
@@ -192,11 +207,14 @@ public class EventHandler {
 	private void triggerEventFunction(World world, EnumCallbackType type) {
 		IEntityMs3Data ms3Data;
 		for (Entity entity : world.loadedEntityList) {
-			ms3Data = entity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
-			if (ms3Data != null) {
-				ms3Data.runCallback(type);
-			} else {
-				this.warnNoCapability();
+			if(!(entity instanceof EntityPlayer)) {
+				ms3Data = entity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
+				if (ms3Data != null) {
+					ms3Data.runCallback(type);
+				} else {
+					Logger.warn(
+							"Error looking up data about Entity!  Internally this means the IEntityMs3Data capability could not be found!");
+				}	
 			}
 		}
 	}
@@ -217,11 +235,17 @@ public class EventHandler {
 							.color(TextFormatting.YELLOW).get());
 			for (AttachedScript as : list) {
 				player.sendMessage(
-						new TextBuilder("> " + as.script.getFile().getPath()).color(TextFormatting.YELLOW).get());
+						new TextBuilder("> " + as.getLocation().getFile().getPath()).color(TextFormatting.YELLOW).get());
 			}
 		}
 	}
 
+	/**
+	 * Clears all {@link BoundObject}s that have been bound to the passed entity.
+	 * 
+	 * @param player
+	 * @param capabilityData
+	 */
 	private void boundScriptClear(ICommandSender player, IEntityMs3Data capabilityData) {
 		capabilityData.getScriptList().removeAll();
 		MessageUtil.sendMessage(player,
@@ -231,15 +255,17 @@ public class EventHandler {
 	/**
 	 * Binds a script to an entity.
 	 * 
-	 * @param player         The player who preformed the click.
+	 * @param player         The player who performed the click.
 	 * @param ms3EntityData
 	 * @param runnableScript The script to bind.
 	 * @param clickedEntity  The entity that was clicked.
 	 */
 	private void addBoundScript(@Nullable ICommandSender player, IEntityMs3Data ms3EntityData, RunnableScript runnableScript, Entity clickedEntity) {
+		// Make sure the entity doesn't already have the same script bound to it.
 		if (ms3EntityData.getScriptList().containsScript(runnableScript)) {
 			MessageUtil.sendMessage(player, new TextBuilder("ms3.stick.cantAddDuplicate").color(TextFormatting.RED));
-		} else {
+		}
+		else {
 			// Try to bind the script.
 			PyInterpreter interpreter = Ms3.getDefaultInterpreter();
 			ms3EntityData.addBoundScript(entity.getWrapperClassForEntity(clickedEntity), runnableScript);
@@ -283,14 +309,5 @@ public class EventHandler {
 		} else {
 			MessageUtil.sendMessage(player, new TextBuilder("ms3.stick.noScriptOnEntity").color(TextFormatting.RED));
 		}
-	}
-
-	/**
-	 * Calls {@link Logger#warn(String)} to alert the user that the
-	 * {@link IEntityMs3Data} capability was missing.
-	 */
-	private void warnNoCapability() {
-		Logger.warn(
-				"Error looking up data about Entity!  Internally this means the IEntityMs3Data capability could not be found!");
 	}
 }

@@ -22,6 +22,7 @@ import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeExclude;
 import com.codeshaper.ms3.capability.AttachedScript;
 import com.codeshaper.ms3.capability.EntityMs3DataProvider;
 import com.codeshaper.ms3.capability.IEntityMs3Data;
+import com.codeshaper.ms3.script.RunnableScript;
 import com.codeshaper.ms3.util.Assert;
 import com.codeshaper.ms3.util.NbtHelper;
 import com.codeshaper.ms3.util.Util;
@@ -115,7 +116,7 @@ public class entity {
 			return entity.instance.new Endermite((EntityEndermite) javaEntity);
 		} else if (javaEntity instanceof EntityGhast) {
 			return entity.instance.new Ghast((EntityGhast) javaEntity);
-		} else if (javaEntity instanceof EntityHorse || javaEntity instanceof EntityZombieHorse) {
+		}else if (javaEntity instanceof EntityHorse || javaEntity instanceof EntityZombieHorse) {
 			return entity.instance.new Horse((EntityHorse) javaEntity);
 		} else if (javaEntity instanceof EntityHusk) {
 			return entity.instance.new Husk((EntityHusk) javaEntity);
@@ -389,7 +390,7 @@ public class entity {
 		@PythonDocString("Gets the bound object of the passed type on this Entity.  If the type has not been bound, None is returned.")
 		public BoundObject getBoundScript(String scriptPath) {
 			IEntityMs3Data ms3EntityData = this.getCapability();
-			AttachedScript as = ms3EntityData.getBoundScript(scriptPath);
+			AttachedScript as = ms3EntityData.getBoundScript(new RunnableScript(scriptPath));
 			if(as == null) {
 				return null;
 			} else {
@@ -401,7 +402,7 @@ public class entity {
 		@PythonDocString("Removes a specific script that has been bound to this Entity.")
 		public void removeBoundScript(String scriptPath) {
 			IEntityMs3Data ms3EntityData = this.getCapability();
-			ms3EntityData.removeBoundScript(scriptPath);
+			ms3EntityData.removeBoundScript(new RunnableScript(scriptPath));
 		}
 		
 		@PythonFunction
@@ -411,18 +412,10 @@ public class entity {
 			ms3EntityData.removeAllBoundScripts();
 		}
 
-		// @PythonFunction
-		// @PythonDocString("Searches every script bound to this entity and calls all
-		// functions with the passed name with the passed args.")
-		// public void call(String functionName, PyObject... args) {
-		// IEntityMs3Data ms3EntityData = this.getCapability();
-		// // TODO
-		// }
-
 		@PythonFunction
 		@PythonDocString("Returns a custom property, or None if the property can't be found.")
 		public Object getProperty(String propertyName) throws PyException {
-			this.func(propertyName);
+			this.validatePropertyName(propertyName);
 
 			IEntityMs3Data ms3EntityData = this.getCapability();
 			return ms3EntityData.getCustomProperty(propertyName);
@@ -431,9 +424,10 @@ public class entity {
 		@PythonFunction
 		@PythonDocString("Sets a custom property, overriding the previous one if it exists.  Pass None for value to remove the property.")
 		public void setProperty(String propertyName, @PythonTypeExclude Object value) throws PyException {
-			this.func(propertyName);
+			this.validatePropertyName(propertyName);
 
 			IEntityMs3Data ms3EntityData = this.getCapability();
+			
 			if (value == null) {
 				ms3EntityData.removeCustomProperty(propertyName);
 			} else {
@@ -448,7 +442,7 @@ public class entity {
 		@PythonFunction
 		@PythonDocString("Checks if this Entity has the specified property.")
 		public boolean hasProperty(String propertyName) throws PyException {
-			this.func(propertyName);
+			this.validatePropertyName(propertyName);
 
 			IEntityMs3Data ms3EntityData = this.getCapability();
 			return ms3EntityData.getCustomProperty(propertyName) != null;
@@ -489,7 +483,7 @@ public class entity {
 		 *
 		 * @throws PyException In the form of a ValueError if it is not valid.
 		 */
-		private void func(String propName) throws PyException {
+		private void validatePropertyName(String propName) throws PyException {
 			if (StringUtils.isNullOrEmpty(propName)) {
 				throw Py.ValueError("propertyName may not be None or empty");
 			}
@@ -1047,9 +1041,8 @@ public class entity {
 		public void setSaddled(boolean saddled) {
 			this.mcEntity.setHorseSaddled(saddled);
 		}
-
-		// TODO Armor.
 	}
+
 
 	/**
 	 * Equivalent to {@link net.minecraft.entity.EntityHanging}.
@@ -1148,6 +1141,15 @@ public class entity {
 		}
 
 		// TODO method to get the variant and markings from the flag?
+		
+		@PythonFunction
+		@PythonDocString("Sets the horses armor stack.")
+		public void setArmorItemStack(itemStack stack) {
+			this.mcEntity.setHorseArmorStack(stack.getMcStack());
+
+		}
+		
+		// TODO get armor stack
 	}
 
 	@PythonClass

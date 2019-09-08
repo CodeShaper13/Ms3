@@ -2,10 +2,11 @@
 commands.scriptNotFound=Script "%s" could not be found!
 
 # Usage for /script
-commands.script.usage=/script <run|edit|new|about|openLocation|help> <scriptName>
+commands.script.usage=/script <run|edit|new|about|openLocation|help|reload> <scriptName>
 commands.script.usageRun=/script <run|edit|new|about|openLocation|help> <scriptName> [args...]
 commands.script.usageRemoteClient=/script <run|about|help> <scriptName>
 commands.script.usageRunRemoteClient=/script <run|about|help> <scriptName> [args...]
+commands.script.usageReload=/script reload [scriptName]
 
 # "about" arg for /script
 commands.script.about0=File name: %s

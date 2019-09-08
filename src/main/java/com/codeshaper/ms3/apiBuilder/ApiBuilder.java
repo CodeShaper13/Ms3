@@ -2,6 +2,7 @@ package com.codeshaper.ms3.apiBuilder;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -36,7 +37,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.world.biome.Biome;
 
 /**
- * Responsible for creating the auto generated Python modules
+ * Responsible for creating the auto generated Python modules.
  */
 public class ApiBuilder {
 
@@ -45,29 +46,50 @@ public class ApiBuilder {
 
 	private ApiPackage apiPackage;
 
+	/**
+	 * When called this will generate .java source files within the project's src
+	 * folder, overwriting the old ones. This is intended to be used whenever
+	 * Minecraft updates, to generate new lists of all the blocks and biomes.
+	 * 
+	 * @param args The first argument should be a path to the api folder. Example:
+	 *             {@code C:\Ms3\src\main\java\com\codeshaper\ms3\api }
+	 * @throws FileNotFoundException if the folder could not be found.
+	 */
+	public static void Main(String[] args) throws FileNotFoundException {
+		if (args.length != 1) {
+			throw new IllegalArgumentException("Exactly one argument is required!");
+		}
+		File outputFolder = new File(args[0]);
+		if (!outputFolder.exists()) {
+			throw new FileNotFoundException("Could not find the specified folder!");
+		}
+		new ClassGeneratorRegisteredNamespace(Block.REGISTRY).generateClass("block", outputFolder);
+		new ClassGeneratorRegisteredNamespace(Item.REGISTRY).generateClass("item", outputFolder);
+		new ClassGeneratorRegisteredNamespace(Biome.REGISTRY).generateClass("biome", outputFolder);
+		new ClassGeneratorRegisteredNamespace(SoundEvent.REGISTRY).generateClass("sound", outputFolder);
+	}
+
 	@SuppressWarnings("unused")
 	public ApiBuilder(File apiFolder) {
 		this.buildList = new BuildList();
 		this.apiFolder = apiFolder;
-
-		// Generate java class files to copy into project. For developing only!
-		if (false) {
-			File outputFolder = new File(System.getProperty("user.home")
-					+ "\\Desktop\\Forge Workspace\\Ms3\\src\\main\\java\\com\\codeshaper\\ms3\\api");
-			new ClassGeneratorRegisteredNamespace(Block.REGISTRY).generateClass("block", outputFolder);
-			new ClassGeneratorRegisteredNamespace(Item.REGISTRY).generateClass("item", outputFolder);
-			new ClassGeneratorRegisteredNamespace(Biome.REGISTRY).generateClass("biome", outputFolder);
-			new ClassGeneratorRegisteredNamespace(SoundEvent.REGISTRY).generateClass("sound", outputFolder);
-		}
 	}
 
 	/**
-	 * Checks if the api is missing and returns the result.
+	 * Checks if the api is missing and returns the result. This does not check the
+	 * contents of the api folder and only assumes if the root folder exists, the
+	 * complete api exists as well.
 	 */
 	private boolean doesApiExist() {
 		return this.apiFolder.exists() && this.apiFolder.isDirectory();
 	}
 
+	/**
+	 * Builds the API if any of the following are true:
+	 * <p> The Configuration file states the API should be built on startup every time.
+	 * <p> If the API root folder does not exists. See {@link ApiBuilder#doesApiExist}.
+	 * <p> Debug mode is turned on, as specified in {@link Ms3#DEBUG_MODE}.
+	 */
 	public void buildApiIfNeeded() {
 		if (Ms3.configManager.getAlwaysRebuild() || !this.doesApiExist() || Ms3.DEBUG_MODE) {
 			Logger.msg("Starting Api Building!");
@@ -103,7 +125,7 @@ public class ApiBuilder {
 
 		this.generateInitFiles();
 	}
-	
+
 	private void writeModuleFiles(List<Module> moduleList) {
 		for (Module module : moduleList) {
 			File dest = this.apiFolder;
@@ -113,7 +135,7 @@ public class ApiBuilder {
 			}
 			File moduleFile = new File(dest, module.getName() + ".py");
 
-			try(BufferedWriter br = new BufferedWriter(new FileWriter(moduleFile))) {
+			try (BufferedWriter br = new BufferedWriter(new FileWriter(moduleFile))) {
 				module.write("", br);
 			} catch (IOException e) {
 				Logger.err("Unable to create auto generated module " + module.getName());
@@ -124,7 +146,7 @@ public class ApiBuilder {
 	}
 
 	/**
-	 * Creates the __init__.py files so PyDev and other plugins will find our
+	 * Creates the __init__.py files so PyDev and other plugins can find the
 	 * modules.
 	 */
 	private void generateInitFiles() {
@@ -146,8 +168,7 @@ public class ApiBuilder {
 	 * Navigates a class, generating the content and recursively calling this on all
 	 * inner classes. parentHolder is null on root classes.
 	 * 
-	 * @param parentHolder
-	 *            Pass null for outer/top level classes.
+	 * @param parentHolder  Pass null for outer/top level classes.
 	 * @param holder
 	 * @param classOfHolder
 	 * @throws IllegalModuleFormatException

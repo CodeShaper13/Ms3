@@ -23,8 +23,6 @@ public class executor {
 	@PythonClass
 	@PythonDocString("Represents whoever or whatever is executing a script.")
 	public static class Executor extends PyObject {
-
-		private static final long serialVersionUID = 7248437926101357378L;
 		
 		private ICommandSender sender;
 

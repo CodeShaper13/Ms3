@@ -1,5 +1,6 @@
 package com.codeshaper.ms3.api;
 
+import org.python.core.PyString;
 import org.python.core.PyType;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
@@ -19,13 +20,13 @@ public class BoundObject {
 
 	private final entity.Base<Entity> entity;
 	private final world.World world;
-	private final PyType type;
+	private final String scriptName;
 	
 	@PythonConstructor
-	public BoundObject(entity.Base<Entity> entity) {
+	public BoundObject(entity.Base<Entity> entity, PyString scriptName) {
 		this.entity = entity;
 		this.world = new world.World((WorldServer) entity.mcEntity.getEntityWorld());
-		this.type = PyType.fromClass(this.getClass());
+		this.scriptName = scriptName.asString();
 
 		this.onConstruct();
 	}
@@ -89,6 +90,6 @@ public class BoundObject {
 	 * the classes name.
 	 */
 	public final String getPrefix() {
-		return this.type.getName();
+		return this.scriptName;
 	}
 }

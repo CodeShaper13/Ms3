@@ -31,7 +31,6 @@ public class itemStack extends PyObject {
 
 	private final ItemStack stack;
 	
-	//@PythonConstructor
 	// Used internally.
 	public itemStack(Item item, int count) {
 		this(item, count, 1);
@@ -172,6 +171,10 @@ public class itemStack extends PyObject {
 		}
 	}
 
+	/**
+	 * Returns the item stack as an instance of {@link net.minecraft.item.ItemStack}.
+	 * @return
+	 */
 	public ItemStack getMcStack() {
 		return this.stack;
 	}

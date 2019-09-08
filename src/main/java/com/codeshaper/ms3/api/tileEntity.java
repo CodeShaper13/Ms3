@@ -185,8 +185,6 @@ public class tileEntity {
 	@PythonClass
 	public class LockableLoot<T extends TileEntityLockableLoot> extends Lockable<T> {
 
-		private static final long serialVersionUID = 5861176632306201482L;
-
 		public LockableLoot(T tileEntity) {
 			super(tileEntity);
 		}
@@ -206,8 +204,6 @@ public class tileEntity {
 
 	@PythonClass
 	public class Beacon extends Lockable<TileEntityBeacon> {
-
-		private static final long serialVersionUID = -6547554580596062244L;
 
 		public Beacon(TileEntityBeacon tileEntity) {
 			super(tileEntity);
@@ -229,8 +225,6 @@ public class tileEntity {
 	@PythonClass
 	public class Bed extends TileEntityBase<TileEntityBed> {
 
-		private static final long serialVersionUID = -2362034535699233202L;
-
 		public Bed(TileEntityBed tileEntity) {
 			super(tileEntity);
 		}
@@ -250,8 +244,6 @@ public class tileEntity {
 
 	@PythonClass
 	public class BrewingStand extends Lockable<TileEntityBrewingStand> {
-
-		private static final long serialVersionUID = -4501498464782181069L;
 
 		@PythonFieldGenerated
 		@PythonDocString("Numeric constant with the left slot ID.")
@@ -301,8 +293,6 @@ public class tileEntity {
 	@PythonClass
 	public class CommandBlock extends TileEntityBase<TileEntityCommandBlock> {
 
-		private static final long serialVersionUID = 1666817160387319102L;
-
 		private final String[] FIELD_NAMES = new String[] { "commandBlockLogic", "field_145824_a" };
 
 		public CommandBlock(TileEntityCommandBlock tileEntity) {
@@ -320,8 +310,6 @@ public class tileEntity {
 
 	@PythonClass
 	public class FlowerPot extends TileEntityBase<TileEntityFlowerPot> {
-
-		private static final long serialVersionUID = 5646847644719526649L;
 
 		public FlowerPot(TileEntityFlowerPot tileEntity) {
 			super(tileEntity);
@@ -350,8 +338,6 @@ public class tileEntity {
 
 	@PythonClass
 	public class Furnace extends Lockable<TileEntityFurnace> {
-
-		private static final long serialVersionUID = 7367812229820446548L;
 
 		@PythonFieldGenerated
 		@PythonDocString("Numeric constant with the ingredient slot ID.")
@@ -395,8 +381,6 @@ public class tileEntity {
 	@PythonClass
 	public class Hopper extends LockableLoot<TileEntityHopper> {
 
-		private static final long serialVersionUID = 3097927657009612724L;
-
 		public Hopper(TileEntityHopper tileEntity) {
 			super(tileEntity);
 		}
@@ -410,8 +394,6 @@ public class tileEntity {
 
 	@PythonClass
 	public class Spawner extends TileEntityBase<TileEntityMobSpawner> {
-
-		private static final long serialVersionUID = 6463338206694416736L;
 
 		private final String[] FIELD_NAMES = new String[] { "potentialSpawns", "field_98285_e" };
 
@@ -474,8 +456,6 @@ public class tileEntity {
 	@PythonClass
 	public class NoteBlock extends TileEntityBase<TileEntityNote> {
 
-		private static final long serialVersionUID = -3298764120818473440L;
-
 		public NoteBlock(TileEntityNote tileEntity) {
 			super(tileEntity);
 		}
@@ -492,20 +472,16 @@ public class tileEntity {
 			if (note < 0 || note > 24) {
 				throw Py.ValueError("note must be between 0 and 24.");
 			}
-			// More or less a copy of TileEntityNote.changePitch()
-			byte old = (byte) note;
-			this.mcTileEntity.note = (byte) ((this.mcTileEntity.note + 1) % 25);
-			if (!net.minecraftforge.common.ForgeHooks.onNoteChange(this.mcTileEntity, old))
-				return;
-			this.mcTileEntity.markDirty();
+			byte oldNote = this.mcTileEntity.note;
+			this.mcTileEntity.note = (byte) note;
+			
+			// Call the Forge enent.
+			net.minecraftforge.common.ForgeHooks.onNoteChange(this.mcTileEntity, oldNote);
 		}
-
 	}
 
 	@PythonClass
 	public class Sign extends TileEntityBase<TileEntitySign> {
-
-		private static final long serialVersionUID = -3977002864117163137L;
 
 		public Sign(TileEntitySign tileEntity) {
 			super(tileEntity);
@@ -535,8 +511,6 @@ public class tileEntity {
 
 	@PythonClass
 	public class Skull extends TileEntityBase<TileEntitySkull> {
-
-		private static final long serialVersionUID = -4226105205783622653L;
 
 		@PythonFieldGenerated
 		public static final String ALEX = "MHF_Alex";

@@ -35,6 +35,9 @@ public abstract class ClassGeneratorBase {
 		}
 
 		try (BufferedWriter br = new BufferedWriter(new FileWriter(f))) {
+			br.write("/* \n");
+			br.write(" * This file was generated and should not be edited by hand! \n");
+			br.write(" */ \n\n");
 			br.write("package com.codeshaper.ms3.api;\n");
 			br.write("\n");
 			br.write("import org.python.core.PyString;\n");

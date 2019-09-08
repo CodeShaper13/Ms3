@@ -8,13 +8,18 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import scala.util.control.Exception;
 
 public class EntityMs3DataProvider implements ICapabilitySerializable<NBTBase> {
 
 	@CapabilityInject(IEntityMs3Data.class)
 	public static final Capability<IEntityMs3Data> ENTITY_MS3_DATA_CAP = null;
 
-	private IEntityMs3Data instance = ENTITY_MS3_DATA_CAP.getDefaultInstance();
+	private IEntityMs3Data instance; // = ENTITY_MS3_DATA_CAP.getDefaultInstance();
+		
+	public EntityMs3DataProvider(Entity object) {
+		this.instance = new EntityMs3Data(object); // ENTITY_MS3_DATA_CAP.getDefaultInstance();
+	}
 
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {

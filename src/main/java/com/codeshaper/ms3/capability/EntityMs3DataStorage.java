@@ -1,10 +1,10 @@
 package com.codeshaper.ms3.capability;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.codeshaper.ms3.EnumCallbackType;
 import com.codeshaper.ms3.api.entity;
 import com.codeshaper.ms3.script.RunnableScript;
 
@@ -24,20 +24,22 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 public class EntityMs3DataStorage implements IStorage<IEntityMs3Data> {
 
 	@Override
-	public NBTBase writeNBT(Capability<IEntityMs3Data> capability, IEntityMs3Data instance, EnumFacing side) {
+	public NBTBase writeNBT(Capability<IEntityMs3Data> capability, IEntityMs3Data instance, EnumFacing side) {		
 		NBTTagCompound tag = new NBTTagCompound();
 
-		// Write the attached scripts.
+		// Execute the onSave() callback so scripts can save their state to properties.
+		instance.runCallback(EnumCallbackType.ON_SAVE);
+		
+		// Write the attached scripts to NBT.
 		NBTTagList nbtList = new NBTTagList();
 		for(AttachedScript as : instance.getScriptList()) {
-			nbtList.appendTag(as.script.writeToNbt());
+			nbtList.appendTag(as.getLocation().writeToNbt());
 		}
 		tag.setTag("scriptList", nbtList);
 
-		// Write the properties.
+		// Write the properties to NBT.
 		NBTTagCompound nbtCompound = new NBTTagCompound();
-		HashMap<String, Object> map = instance.getPropertyMap();
-		for (Map.Entry<String, Object> entry : map.entrySet()) {
+		for (Map.Entry<String, Object> entry : instance.getPropertyMap().entrySet()) {
 			String key = entry.getKey();
 			Object value = entry.getValue();
 			if (value instanceof String) {
@@ -60,14 +62,14 @@ public class EntityMs3DataStorage implements IStorage<IEntityMs3Data> {
 	}
 
 	@Override
-	public void readNBT(Capability<IEntityMs3Data> capability, IEntityMs3Data instance, EnumFacing side, NBTBase nbt) {
+	public void readNBT(Capability<IEntityMs3Data> capability, IEntityMs3Data instance, EnumFacing side, NBTBase nbt) {		
 		NBTTagCompound tag = (NBTTagCompound) nbt;
 
 		// Read the attached scripts.
 		NBTTagList nbtList = tag.getTagList("scriptList", 10);
 		AttachedScriptList list = instance.getScriptList();
 		for (int i = 0; i < nbtList.tagCount(); i++) {
-			//list.add(new RunnableScript(nbtList.getCompoundTagAt(i)));
+			list.add(entity.getWrapperClassForEntity(((EntityMs3Data)instance).e), new RunnableScript(nbtList.getCompoundTagAt(i)));
 		}
 
 		// Read the properties.
@@ -92,7 +94,10 @@ public class EntityMs3DataStorage implements IStorage<IEntityMs3Data> {
 			} else {
 				throw new Error("Unknown type: " + obj.getClass());
 			}
+
 			map.put(key, value);
 		}
+
+		instance.runCallback(EnumCallbackType.ON_LOAD);
 	}
 }
