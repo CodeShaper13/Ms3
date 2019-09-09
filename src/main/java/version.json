@@ -4,19 +4,19 @@
 			"ms3Version": "1.0.0",
 			"mcVersion": "1.12.2",
 			"changelog": "Release!",
-			"download": "mediafire.com"
+			"download": "http://mediafire.com"
 		},
 		{
 			"ms3Version": "1.1.0",
 			"mcVersion": "1.12.2",
 			"changelog": "Fixed bug #1",
-			"download": "youtube.com"
+			"download": "http://youtube.com"
 		},
 		{
 			"ms3Version": "1.2.0",
 			"mcVersion": "1.12.2",
 			"changelog": "Added fun features!!!",
-			"download": "google.com"
+			"download": "http://google.com"
 		}
 	]
 }
