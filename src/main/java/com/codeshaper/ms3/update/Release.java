@@ -13,35 +13,29 @@ import net.minecraftforge.common.ForgeVersion;
 public class Release {
 
 	public final Version modVersion;
+	/** The Minecraft Version that this release is for. */
 	public final Version minecraftVersion;
 	@Nullable
 	public final String changelog;
+	/** The URL to download the this version. */
 	@Nullable
 	public final URL downloadUrl;
 
 	/**
-	 * @param modVersion
-	 * @param mcVersion
-	 *            If null, the version is looked up from
-	 *            {@link ForgeVersions.mcVersion}.
-	 * @param changelog
-	 *            Can be null.
-	 * @param downloadUrl
-	 *            Can be null.
+	 * @param modVersion  The current
+	 * @param mcVersion   If null, the version is looked up from
+	 *                    {@link ForgeVersions.mcVersion}.
+	 * @param changelog   Can be null.
+	 * @param downloadUrl Can be null.
 	 */
-	public Release(String modVersion, @Nullable String mcVersion, @Nullable String changelog,
-			@Nullable String downloadUrl) {
-		this.modVersion = new Version(modVersion);
-		this.minecraftVersion = new Version(mcVersion != null ? mcVersion : ForgeVersion.mcVersion);
+	public Release(Version modVersion, @Nullable Version mcVersion, @Nullable String changelog,
+			@Nullable String downloadUrl) throws MalformedURLException {
+		this.modVersion = modVersion;
+		this.minecraftVersion = mcVersion != null ? mcVersion : new Version(ForgeVersion.mcVersion);
 		this.changelog = changelog;
 
 		if (downloadUrl != null) {
-			URL url = null;
-			try {
-				url = new URL(downloadUrl);
-			} catch (MalformedURLException e) {
-			}
-			this.downloadUrl = url;
+			this.downloadUrl = new URL(downloadUrl);
 		} else {
 			this.downloadUrl = null;
 		}

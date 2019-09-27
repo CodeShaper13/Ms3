@@ -115,40 +115,19 @@ public class EventHandler {
 			Minecraft mc = Minecraft.getMinecraft();
 			if (Ms3.ms3Props.showWarning()) {
 				mc.displayGuiScreen(new GuiWarning(event.getGui()));
-			} else if (!flag && UpdateChecker.isOutdated(Ms3.RELEASE)) {
-				flag = true;
-				mc.displayGuiScreen(new GuiUpdate(event.getGui()));
+			} else if (!this.flag) {
+				try {
+					if (Ms3.updateChecker.isOutdated(new Version(Ms3.MOD_VERSION))) {
+						this.flag = true;
+						mc.displayGuiScreen(new GuiUpdate(event.getGui()));
+					}
+				} catch (NumberFormatException | MalformedJsonException e) {
+					System.out.println("Could not check for an update!");
+					e.printStackTrace();
+				}
 			}
 		}
 	}
-
-//	/**
-//	 * This event calls the onLoad callback on every {@link BoundObject} that is bound to a
-//	 * loaded Entity when triggered.
-//	 * 
-//	 * @param event
-//	 */
-//	@SubscribeEvent
-//	public void worldLoadEvent(WorldEvent.Load event) {
-//		World world = event.getWorld();
-//		if (!world.isRemote) {
-//			//this.triggerEventFunction(world, EnumCallbackType.ON_LOAD);
-//		}
-//	}
-//
-//	/**
-//	 * This event calls the onSave callback on every {@link BoundObject} that is bound to a
-//	 * loaded Entity when triggered.
-//	 * 
-//	 * @param event
-//	 */
-//	@SubscribeEvent
-//	public void worldSaveEvent(WorldEvent.Save event) {
-//		World world = event.getWorld();
-//		if (!world.isRemote) {
-//			//this.triggerEventFunction(world, EnumCallbackType.ON_SAVE);
-//		}
-//	}
 
 	@SubscribeEvent
 	public void worldTickEvent(WorldTickEvent event) {

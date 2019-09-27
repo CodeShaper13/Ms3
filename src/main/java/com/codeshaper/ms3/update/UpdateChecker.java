@@ -11,82 +11,89 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.stream.MalformedJsonException;
 
 /**
  * @author CodeShaper
  */
 public class UpdateChecker {
-	
-	private static URL VERSIONS_JSON_URL;
 
-	public static String updates = "";
-	public static boolean outdated = false;
-	
-	static {
-		try {
-			VERSIONS_JSON_URL = new URL("https://www.google.com");
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
+	private URL versionJsonUrl;
+
+	public String updates = "";
+	public boolean outdated = false;
+
+	/**
+	 * @param releaseFileUrl A URL that points to a json file containing a list of
+	 *                       all the releases.
+	 * @throws MalformedURLException If the url was malformed when constructed.
+	 */
+	public UpdateChecker(String releaseFileUrl) throws MalformedURLException {
+		this.versionJsonUrl = new URL(releaseFileUrl);
 	}
 
-	public static boolean isOutdated(Release currentRelease) {
-		if("s".equals("s")) {
-			return true;
-		}
-		
+	/**
+	 * Checks if the passed release is outdated.
+	 * 
+	 * @param currentRelease
+	 * @return True if the release is outdates, false if it is up to date.
+	 */
+	public boolean isOutdated(Version currentVersion) throws MalformedJsonException {
 		JsonParser parser = new JsonParser();
 
 		List<Release> allReleases = new ArrayList<>();
-		
-		try(BufferedReader br = new BufferedReader(new InputStreamReader(VERSIONS_JSON_URL.openStream(), Charset.forName("UTF-8")))) {
-			JsonElement jsontree = parser.parse(br); //new FileReader("www.x.com"));
-			JsonElement je = jsontree.getAsJsonObject();
-			JsonArray jsonArray = je.getAsJsonArray();
-						
-			for (Object obj : jsonArray) {
-				JsonObject version = (JsonObject) obj;
 
-				String ms3Version = version.get("modVersion").getAsString();
+		try (BufferedReader br = new BufferedReader(
+				new InputStreamReader(this.versionJsonUrl.openStream(), Charset.forName("UTF-8")))) {
+			JsonObject jsontree = (JsonObject) parser.parse(br);
+			JsonArray versionsArray = jsontree.get("versions").getAsJsonArray();
+
+			for (int i = 0; i < versionsArray.size(); i++) {
+				JsonObject version = (JsonObject) versionsArray.get(i);
+
+				String ms3Version = version.get("ms3Version").getAsString();
 				String minecraftVersion = version.get("mcVersion").getAsString();
 				String changelog = version.get("changelog").getAsString();
 				String download = version.get("download").getAsString();
-				
-				allReleases.add(new Release(ms3Version, minecraftVersion, changelog, download));
+
+				// TODO fix
+				allReleases.add(new Release(new Version(ms3Version), new Version(minecraftVersion), changelog,
+						"http://www.google.com"));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		Release current = findNewest(allReleases);
-		if(currentRelease.modVersion.compareTo(current.modVersion) == -1) {
+
+		Release current = this.findNewest(allReleases);
+		if (currentVersion.compareTo(current.modVersion) == -1) {
 			return true; // Outdated.
 		} else {
 			return false;
 		}
 	}
-	
+
 	/**
-	 * If the list is empty, null is returned.
+	 * Returns the newest release in the list. Null if the list is empty.
 	 */
 	@Nullable
 	private static Release findNewest(List<Release> releases) {
 		Release newest = null;
-		
-		for(Release r : releases) {
-			if(newest == null) {
+
+		for (Release r : releases) {
+			if (newest == null) {
 				newest = r;
 			} else {
-				if(r.modVersion.compareTo(newest.modVersion) == 1) {
+				if (r.modVersion.compareTo(newest.modVersion) == 1) {
 					newest = r;
 				}
 			}
 		}
-		
-		return newest;		
+
+		return newest;
 	}
 }

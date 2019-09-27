@@ -1,6 +1,7 @@
 package com.codeshaper.ms3;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -13,12 +14,15 @@ import com.codeshaper.ms3.bindScriptAction.BindScriptAction;
 import com.codeshaper.ms3.command.CommandBindScript;
 import com.codeshaper.ms3.command.CommandExec;
 import com.codeshaper.ms3.command.CommandScript;
+import com.codeshaper.ms3.drawing.EventHandlerDrawing;
 import com.codeshaper.ms3.interpreter.PyInterpreter;
 import com.codeshaper.ms3.interpreter.PyInterpreterManager;
 import com.codeshaper.ms3.items.ItemScriptBinder;
 import com.codeshaper.ms3.proxy.ProxyCommon;
 import com.codeshaper.ms3.update.Release;
+import com.codeshaper.ms3.update.UpdateChecker;
 import com.codeshaper.ms3.update.Version;
+import com.google.gson.stream.MalformedJsonException;
 
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -55,15 +59,10 @@ public class Ms3 {
 	public static final String MOD_NAME = "Ms3";
 	public static final String MOD_ID = "ms3";
 	public static final String AUTHOR = "codeshaper";
-
-	/**
-	 * String identifier for the version. Changes with every update. Make sure to
-	 * update mcmod.info
-	 */
-	public static final String MOD_VERSION = "0.1.0";
+	/** String identifier for the version. Make sure to update mcmod.info */
+	public static final String MOD_VERSION = "1.0.0";
 	public static final Version API_VERSION = new Version(1, 0, 0);
-
-	public static final Release RELEASE = new Release(Ms3.MOD_VERSION, null, null, "www.mediafire.com"); // TODO this won't work?
+	public static final Version RELEASE = new Version(Ms3.MOD_VERSION);
 
 	@Mod.Instance(Ms3.MOD_ID)
 	public static Ms3 instance;
@@ -75,24 +74,28 @@ public class Ms3 {
 	public static Ms3Properties ms3Props;
 	public static Config configManager;
 	public static ApiBuilder apiBuilder;
+	public static UpdateChecker updateChecker;
 
 	/** Reference to the script binder item. */
 	public static ItemScriptBinder itemScriptBinder = new ItemScriptBinder("script_binder");
 
 	/**
-	 * Hashmap of actions set by players through the bindScript command. Note, null
+	 * Hashmap of actions set by players through the bindScript command. This is null
 	 * on the client side!
 	 */
-	//@SideOnly(Side.SERVER)
 	public static HashMap<UUID, BindScriptAction> players = new HashMap<>();
 
-	/**
-	 * Single reference to the Python Interpreter. Note, null on the client side.
-	 */
+	/** Single reference to the Python Interpreter.  This is null on the client side. */
 	public PyInterpreterManager interpreterManager;
 
+	// Used to debug the update checker.
+	public static void main(String[] args) throws MalformedURLException, NumberFormatException, MalformedJsonException {
+		Ms3.updateChecker = new UpdateChecker("https://raw.githubusercontent.com/CodeShaper13/Ms3/master/src/main/java/version.json");
+		System.out.println("Is outdates: " + Ms3.updateChecker.isOutdated(new Version(Ms3.MOD_VERSION)));
+	}
+	
 	@Mod.EventHandler
-	public void preInit(FMLPreInitializationEvent event) {
+	public void preInit(FMLPreInitializationEvent event) throws MalformedURLException {
 		Ms3.dirManager = new DirectoryManager(event);
 		Ms3.ms3Props = new Ms3Properties();
 		Ms3.configManager = new Config(new File(Ms3.dirManager.getMs3Folder(), "config.cfg"));
@@ -106,6 +109,8 @@ public class Ms3 {
 		blocks.getAllBlocks();
 		items.getAllItems();
 		sounds.getAllSounds();
+		
+		Ms3.updateChecker = new UpdateChecker("https://raw.githubusercontent.com/CodeShaper13/Ms3/master/src/main/java/version.json");
 	}
 
 	@Mod.EventHandler

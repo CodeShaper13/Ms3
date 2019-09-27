@@ -12,19 +12,31 @@ public class Version implements Comparable<Version> {
 	private final int majorVersion;
 	private final int minorVersion;
 	private final int patchVersion;
-	
-	public Version(String version) {
+
+	/**
+	 * Constructs a Version from a string that uses "." to seperate the major, minor
+	 * and patch numbers. The minor and patch numbers are optional and are assumed
+	 * to be 0 if not specified.
+	 * 
+	 * @param version A string containing the version.
+	 */
+	public Version(String version) throws NumberFormatException {
 		String[] s = StringUtils.split(version, '.');
 		this.majorVersion = Integer.parseInt(s[0]);
-		this.minorVersion = Integer.parseInt(s[1]);
-		
-		if(s.length > 2) {
+
+		if (s.length > 1) {
+			this.minorVersion = Integer.parseInt(s[1]);
+		} else {
+			this.minorVersion = 0;
+		}
+
+		if (s.length > 2) {
 			this.patchVersion = Integer.parseInt(s[2]);
 		} else {
 			this.patchVersion = 0;
 		}
 	}
-	
+
 	public Version(int majorVersion, int minorVersion, int patchVersion) {
 		this.majorVersion = majorVersion;
 		this.minorVersion = minorVersion;
@@ -72,17 +84,17 @@ public class Version implements Comparable<Version> {
 
 	@Override
 	public int compareTo(Version v) {
-		if(this.equals(v)) {
+		if (this.equals(v)) {
 			return 0;
 		}
-		
-		if(this.majorVersion > v.majorVersion) {
+
+		if (this.majorVersion > v.majorVersion) {
 			return 1;
 		}
-		if(this.minorVersion > v.minorVersion) {
+		if (this.minorVersion > v.minorVersion) {
 			return 1;
 		}
-		if(this.patchVersion > v.patchVersion) {
+		if (this.patchVersion > v.patchVersion) {
 			return 1;
 		}
 		return -1;
