@@ -118,6 +118,7 @@ public class Ms3 {
 		Ms3.proxy.init();
 
 		MinecraftForge.EVENT_BUS.register(new EventHandler());
+		MinecraftForge.EVENT_BUS.register(new EventHandlerDrawing());
 	}
 
 	@Mod.EventHandler

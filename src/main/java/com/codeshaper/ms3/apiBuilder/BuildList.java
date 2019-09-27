@@ -6,6 +6,7 @@ import com.codeshaper.ms3.api.biomes;
 import com.codeshaper.ms3.api.blockUtils;
 import com.codeshaper.ms3.api.blocks;
 import com.codeshaper.ms3.api.colors;
+import com.codeshaper.ms3.api.drawer;
 import com.codeshaper.ms3.api.effectList;
 import com.codeshaper.ms3.api.enchantments;
 import com.codeshaper.ms3.api.entity;
@@ -45,6 +46,7 @@ public class BuildList {
 				BoundObject.class,
 				blocks.class,
 				colors.class,
+				drawer.class,
 				effectList.class,
 				enchantments.class,
 				entity.class,
