@@ -5,23 +5,25 @@ import java.io.OutputStream;
 
 import com.codeshaper.ms3.util.Util;
 
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 /**
  * Stream used for output messages, replacing the default python sys.out and
- * acting as a parent for @link ChatErrorStream
+ * acting as a parent for {@link ChatErrorStream}.
+ * 
+ * @author CodeShaper
  */
 public class ChatOutputStream extends OutputStream {
 	/**
-	 * The string that we are building from the output stream. Once it is done, we
-	 * print it to the MC chat and clear it.
+	 * The string that is being built from the output stream. Once the string is
+	 * done, it is printed to the MC chat and the field is cleared.
 	 */
 	private StringBuilder stringBuilder = new StringBuilder();
 	/**
-	 * Set to true once we get the carriage return (13) and we know that if a
-	 * newline is the next char, end the string.
+	 * Set to true once the carriage return character (13), is gotten.
 	 */
 	private boolean gottenCarriage = false;
 
@@ -30,20 +32,25 @@ public class ChatOutputStream extends OutputStream {
 		if (b == 13) { // Carriage return
 			this.gottenCarriage = true;
 		} else if (b == 10 && this.gottenCarriage) { // New line.
-			FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList()
-					.sendMessage(this.getChat(this.stringBuilder.toString()));
+			MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+			server.getPlayerList().sendMessage(this.getChat(this.stringBuilder.toString()));
 
-			/*
-			 * EntityPlayerSP p = Minecraft.getMinecraft().player; if(p != null) {
-			 * Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(this.getChat
-			 * (this.stringBuilder.toString())); } else {
-			 * this.msg(this.stringBuilder.toString()); }
-			 */
 			this.stringBuilder.setLength(0);
 			this.gottenCarriage = true;
 		} else {
 			char character = (char) b;
-			this.stringBuilder.append(character == '&' ? Util.SECTION_SIGN : character == '\t' ? "    " : character);
+			String s;
+
+			if (character == '&') {
+				s = Character.toString(Util.SECTION_SIGN);
+			} else if (character == '\t') {
+				// Add 4 spaces for \t
+				s = "    ";
+			} else {
+				s = Character.toString(character);
+			}
+
+			this.stringBuilder.append(s);
 		}
 	}
 

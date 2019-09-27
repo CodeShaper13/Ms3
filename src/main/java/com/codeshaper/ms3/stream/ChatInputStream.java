@@ -5,6 +5,8 @@ import java.io.InputStream;
 
 /**
  * Unfinished
+ * 
+ * @author CodeShaper
  */
 public class ChatInputStream extends InputStream {
 

@@ -25,15 +25,6 @@ public class NewScriptHelper {
 			br.write("\n");
 		}
 	}
-	
-	public static void writeOnBind(File file) throws IOException {
-		try (BufferedWriter br = new BufferedWriter(new FileWriter(file))) {
-			br.write("def onBind(world, theEntity):\n");
-			br.write("    assert isinstance(world, ms3.world.World)\n");
-			br.write("    assert isinstance(sender, ms3.entity.EntityBase)\n");
-			br.write("\n");
-		}
-	}
 
 	public static void writeExecute(File file) throws IOException {
 		try (BufferedWriter br = new BufferedWriter(new FileWriter(file))) {

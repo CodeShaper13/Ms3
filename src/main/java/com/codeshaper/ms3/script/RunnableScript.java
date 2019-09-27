@@ -46,24 +46,22 @@ public class RunnableScript extends PythonScript {
 	public RunnableScript(String pathToScript) {
 		this(pathToScript, new PyList());
 	}
-	
+
 	public RunnableScript(String pathToScript, @Nullable String[] args) throws PyException {
 		this(pathToScript, args != null ? RunnableScript.stringArgsToPyType(args) : null);
 	}
 
 	/**
-	 * @param pathToScript
-	 *            Path from the scripts folder to the file. If there is no
-	 *            extension, .py is assumed.
+	 * @param pathToScript Path from the scripts folder to the file. If there is no
+	 *                     extension, .py is assumed.
 	 * @param args
-	 * @throws PyException
-	 *             If {@code args} contains an invalid data type.
+	 * @throws PyException If {@code args} contains an invalid data type.
 	 */
 	public RunnableScript(String pathToScript, @Nullable PyList args) throws PyException {
 		super(pathToScript);
-		
-		// Validate that the args and throw an exception if they are not of the correct
-		// type.
+
+		// Validate that the args are of the correct type.
+		// If not, throw a Py.ValueError exception.
 		if (args != null) {
 			Object obj;
 			for (int i = 0; i < args.size(); i++) {
@@ -84,7 +82,7 @@ public class RunnableScript extends PythonScript {
 
 	public RunnableScript(NBTTagCompound tag) {
 		super(tag);
-		
+
 		this.scriptArgs = new PyList();
 
 		Integer i = 0;
@@ -138,6 +136,10 @@ public class RunnableScript extends PythonScript {
 		return true;
 	}
 
+	/**
+	 * Returns the instance of the list containing the arguments of this
+	 * RunnableScript.
+	 */
 	public PyList getArgs() {
 		return this.scriptArgs;
 	}
@@ -180,18 +182,19 @@ public class RunnableScript extends PythonScript {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Runs the getArgs function in a script if it exists and returns the next arg
 	 * to auto complete.
 	 *
 	 * @param runnableScript
 	 * @param sender
-	 * @return An object representing the returned value, either a single string or
-	 *         an array of strings.
-	 * @throws InvalidReturnedArgumentException If one of the values is not a string
-	 *                                          or sequence containing strings, or
-	 *                                          None.
+	 * @return An array of options to suggest for tab auto complete, either a single
+	 *         string or an array of strings. Null is returned if not options should
+	 *         be presented.
+	 * @throws InvalidReturnedArgumentException If one of the values is not one of
+	 *                                          the following: a string, a sequence
+	 *                                          containing strings, None.
 	 */
 	@Nullable
 	public String[] runGetArgsFunction(PyInterpreter interpreter, ICommandSender sender)
@@ -234,11 +237,9 @@ public class RunnableScript extends PythonScript {
 		}
 		return null;
 	}
-	
-	
+
 	/**
-	 * Gets the doc string from a script and returns it to provide the help text for
-	 * a script.
+	 * Gets the doc string from the script and prints it out to the passed sender.
 	 *
 	 * @param runnableScript
 	 * @param sender
@@ -266,13 +267,18 @@ public class RunnableScript extends PythonScript {
 			MessageUtil.sendErrorMessage(sender, "Error getting __doc__ attribute()", exception);
 		}
 	}
-	
-	
+
+	/**
+	 * Converts an array of strings to an instance of {@link PyList} contanining
+	 * {@link PyStrings}s. Empty strings will be removed from the list.
+	 * 
+	 * @param args
+	 * @return
+	 */
 	private static PyList stringArgsToPyType(String[] args) {
 		PyList list = new PyList();
 		for (String s : args) {
 			list.add(s);
-			//list.add(Util.stringToPyObject(s));
 		}
 
 		// Empty strings are added to the end of args sometimes from commands, remove

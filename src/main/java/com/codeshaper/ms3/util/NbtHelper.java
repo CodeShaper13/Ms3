@@ -95,7 +95,7 @@ public class NbtHelper {
 				return new PyList(Arrays.asList(((NBTTagIntArray) tag).getIntArray()));
 			}
 			// Long array doesn't seem to be used by Minecraft?
-			else { // This must me an NBTTagCompound.
+			else { // This must be an NBTTagCompound.
 				throw new Error("Invalid object type: " + tag.getClass());
 			}
 		}

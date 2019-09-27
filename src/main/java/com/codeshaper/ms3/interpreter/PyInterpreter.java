@@ -48,13 +48,11 @@ import net.minecraft.world.WorldServer;
 public class PyInterpreter {
 
 	/**
-	 * The name of the default interpreter. Only exist for unused version with
-	 * multiple interpreters.
+	 * The name of the default interpreter.
 	 */
 	public static final String DEFAULT_NAME = "default";
 
 	// Save the original streams in case we want to go back to using them.
-	@SuppressWarnings("unused")
 	private PyObject consoleStdIn;
 	private PyObject consoleStdOut;
 	private PyObject consoleStdErr;
@@ -84,14 +82,16 @@ public class PyInterpreter {
 			// TODO
 		}
 
-		// Add to the sys.path so we can find stuff.
-		PySystemState pss = Py.getSystemState();
-		pss.path.add(Ms3.dirManager.getScriptFolder().getAbsolutePath());
+		// Add to the sys.path so scripts can find other scripts in the /scripts folder.
+		PySystemState systemState = Py.getSystemState();
+		systemState.path.add(Ms3.dirManager.getScriptFolder().getAbsolutePath());
 
-		// Add the path to site-packages, if the path to Python is set in the config.
+		// Add the path to the site-packages folder in the Python install directory.
+		// If no Python path is specified, then nothing is added and no big deal.
+		// This is only if you want to reference libraries such a pygame.
 		String pythonPath = Ms3.configManager.getPythonPath();
 		if (StringUtils.isBlank(pythonPath)) {
-			pss.path.add(pythonPath + "\\Lib\\site-packages");
+			systemState.path.add(pythonPath + "\\Lib\\site-packages");
 		}
 	}
 
@@ -102,9 +102,8 @@ public class PyInterpreter {
 		return this.interpreterName;
 	}
 
-
 	/**
-	 * Calls the onBind function, if there is one.
+	 * Calls the onBind function, if the passed runnableScript has one.
 	 *
 	 * @param runnableScript
 	 * @param sender
@@ -122,7 +121,7 @@ public class PyInterpreter {
 			return false;
 		}
 	}
-	
+
 	// This seems to try to get a class in a script with the same name as the file.
 	// Unused, moved to AttachedScript.java
 	public PyObject func(RunnableScript runnableScript, ICommandSender sender) {
@@ -142,6 +141,12 @@ public class PyInterpreter {
 		}
 	}
 
+	/**
+	 * 
+	 * @param runnableScript
+	 * @param entity
+	 * @param player
+	 */
 	public void runOnClick(RunnableScript runnableScript, Entity entity, EntityPlayer player) {
 		try {
 			this.primeScript(runnableScript);
@@ -164,8 +169,8 @@ public class PyInterpreter {
 	public boolean callFunction(String functionName, @Nullable PyObject... args) {
 		PyObject function = this.getVariable(functionName);
 		if (function != null) {
-			@SuppressWarnings("unused")
 			PyObject returnValue = function.__call__(args != null ? args : new PyObject[0]);
+			// TODO send the return value to the calling method.
 			return true;
 		} else {
 			return false;
@@ -182,22 +187,22 @@ public class PyInterpreter {
 	}
 
 	/**
-	 * Gets a variable from the global namespace.
+	 * Gets a variable from the global namespace and returns it.
 	 */
 	@Nullable
 	public PyObject getVariable(String name) {
 		return this.pythonInterpreter.get(name);
 	}
-	
+
 	public void setVariable(String name, PyObject value) {
 		this.pythonInterpreter.set(name, Py.None);
 	}
-	
+
 	/**
 	 * Deletes a variable from the global scope.
 	 *
 	 * @param name Name of the variable.
-	 * @return True if the variable was found and deleted, false otherwise.
+	 * @return True if the variable was found and deleted, false if it couldn't be found.
 	 */
 	public boolean delIfExists(String name) {
 		if (this.exists(name)) {
@@ -210,6 +215,7 @@ public class PyInterpreter {
 
 	/**
 	 * Executes a single string of code.
+	 * 
 	 * @param code
 	 * @return True if the code ran without error, false otherwise.
 	 * @throws PyException If there was an error running the code.
@@ -218,7 +224,7 @@ public class PyInterpreter {
 		try {
 			this.pythonInterpreter.exec(code);
 			return true;
-		} catch(PyException exception) {
+		} catch (PyException exception) {
 			throw exception;
 		}
 	}

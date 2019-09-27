@@ -28,16 +28,16 @@ import com.codeshaper.ms3.api.util;
 import com.codeshaper.ms3.api.world;
 
 /**
- * A list of classes to build into Python modules.  Moved to a different class
- * so we wouldn't bloat the import section of ModuleBuilder.
+ * A list of classes to build into Python modules. Moved to a different class so
+ * we wouldn't bloat the import section of ModuleBuilder.
  * 
  * @author CodeShaper
  */
 public class BuildList {
-	
-	/** An array of all the classes to compile.  Update this manually to add more. */
+
+	/** An array of all the classes to compile. Update this manually to add more. */
 	public Class<?>[] classList;
-	
+
 	public BuildList() {
 		this.classList = new Class[] {
 				biomes.class,
@@ -53,34 +53,37 @@ public class BuildList {
 				exception.class,
 				executor.class,
 				formattingCode.class,
-				//interpreter.class,
+				// interpreter.class,
 				itemUtils.class,
 				items.class,
 				itemStack.class,
 				obfuscationHelper.class,
 				particleType.class,
 				soundCategories.class,
-				sounds.class,
+				sounds.class, 
 				util.class,
 				tileEntity.class,
 				tileEntityList.class,
 				translations.class,
 				util.class,
 				world.class,
-				//worldBorder.class,
+				// worldBorder.class,
 		};
-		
+
 		this.validateList();
 	}
-	
+
 	/**
-	 * Checks that there were no mistakes and an outside class was added to the list.
+	 * Checks that no outside classer were added to the list.
+	 * 
+	 * @throws Error If an outside class was added.
 	 */
-	private void validateList() {
+	private void validateList() throws Error {
 		for (Class<?> clazz : this.classList) {
 			String s = clazz.getCanonicalName();
-			if(!s.startsWith("com." + Ms3.AUTHOR + "." + Ms3.MOD_ID)) {
-				throw new Error("The module build list should not contain classes from other jars and it contains " + s + "!");
+			if (!s.startsWith("com." + Ms3.AUTHOR + "." + Ms3.MOD_ID)) {
+				throw new Error("The module build list should not contain classes from external jars and it contains "
+						+ s + "!");
 			}
 		}
 	}

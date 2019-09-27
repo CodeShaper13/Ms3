@@ -119,7 +119,7 @@ public class entity {
 			return entity.instance.new Endermite((EntityEndermite) javaEntity);
 		} else if (javaEntity instanceof EntityGhast) {
 			return entity.instance.new Ghast((EntityGhast) javaEntity);
-		}else if (javaEntity instanceof EntityHorse || javaEntity instanceof EntityZombieHorse) {
+		} else if (javaEntity instanceof EntityHorse || javaEntity instanceof EntityZombieHorse) {
 			return entity.instance.new Horse((EntityHorse) javaEntity);
 		} else if (javaEntity instanceof EntityHusk) {
 			return entity.instance.new Husk((EntityHusk) javaEntity);

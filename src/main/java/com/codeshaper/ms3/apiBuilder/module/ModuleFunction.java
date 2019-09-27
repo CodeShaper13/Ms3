@@ -32,7 +32,7 @@ public class ModuleFunction extends BaseAttribute {
 	 * Creates a Python function based on a method
 	 */
 	public ModuleFunction(Executable exec) {
-		this(func01(exec), Util.getPydValue(exec), ModuleFunction.func(exec.getParameters()));
+		this(func01(exec), ModuleUtil.getPydValue(exec), ModuleFunction.func(exec.getParameters()));
 		Object o = ObjectUtils.NULL;
 
 		if (exec instanceof Method) {

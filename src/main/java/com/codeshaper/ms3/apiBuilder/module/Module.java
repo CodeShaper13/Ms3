@@ -20,7 +20,7 @@ public class Module extends AttributeHolder {
 	private final String modulePath;
 
 	public Module(Class<?> clazz) {
-		this(clazz.getSimpleName(), Util.getPydValue(clazz));
+		this(clazz.getSimpleName(), ModuleUtil.getPydValue(clazz));
 	}
 
 	public Module(String moduleName) {

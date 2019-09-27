@@ -19,9 +19,9 @@ public class ScheduledScript extends RunnableScript {
 	public ScheduledScript(String pathToScript, executor.Executor sender, int ticksUntil, PyList args)
 			throws PyException {
 		super(pathToScript, args);
-		
+
 		this.sender = sender;
-		
+
 		if (ticksUntil < 0) {
 			throw Py.ValueError("ticksUntil must be greater or equal to 0!");
 		}
@@ -31,7 +31,7 @@ public class ScheduledScript extends RunnableScript {
 	public Executor getExecutor() {
 		return sender;
 	}
-	
+
 	/**
 	 * Reduces the number of ticks until this script runs.
 	 * 

@@ -12,7 +12,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 /**
- * Static methods for sending messages, including errors, to users.
+ * Static methods for sending messages, including errors, to Players.
  * 
  * @author CodeShaper
  */
@@ -32,20 +32,23 @@ public class MessageUtil {
 		MessageUtil.sendMessage(sender, new TextBuilder(text).color(TextFormatting.RED).bold());
 	}
 
-	public static void sendErrorMessage(@Nullable ICommandSender sender, String text, Exception e) {
+	/**
+	 * 
+	 * @param sender
+	 * @param text
+	 * @param exception
+	 */
+	public static void sendErrorMessage(@Nullable ICommandSender sender, String text, Exception exception) {
 		MessageUtil.sendErrorMessage(sender, text);
 		if (sender != null) {
-			e.printStackTrace();
+			exception.printStackTrace();
 		}
 	}
 
 	/**
-	 * Sends an error message to every player on the current game. Call whenever you
-	 * need to warn the players that there is a problem/error with a script but it
-	 * is not obvious what player triggered this, in the event of bound scripts and
-	 * objects.
+	 * Sends an error message to every player on the current game.
 	 * 
-	 * @param text
+	 * @param text 
 	 * @param exception
 	 */
 	public static void sendErrorMessageToAll(String text, Exception exception) {
@@ -59,7 +62,7 @@ public class MessageUtil {
 	}
 
 	/**
-	 * Sends a message to the sender, as long as sender is not null.
+	 * Sends a message to the passed sender, as long as sender is not null.
 	 * 
 	 * @param sender
 	 * @param text

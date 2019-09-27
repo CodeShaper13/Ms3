@@ -31,7 +31,7 @@ public class util {
 	@PythonFunction
 	@PythonDocString("Returns the Ms3 version as a string.")
 	public static PyString getMs3Version() {
-		return new PyString(Ms3.RELEASE.modVersion.toString());
+		return new PyString(Ms3.MOD_VERSION);
 	}
 
 	@PythonFunction
@@ -55,9 +55,30 @@ public class util {
 		}
 
 		ScheduledScript scheduledScript = new ScheduledScript(pathToScript, e, ticksUntil, args);
-		scheduledScript.tryThrowMissingScript();
+		util.tryThrowMissingScript(scheduledScript);
 
 		util.scheduledScripts.add(scheduledScript);
+	}
+	
+	/**
+	 * Checks if the RunnableScript refers to an actual file and is of type .py.
+	 * 
+	 * @throws exception.MissingScriptException
+	 *             If the script can't be found in the event of the file being
+	 *             moved/deleted or if the file is not in a valid format.
+	 */
+	private static void tryThrowMissingScript(ScheduledScript scheduledScript) throws exception.MissingScriptException {
+		if (!scheduledScript.exists()) {
+			throw Py.ValueError("Script with name " + scheduledScript.getFile().toString()
+					+ " could not be found!  Was it moved, renamed or deleted?");
+		}
+		String fileName = scheduledScript.getFile().getName();
+
+		String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
+		if (!(extension.equalsIgnoreCase("py"))) {
+			throw exception.instance.new MissingScriptException("Script file is not of type .py",
+					scheduledScript.getFile().getPath());
+		}
 	}
 
 	@PythonFunction
@@ -67,7 +88,7 @@ public class util {
 	}
 
 	@PythonFunction
-	@PythonDocString("Prints text directly to the console.") // reguardless of the Interpreters stream settings.")
+	@PythonDocString("Prints text directly to the console.")
 	public static void printToConsole(@PythonTypeExclude Object object) {
 		System.out.println(object.toString());
 	}

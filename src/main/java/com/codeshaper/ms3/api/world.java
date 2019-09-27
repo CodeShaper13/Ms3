@@ -295,7 +295,7 @@ public class world {
 		}
 
 		@PythonFunction
-		@PythonDocString("Plays a sound.  categoryName if for what volume setting should be used.  See coundCategory.py for a list of sound categories.")
+		@PythonDocString("Plays a sound.  categoryName if for what volume setting should be used.  See soundCategory.py for a list of sound categories.")
 		public void playSound(String soundName, String categoryName, double x, double y, double z, float volume,
 				float pitch) {
 

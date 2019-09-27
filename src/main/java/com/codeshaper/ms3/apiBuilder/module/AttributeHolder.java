@@ -30,7 +30,7 @@ public abstract class AttributeHolder extends BaseAttribute {
 	}
 
 	public AttributeHolder(String name, AnnotatedElement ao) {
-		this(name, Util.getPydValue(ao));
+		this(name, ModuleUtil.getPydValue(ao));
 	}
 
 	public AttributeHolder(String name) {

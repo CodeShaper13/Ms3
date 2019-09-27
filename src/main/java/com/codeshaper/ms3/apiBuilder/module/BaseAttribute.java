@@ -17,7 +17,7 @@ public abstract class BaseAttribute implements IWritable {
 	private final String docString;
 
 	public BaseAttribute(String name, AnnotatedElement ao) {
-		this(name, Util.getPydValue(ao));
+		this(name, ModuleUtil.getPydValue(ao));
 	}
 
 	public BaseAttribute(String name, String docString) {

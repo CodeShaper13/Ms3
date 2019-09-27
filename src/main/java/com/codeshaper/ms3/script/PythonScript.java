@@ -49,25 +49,4 @@ public class PythonScript {
 	public boolean exists() {
 		return this.scriptFile.exists();
 	}
-	
-	/**
-	 * Checks if the RunnableScript refers to an actual file and is of type .py.
-	 * 
-	 * @throws exception.MissingScriptException
-	 *             If the script can't be found in the event of the file being
-	 *             moved/deleted or if the file is not in a valid format.
-	 */
-	public void tryThrowMissingScript() throws exception.MissingScriptException {
-		if (!this.exists()) {
-			throw Py.ValueError("Script with name " + this.scriptFile.toString()
-					+ " could not be found!  Was it moved, renamed or deleted?");
-		}
-		String fileName = this.scriptFile.getName();
-
-		String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
-		if (!(extension.equalsIgnoreCase("py"))) {
-			throw exception.instance.new MissingScriptException("Script file is not of type .py",
-					this.scriptFile.getPath());
-		}
-	}
 }
