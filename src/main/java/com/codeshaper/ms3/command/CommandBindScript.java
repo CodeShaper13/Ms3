@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.bindScriptAction.BSAction;
 import com.codeshaper.ms3.bindScriptAction.BindScriptAction;
+import com.codeshaper.ms3.capability.EntityMs3DataProvider;
 import com.codeshaper.ms3.script.RunnableScript;
 
 import net.minecraft.command.CommandBase;
@@ -25,7 +26,7 @@ import net.minecraft.util.math.BlockPos;
  *
  * @author CodeShaper
  */
-public class CommandBindScript extends CommandScript {
+public class CommandBindScript extends CommandScript { // Only extends to get the getAllScripts() method.
 
 	/**
 	 * Get the name of the command
@@ -54,6 +55,8 @@ public class CommandBindScript extends CommandScript {
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		Entity cmdSender = sender.getCommandSenderEntity();
+
+		// Players can only run this command!
 		if (!(cmdSender instanceof EntityPlayer)) {
 			throw new CommandException("commands.bindScript.onlyByPlayer");
 		}
@@ -63,11 +66,24 @@ public class CommandBindScript extends CommandScript {
 
 		if (args.length >= 1 && (checkArg || clearArg)) {
 			if (checkArg) {
-				this.storeAction(cmdSender, new BindScriptAction(BSAction.CHECK));
-				CommandBase.notifyCommandListener(sender, this, "commands.bindScript.useStickCheck");
-			} else { // checkArg
-				this.storeAction(cmdSender, new BindScriptAction(BSAction.CLEAR));
-				CommandBase.notifyCommandListener(sender, this, "commands.bindScript.useStickClear");
+				if (args.length == 1) {
+					this.storeAction(cmdSender, new BindScriptAction(BSAction.CHECK));
+					CommandBase.notifyCommandListener(sender, this, "commands.bindScript.useStickCheck");
+				} else if (args.length == 2) {
+					this.getCapability(getPlayer(server, sender, args[1])).getScriptList().func(sender);
+				} else {
+					throw new WrongUsageException("commands.bindScript.usageCheck");
+				}
+			}
+			if (clearArg) {
+				if (args.length == 1) {
+					this.storeAction(cmdSender, new BindScriptAction(BSAction.CLEAR));
+					CommandBase.notifyCommandListener(sender, this, "commands.bindScript.useStickClear");
+				} else if (args.length == 2) {
+					this.getCapability(getPlayer(server, sender, args[1])).getScriptList().removeAll();
+				} else {
+					throw new WrongUsageException("commands.bindScript.usageCheck");
+				}
 			}
 		} else if (args.length < 2 || !(args[0].equals("add") || args[0].equals("remove"))) {
 			throw new WrongUsageException("commands.bindScript.usage");
@@ -99,10 +115,15 @@ public class CommandBindScript extends CommandScript {
 			@Nullable BlockPos pos) {
 		if (args.length == 1) {
 			return CommandBase.getListOfStringsMatchingLastWord(args, "add", "remove", "check", "clear");
-		} else if (args.length == 2 && (args[0].equals("add") || args[0].equals("remove"))) {
-			return CommandBase.getListOfStringsMatchingLastWord(args, this.getAllScripts());
-		} else {
-			return Collections.emptyList();
+		} else if (args.length == 2) {
+			if (args[0].equals("add") || args[0].equals("remove")) {
+				return CommandBase.getListOfStringsMatchingLastWord(args, this.getAllScripts());
+			}
+			if (args[0].equals("check") || args[0].equals("clear")) {
+				return CommandBase.getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames());
+			}
 		}
+
+		return Collections.emptyList();
 	}
 }

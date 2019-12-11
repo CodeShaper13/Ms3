@@ -74,14 +74,14 @@ public class BoundObject {
 	}
 
 	@PythonFunction
-	@PythonDocString("Calls self.entity.setProperty and prefixs propertyName with the type name of this object.")
+	@PythonDocString("Calls self.entity.setProperty() and prefixs propertyName with the type name of this object.  This is the recomended way to set property values.")
 	protected void setProperty(String propertyName, @PythonTypeExclude Object value) {
 		this.entity.setProperty(this.getPrefix() + "." + propertyName, value);
 	}
 
 	@PythonFunction
-	@PythonDocString("Calls self.entity.readProperty and prefixs propertyName with the type name of this object.")
-	protected Object readProperty(String propertyName) {
+	@PythonDocString("Calls self.entity.getProperty() and prefixs propertyName with the type name of this object.  This is the recomended way to get property values.")
+	protected Object getProperty(String propertyName) {
 		return this.entity.getProperty(this.getPrefix() + "." + propertyName);
 	}
 

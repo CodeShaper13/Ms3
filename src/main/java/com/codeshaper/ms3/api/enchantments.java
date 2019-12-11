@@ -17,7 +17,7 @@ import com.codeshaper.ms3.util.Util;
 import net.minecraft.enchantment.Enchantment;
 
 @PythonClass
-@PythonDocString("Constants of all the enchantments as tuples.  1st index is id, 2nd is the string identifier.")
+@PythonDocString("Constants of all the enchantments as tuples.  1st index is the numeric id, 2nd is the string identifier.")
 public class enchantments {
 
 	private enchantments() {

@@ -34,6 +34,7 @@ import com.codeshaper.ms3.script.RunnableScript;
 import com.codeshaper.ms3.stream.ChatErrorStream;
 import com.codeshaper.ms3.stream.ChatOutputStream;
 import com.codeshaper.ms3.util.Assert;
+import com.codeshaper.ms3.util.Logger;
 import com.codeshaper.ms3.util.MessageUtil;
 import com.codeshaper.ms3.util.textBuilder.TextBuilder;
 import com.codeshaper.ms3.util.textBuilder.TextBuilderTrans;
@@ -90,7 +91,7 @@ public class PyInterpreter {
 		// If no Python path is specified, then nothing is added and no big deal.
 		// This is only if you want to reference libraries such a pygame.
 		String pythonPath = Ms3.configManager.getPythonPath();
-		if (StringUtils.isBlank(pythonPath)) {
+		if (!StringUtils.isBlank(pythonPath)) {
 			systemState.path.add(pythonPath + "\\Lib\\site-packages");
 		}
 	}

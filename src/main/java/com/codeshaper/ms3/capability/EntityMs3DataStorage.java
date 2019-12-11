@@ -11,6 +11,7 @@ import com.codeshaper.ms3.script.RunnableScript;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagDouble;
 import net.minecraft.nbt.NBTTagFloat;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagList;
@@ -91,6 +92,8 @@ public class EntityMs3DataStorage implements IStorage<IEntityMs3Data> {
 			} else if (nbtCompound.hasUniqueId(key)) {
 				Entity e = FMLCommonHandler.instance().getMinecraftServerInstance().getEntityFromUuid(nbtCompound.getUniqueId(key));
 				value = entity.getWrapperClassForEntity(e);
+			} else if(obj instanceof NBTTagDouble) {
+				value = ((NBTTagDouble) obj).getDouble();
 			} else {
 				throw new Error("Unknown type: " + obj.getClass());
 			}

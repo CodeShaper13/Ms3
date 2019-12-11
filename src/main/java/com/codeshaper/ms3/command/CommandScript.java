@@ -107,9 +107,7 @@ public class CommandScript extends CommandBase {
 					try {
 						newScriptFile.createNewFile();
 
-						NewScriptHelper.writeImports(newScriptFile, true);
-						NewScriptHelper.writeExecute(newScriptFile);
-						NewScriptHelper.writeGetArgs(newScriptFile);
+						NewScriptHelper.writeToFile(newScriptFile);
 
 						CommandBase.notifyCommandListener(sender, this, "commands.script.createFileSuccess");
 					} catch (IOException | SecurityException e) {
@@ -183,21 +181,21 @@ public class CommandScript extends CommandBase {
 
 				IEntityMs3Data capData;
 				for (Entity e : sender.getEntityWorld().loadedEntityList) {
-					if(Util.validEntityForMs3Data(e)) {
-						capData = e.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
-						
+					if (Util.validEntityForMs3Data(e)) {
+						capData = this.getCapability(e);
+
 						for (AttachedScript as : capData.getScriptList()) {
 							RunnableScript rs = as.getLocation();
-							
+
 							// Have the script write it's data to the properties list.
 							as.getInstance().onSave();
-							
+
 							// Remove the old script instance.
 							capData.removeBoundScript(rs);
-							
+
 							// Add a new instance of the script to the entity.
 							capData.addBoundScript(entity.getWrapperClassForEntity(e), rs);
-							
+
 							// Have the script read it's properties
 							capData.getBoundScript(rs).getInstance().onLoad();
 						}
@@ -264,6 +262,10 @@ public class CommandScript extends CommandBase {
 		return false;
 	}
 
+	public IEntityMs3Data getCapability(Entity entity) {
+		return entity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
+	}
+	
 	/**
 	 * @return A String[] of all the script file names in the scripts folder, with
 	 *         extension.

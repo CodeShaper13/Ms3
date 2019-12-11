@@ -10,8 +10,12 @@ import com.codeshaper.ms3.api.BoundObject;
 import com.codeshaper.ms3.api.entity;
 import com.codeshaper.ms3.api.entity.Base;
 import com.codeshaper.ms3.script.RunnableScript;
+import com.codeshaper.ms3.util.textBuilder.TextBuilder;
+import com.codeshaper.ms3.util.textBuilder.TextBuilderTrans;
 
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.text.TextFormatting;
 
 /**
  * A collection of {@link AttachedScript}s that can be accessed by the location
@@ -108,5 +112,19 @@ public class AttachedScriptList implements Iterable<AttachedScript> {
 	@Override
 	public Iterator<AttachedScript> iterator() {
 		return this.attachedScripts.iterator();
+	}
+
+	/**
+	 * Prints out all of the scripts to the passed sender.
+	 * 
+	 * @param sender
+	 */
+	public void func(ICommandSender sender) {
+		sender.sendMessage(new TextBuilderTrans("ms3.stick.totalScriptCount", this.size(), this.size() > 1 ? "" : "s")
+				.color(TextFormatting.YELLOW).get());
+		for (AttachedScript as : this) {
+			sender.sendMessage(
+					new TextBuilder("> " + as.getLocation().getFile().getPath()).color(TextFormatting.YELLOW).get());
+		}
 	}
 }

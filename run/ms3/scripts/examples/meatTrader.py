@@ -51,9 +51,9 @@ class MeatTrader(ms3.BoundObject):
 
 
     def onLoad(self):
-        self.itemWanted = self.readProperty("itemWanted")
-        self.quantityWanted = self.readProperty("quantityWanted")
-        self.nuggetsGiven = self.readProperty("nuggetsPerItem")        
+        self.itemWanted = self.getProperty("itemWanted")
+        self.quantityWanted = self.getProperty("quantityWanted")
+        self.nuggetsGiven = self.getProperty("nuggetsPerItem")        
 
     def onSave(self):
         self.setProperty("itemWanted", self.itemWanted)

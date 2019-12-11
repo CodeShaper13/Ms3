@@ -153,7 +153,7 @@ public class entity {
 			return entity.instance.new Snowman((EntitySnowman) javaEntity);
 		} else if (javaEntity instanceof EntityVillager) {
 			return entity.instance.new Villager((EntityVillager) javaEntity);
-		} else if(javaEntity instanceof EntityVindicator) {
+		} else if (javaEntity instanceof EntityVindicator) {
 			return entity.instance.new Vindicator((EntityVindicator) javaEntity);
 		} else if (javaEntity instanceof EntityWolf) {
 			return entity.instance.new Wolf((EntityWolf) javaEntity);
@@ -348,25 +348,21 @@ public class entity {
 				throw Py.ValueError("tag string can not start or end with curly brackets (\"{\", \"}\")");
 			}
 
-			NBTTagCompound nbttagcompound = CommandBase.entityToNBT(this.mcEntity);
-			NBTTagCompound nbtTagCopy = nbttagcompound.copy();
-			NBTTagCompound nbttagcompound2;
+			NBTTagCompound originalNbt = CommandBase.entityToNBT(this.mcEntity);
+			NBTTagCompound nbtTagCopy = originalNbt.copy();
+			NBTTagCompound newNbt;
 
 			try {
-				nbttagcompound2 = JsonToNBT.getTagFromJson("{" + tagKey + ":" + value.toString() + "}");
+				newNbt = JsonToNBT.getTagFromJson("{" + tagKey + ":" + value.toString() + "}");
 			} catch (NBTException nbtexception) {
 				throw Py.ValueError("Nbt was not in valid JSON format!");
 			}
 
 			UUID uuid = this.mcEntity.getUniqueID();
-			nbttagcompound.merge(nbttagcompound2);
+			originalNbt.merge(newNbt);
 			this.mcEntity.setUniqueId(uuid);
 
-			if (nbttagcompound.equals(nbtTagCopy)) {
-				throw Py.ValueError("commands.entitydata.failed");
-			} else {
-				this.mcEntity.readFromNBT(nbttagcompound);
-			}
+			this.mcEntity.readFromNBT(originalNbt);
 		}
 
 		@PythonFunction
@@ -396,20 +392,20 @@ public class entity {
 		public BoundObject getBoundScript(String scriptPath) {
 			IEntityMs3Data ms3EntityData = this.getCapability();
 			AttachedScript as = ms3EntityData.getBoundScript(new RunnableScript(scriptPath));
-			if(as == null) {
+			if (as == null) {
 				return null;
 			} else {
 				return as.getInstance();
 			}
 		}
-		
+
 		@PythonFunction
 		@PythonDocString("Removes a specific script that has been bound to this Entity.")
 		public void removeBoundScript(String scriptPath) {
 			IEntityMs3Data ms3EntityData = this.getCapability();
 			ms3EntityData.removeBoundScript(new RunnableScript(scriptPath));
 		}
-		
+
 		@PythonFunction
 		@PythonDocString("Removes all scripts that have been bound to this Entity.")
 		public void removeAllBoundScripts(String scriptPath) {
@@ -432,7 +428,7 @@ public class entity {
 			this.validatePropertyName(propertyName);
 
 			IEntityMs3Data ms3EntityData = this.getCapability();
-			
+
 			if (value == null) {
 				ms3EntityData.removeCustomProperty(propertyName);
 			} else {
@@ -1145,14 +1141,14 @@ public class entity {
 		}
 
 		// TODO method to get the variant and markings from the flag?
-		
+
 		@PythonFunction
 		@PythonDocString("Sets the horses armor stack.")
 		public void setArmorItemStack(itemStack stack) {
 			this.mcEntity.setHorseArmorStack(stack.getMcStack());
 
 		}
-		
+
 		// TODO get armor stack
 	}
 
@@ -1326,16 +1322,14 @@ public class entity {
 
 		@PythonFunction
 		@PythonDocString("Sets the art on the Painting to the passed name, or to " + Painting.KEBAB
-				+ " if the name is invalid.")
+				+ " if the name is invalid.  Due to a Minecraft Bug, the change will not be visible until after the chunk is reloaded.")
 		public void setArt(String artName) {
 			for (EntityPainting.EnumArt art : EntityPainting.EnumArt.values()) {
 				if (art.title.equals(artName)) {
 					this.mcEntity.art = art;
 				}
 			}
-			if (this.mcEntity.art == null) {
-				this.mcEntity.art = EntityPainting.EnumArt.KEBAB;
-			}
+			this.mcEntity.art = EntityPainting.EnumArt.KEBAB;
 		}
 	}
 
@@ -1371,7 +1365,6 @@ public class entity {
 			this.mcEntity.setVariant(variant);
 		}
 	}
-
 
 	@PythonClass
 	public class Pig extends Animal<EntityPig> {
@@ -1845,16 +1838,16 @@ public class entity {
 	public class Vindicator extends Living<EntityVindicator> {
 
 		private final String[] NAMES = new String[] { "johnny", "field_190643_b" };
-		
+
 		public Vindicator(EntityVindicator entity) {
 			super(entity);
 		}
-		
+
 		@PythonFunction
 		public void setJohnny(boolean flag) {
 			ReflectionHelper.setPrivateValue(EntityVindicator.class, this.mcEntity, flag, NAMES);
 		}
-		
+
 		@PythonFunction
 		public boolean getJohnny() {
 			return ReflectionHelper.getPrivateValue(EntityVindicator.class, this.mcEntity, NAMES);

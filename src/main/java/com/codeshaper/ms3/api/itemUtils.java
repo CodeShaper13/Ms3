@@ -39,7 +39,7 @@ public class itemUtils {
 
 	@PythonFunction
 	@PythonDocString("Converts a tuple like (item_name/item_id, [optional]amount, [optional]meta) into a net.minecraft.item.ItemStack")
-	public static ItemStack itemStackFromTuple(PyTuple tuple) {
+	public static ItemStack tupleToItemStack(PyTuple tuple) {
 		int i = tuple.size();
 
 		String id;

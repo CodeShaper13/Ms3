@@ -32,6 +32,9 @@ commands.script.helpTextHeader=Doc string:
 
 # /bindscript command:
 commands.bindScript.usage=/bindscript <add|remove|check|clear> [scriptName] [args...]
+commands.bindScript.usageCheck=/bindscript check [player]
+commands.bindScript.usageClear=/bindscript clear [player]
+
 commands.bindScript.useStickCheck=Use the stick on an Entity to check it's bound scripts
 commands.bindScript.useStickAdd=Script set, Use the stick on an Entity to bind this script to it
 commands.bindScript.useStickRemove=Use the stick on an Entity to remove this script from it.
