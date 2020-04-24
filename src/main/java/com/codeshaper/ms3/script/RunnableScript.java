@@ -1,11 +1,9 @@
 package com.codeshaper.ms3.script;
 
-import java.io.File;
 import java.util.Collections;
 
 import javax.annotation.Nullable;
 
-import org.apache.commons.io.FilenameUtils;
 import org.python.core.Py;
 import org.python.core.PyBoolean;
 import org.python.core.PyException;
@@ -18,14 +16,12 @@ import org.python.core.PyObject;
 import org.python.core.PySequenceList;
 import org.python.core.PyString;
 
-import com.codeshaper.ms3.Ms3;
-import com.codeshaper.ms3.api.exception;
 import com.codeshaper.ms3.api.executor;
+import com.codeshaper.ms3.exception.IllegalNBTFormattException;
 import com.codeshaper.ms3.exception.InvalidReturnedArgumentException;
 import com.codeshaper.ms3.interpreter.PyInterpreter;
 import com.codeshaper.ms3.util.MessageUtil;
 import com.codeshaper.ms3.util.NbtHelper;
-import com.codeshaper.ms3.util.Util;
 import com.codeshaper.ms3.util.textBuilder.TextBuilder;
 import com.codeshaper.ms3.util.textBuilder.TextBuilderTrans;
 
@@ -55,7 +51,8 @@ public class RunnableScript extends PythonScript {
 	 * @param pathToScript Path from the scripts folder to the file. If there is no
 	 *                     extension, .py is assumed.
 	 * @param args
-	 * @throws PyException If {@code args} contains an invalid data type.
+	 * @throws PyException If {@code args} contains an invalid data type. These are
+	 *                     any types that are no a str, bool, int or float.
 	 */
 	public RunnableScript(String pathToScript, @Nullable PyList args) throws PyException {
 		super(pathToScript);
@@ -85,13 +82,13 @@ public class RunnableScript extends PythonScript {
 
 		this.scriptArgs = new PyList();
 
-		Integer i = 0;
+		Integer index = 0;
 		NBTTagCompound compound = tag.getCompoundTag("args");
 		while (true) {
-			String key = i.toString();
+			String key = index.toString();
 			if (compound.hasKey(key)) {
-				this.scriptArgs.add(NbtHelper.nbtToObject(compound.getTag(key)));
-				i++;
+				this.scriptArgs.add(NbtHelper.readObjFromNbt(compound.getTag(key)));
+				index++;
 			} else {
 				break;
 			}
@@ -144,17 +141,17 @@ public class RunnableScript extends PythonScript {
 		return this.scriptArgs;
 	}
 
-	public NBTTagCompound writeToNbt() {
+	public NBTTagCompound writeToNbt() throws IllegalNBTFormattException {
 		NBTTagCompound tag = new NBTTagCompound();
 
 		tag.setString("path", this.scriptFile.getPath());
 
 		// Write args to NBT.
 		NBTTagCompound compound = new NBTTagCompound();
-		Integer i = 0;
+		Integer index = 0;
 		for (Object obj : this.scriptArgs) {
-			compound.setTag(i.toString(), NbtHelper.objToNbt(obj));
-			i++;
+			NbtHelper.writeObjToNbt(compound, index.toString(), obj);
+			index++;
 		}
 		tag.setTag("args", compound);
 
@@ -166,7 +163,8 @@ public class RunnableScript extends PythonScript {
 	 *
 	 * @param runnableScript
 	 * @param sender
-	 * @return False if no function can be found, thus it was not run.
+	 * @return {@code True} if the function wall called, {@code false} if no
+	 *         function can be found, thus it was not run.
 	 * @throws CommandException
 	 */
 	public boolean runExecuteFunction(PyInterpreter interpreter, ICommandSender sender) throws CommandException {
@@ -174,7 +172,12 @@ public class RunnableScript extends PythonScript {
 			interpreter.primeScript(this);
 
 			executor.Executor e = new executor.Executor(sender);
-			if (!interpreter.callFunction("execute", e.getSenderWorld(), e)) {
+
+			final String EXECUTE_FUNC_NAME = "execute";
+			if (interpreter.functionExists(EXECUTE_FUNC_NAME)) {
+				interpreter.callFunction(EXECUTE_FUNC_NAME, e.getSenderWorld(), e);
+				return true;
+			} else {
 				return false;
 			}
 		} catch (PyException e) {

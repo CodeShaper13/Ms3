@@ -25,23 +25,15 @@ public class EntityMs3Data implements IEntityMs3Data {
 	private AttachedScriptList attachedScripts = new AttachedScriptList();
 
 	private boolean clearMethodCall;
-	
+
 	public Entity e;
-	
+
 	public EntityMs3Data() {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	public EntityMs3Data(Entity entity) {
 		this.e = entity;
-	}
-
-	@Override
-	public boolean addBoundScript(entity.Base<? extends Entity> entity, String pathToScript, @Nullable PyList args)
-			throws PyException, MissingScriptException {
-		RunnableScript runnableScript = new RunnableScript(pathToScript, args);
-		// runnableScript.tryThrowMissingScript();
-		return this.addBoundScript(entity, runnableScript);
 	}
 
 	@Override
@@ -111,7 +103,7 @@ public class EntityMs3Data implements IEntityMs3Data {
 					instance.onSave();
 					break;
 				case ON_CLICK:
-					instance.onClick((entity.Player) entity.getWrapperClassForEntity((Entity) args[0]));
+					instance.onClick((entity.Player) entity.createWrapperClassForEntity((Entity) args[0]));
 					break;
 				}
 			}

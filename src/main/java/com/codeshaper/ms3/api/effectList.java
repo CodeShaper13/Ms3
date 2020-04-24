@@ -5,7 +5,7 @@ import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
 
 @PythonClass
-@PythonDocString("Constants for all the effect IDs.")
+@PythonDocString("Numerical constants for all the effect IDs.")
 public class effectList {
 
 	private effectList() {

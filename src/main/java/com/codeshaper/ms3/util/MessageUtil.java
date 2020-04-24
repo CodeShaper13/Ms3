@@ -62,15 +62,21 @@ public class MessageUtil {
 	}
 
 	/**
-	 * Sends a message to the passed sender, as long as sender is not null.
+	 * Sends a message to the passed sender.
 	 * 
-	 * @param sender
+	 * @param sender If null, nothing happens.
 	 * @param text
 	 */
 	public static void sendMessage(@Nullable ICommandSender sender, TextBuilder text) {
 		MessageUtil.sendMessage(sender, text.get());
 	}
 
+	/**
+	 * Sends a message to the passed sender.
+	 * 
+	 * @param sender If null, nothing happens.
+	 * @param text
+	 */
 	public static void sendMessage(@Nullable ICommandSender sender, ITextComponent text) {
 		if (sender != null) {
 			sender.sendMessage(text);

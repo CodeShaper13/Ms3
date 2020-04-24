@@ -24,9 +24,8 @@ import com.google.gson.stream.MalformedJsonException;
 public class UpdateChecker {
 
 	private URL versionJsonUrl;
-
-	public String updates = "";
-	public boolean outdated = false;
+	private String updates = "";
+	private boolean outdated = false;
 
 	/**
 	 * @param releaseFileUrl A URL that points to a json file containing a list of
@@ -43,9 +42,10 @@ public class UpdateChecker {
 	 * @param currentRelease
 	 * @return True if the release is outdates, false if it is up to date.
 	 */
-	public boolean isOutdated(Version currentVersion) throws MalformedJsonException {
+	public EnumCurrentStatus isOutdated(Version currentVersion) throws MalformedJsonException {
 		JsonParser parser = new JsonParser();
 
+		// Finds all of the releases from online.
 		List<Release> allReleases = new ArrayList<>();
 
 		try (BufferedReader br = new BufferedReader(
@@ -61,7 +61,7 @@ public class UpdateChecker {
 				String changelog = version.get("changelog").getAsString();
 				String download = version.get("download").getAsString();
 
-				// TODO fix
+				// TODO fix (with what?)
 				allReleases.add(new Release(new Version(ms3Version), new Version(minecraftVersion), changelog,
 						"http://www.google.com"));
 			}
@@ -70,15 +70,18 @@ public class UpdateChecker {
 		}
 
 		Release current = this.findNewest(allReleases);
-		if (currentVersion.compareTo(current.modVersion) == -1) {
-			return true; // Outdated.
+		if (current == null) {
+			return EnumCurrentStatus.UNKNOWN;
+		} else if (currentVersion.compareTo(current.modVersion) == -1) {
+			return EnumCurrentStatus.OUTDATED;
 		} else {
-			return false;
+			return EnumCurrentStatus.CURRENT;
 		}
 	}
 
 	/**
-	 * Returns the newest release in the list. Null if the list is empty.
+	 * Returns the newest release in the list of releases. Null is returned if the
+	 * list is empty.
 	 */
 	@Nullable
 	private static Release findNewest(List<Release> releases) {

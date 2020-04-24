@@ -74,13 +74,13 @@ public class BoundObject {
 	}
 
 	@PythonFunction
-	@PythonDocString("Calls self.entity.setProperty() and prefixs propertyName with the type name of this object.  This is the recomended way to set property values.")
+	@PythonDocString("Calls self.entity.setProperty() and prefixs the propertyName argument with the type name of this object.  This is the recomended way to set property values.")
 	protected void setProperty(String propertyName, @PythonTypeExclude Object value) {
 		this.entity.setProperty(this.getPrefix() + "." + propertyName, value);
 	}
 
 	@PythonFunction
-	@PythonDocString("Calls self.entity.getProperty() and prefixs propertyName with the type name of this object.  This is the recomended way to get property values.")
+	@PythonDocString("Calls self.entity.getProperty() and prefixs the propertyName argument with the type name of this object.  This is the recomended way to get property values.")
 	protected Object getProperty(String propertyName) {
 		return this.entity.getProperty(this.getPrefix() + "." + propertyName);
 	}
@@ -89,7 +89,7 @@ public class BoundObject {
 	 * Returns a prefix to use when reading and settings properties. This should be
 	 * the classes name.
 	 */
-	public final String getPrefix() {
+	private final String getPrefix() {
 		return this.scriptName;
 	}
 }

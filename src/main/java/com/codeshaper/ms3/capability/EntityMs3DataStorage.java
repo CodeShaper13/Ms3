@@ -4,9 +4,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.python.core.PyDictionary;
+import org.python.core.PyList;
+import org.python.core.PySequence;
+import org.python.core.PySequenceList;
+
 import com.codeshaper.ms3.EnumCallbackType;
 import com.codeshaper.ms3.api.entity;
+import com.codeshaper.ms3.exception.IllegalNBTFormattException;
 import com.codeshaper.ms3.script.RunnableScript;
+import com.codeshaper.ms3.util.NbtHelper;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTBase;
@@ -34,27 +41,21 @@ public class EntityMs3DataStorage implements IStorage<IEntityMs3Data> {
 		// Write the attached scripts to NBT.
 		NBTTagList nbtList = new NBTTagList();
 		for(AttachedScript as : instance.getScriptList()) {
-			nbtList.appendTag(as.getLocation().writeToNbt());
+			try { //TODO handle better.
+				nbtList.appendTag(as.getLocation().writeToNbt());
+			} catch (IllegalNBTFormattException e) {
+				e.printStackTrace();
+			}
 		}
 		tag.setTag("scriptList", nbtList);
 
 		// Write the properties to NBT.
 		NBTTagCompound nbtCompound = new NBTTagCompound();
-		for (Map.Entry<String, Object> entry : instance.getPropertyMap().entrySet()) {
-			String key = entry.getKey();
-			Object value = entry.getValue();
-			if (value instanceof String) {
-				nbtCompound.setString(key, (String) value);
-			} else if (value instanceof Integer) {
-				nbtCompound.setInteger(key, (int) value);
-			} else if (value instanceof Long) {
-				nbtCompound.setLong(key, (long) value);
-			} else if (value instanceof Double) {
-				nbtCompound.setDouble(key, (double) value);
-			} else if (value instanceof entity.Base) {
-				nbtCompound.setUniqueId(key, ((entity.Base<?>) value).mcEntity.getUniqueID());
-			} else {
-				throw new Error("Unknown type: " + value.getClass());
+		for (Map.Entry<String, Object> entry : instance.getPropertyMap().entrySet()) {			
+			try {
+				NbtHelper.writeObjToNbt(nbtCompound, entry.getKey(), entry.getValue());
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		tag.setTag("properties", nbtCompound);
@@ -70,7 +71,7 @@ public class EntityMs3DataStorage implements IStorage<IEntityMs3Data> {
 		NBTTagList nbtList = tag.getTagList("scriptList", 10);
 		AttachedScriptList list = instance.getScriptList();
 		for (int i = 0; i < nbtList.tagCount(); i++) {
-			list.add(entity.getWrapperClassForEntity(((EntityMs3Data)instance).e), new RunnableScript(nbtList.getCompoundTagAt(i)));
+			list.add(entity.createWrapperClassForEntity(((EntityMs3Data)instance).e), new RunnableScript(nbtList.getCompoundTagAt(i)));
 		}
 
 		// Read the properties.
@@ -91,7 +92,7 @@ public class EntityMs3DataStorage implements IStorage<IEntityMs3Data> {
 				value = ((NBTTagString) obj).getString();
 			} else if (nbtCompound.hasUniqueId(key)) {
 				Entity e = FMLCommonHandler.instance().getMinecraftServerInstance().getEntityFromUuid(nbtCompound.getUniqueId(key));
-				value = entity.getWrapperClassForEntity(e);
+				value = entity.createWrapperClassForEntity(e);
 			} else if(obj instanceof NBTTagDouble) {
 				value = ((NBTTagDouble) obj).getDouble();
 			} else {

@@ -82,14 +82,12 @@ public class executor {
 			Entity e = this.sender.getCommandSenderEntity();
 			
 			if(e != null) {
-				return entity.getWrapperClassForEntity(e);
+				return entity.createWrapperClassForEntity(e);
 			} else {
 				return null;
 			}
 		}
 
-		//@PythonFunction
-		//@PythonDocString("Returns the internal instance of net.minecraft.command.ICommandSender.  For advenced users only!")
 		public ICommandSender getSenderObj() {
 			return this.sender;
 		}

@@ -90,9 +90,16 @@ public class CommandScript extends CommandBase {
 				if (!rs.exists()) {
 					throw new CommandException("commands.scriptNotFound", scriptName);
 				}
-				if (!rs.runExecuteFunction(Ms3.getDefaultInterpreter(), sender)) {
+				boolean funcRun = rs.runExecuteFunction(Ms3.getDefaultInterpreter(), sender);
+				if (!funcRun) {
 					throw new CommandException("commands.script.noExecuteFunction");
 				}
+			} else if(args[0].equals("bind")) {
+				/*
+				 * Binds a script to the script binder tool.
+				 */
+				
+				//TODO
 			} else if (args[0].equals("new")) {
 				/*
 				 * Creates a new script file and fills it with the default contents.
@@ -194,7 +201,7 @@ public class CommandScript extends CommandBase {
 							capData.removeBoundScript(rs);
 
 							// Add a new instance of the script to the entity.
-							capData.addBoundScript(entity.getWrapperClassForEntity(e), rs);
+							capData.addBoundScript(entity.createWrapperClassForEntity(e), rs);
 
 							// Have the script read it's properties
 							capData.getBoundScript(rs).getInstance().onLoad();
@@ -214,26 +221,29 @@ public class CommandScript extends CommandBase {
 			@Nullable BlockPos pos) {
 		if (args.length == 1) {
 			String[] array = this.ranByHostPlayer(sender)
-					? new String[] { "run", "edit", "new", "about", "openLocation", "help", "reload" }
-					: new String[] { "run", "about", "help" };
+					? new String[] { "run", "bind", "edit", "new", "about", "openLocation", "help", "reload" }
+					: new String[] { "run", "bind", "about", "help" };
 			return CommandBase.getListOfStringsMatchingLastWord(args, array);
 		} else if (args.length == 2 && !args[0].equals("new")) {
+			// Propose a script name for the auto complete.
 			return CommandBase.getListOfStringsMatchingLastWord(args, this.getAllScripts());
+//		} else if(args.length == 3 && args[0].equals("bind")) {
+//			
 		} else if (args.length >= 3 && args[0].equals("run")) {
+			// Try to hind arguments that the script offers from its getArgs() function.
 			String scriptName = args[1];
 			File scriptFile = new File(Ms3.dirManager.getScriptFolder(), scriptName);
 
+			// Warn the user if they are trying to get hints for a script that doesn't exist.
 			if (!scriptFile.exists()) {
-				CommandBase.notifyCommandListener(sender, this, "commands.scriptNotFound", scriptName);
+				CommandBase.notifyCommandListener(sender, this, "commands.script.noScriNothingToHint", scriptName);
 			}
-
-			PyInterpreter interpreter = Ms3.getDefaultInterpreter();
 
 			try {
 				RunnableScript rs = new RunnableScript(scriptName,
 						args.length > 2 ? Arrays.copyOfRange(args, 2, args.length) : null);
 				if (rs.exists()) {
-					String[] result = rs.runGetArgsFunction(interpreter, sender);
+					String[] result = rs.runGetArgsFunction(Ms3.getDefaultInterpreter(), sender);
 					if (result != null) {
 						return CommandBase.getListOfStringsMatchingLastWord(args, result);
 					}

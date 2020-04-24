@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
@@ -14,18 +15,35 @@ import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.python.core.PyTuple;
 
+import com.codeshaper.ms3.api.tileEntity.Beacon;
+import com.codeshaper.ms3.api.tileEntity.Bed;
+import com.codeshaper.ms3.api.tileEntity.BrewingStand;
+import com.codeshaper.ms3.api.tileEntity.CommandBlock;
+import com.codeshaper.ms3.api.tileEntity.FlowerPot;
+import com.codeshaper.ms3.api.tileEntity.Furnace;
+import com.codeshaper.ms3.api.tileEntity.Hopper;
+import com.codeshaper.ms3.api.tileEntity.Lockable;
+import com.codeshaper.ms3.api.tileEntity.LockableLoot;
+import com.codeshaper.ms3.api.tileEntity.NoteBlock;
+import com.codeshaper.ms3.api.tileEntity.Sign;
+import com.codeshaper.ms3.api.tileEntity.Skull;
+import com.codeshaper.ms3.api.tileEntity.Spawner;
+import com.codeshaper.ms3.api.tileEntity.TileEntityBase;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeExclude;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
+import com.codeshaper.ms3.util.Assert;
 import com.codeshaper.ms3.util.NbtHelper;
+import com.codeshaper.ms3.util.Util;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTException;
@@ -57,10 +75,44 @@ public class tileEntity {
 
 	public static final tileEntity instance = new tileEntity();
 
+	public static tileEntity.TileEntityBase<? extends TileEntity> getWrapperClassForTileEntity(@Nonnull TileEntity te) {
+		// Specific types:
+		if (te instanceof TileEntityBeacon) {
+			return tileEntity.instance.new Beacon((TileEntityBeacon) te);
+		} else if (te instanceof TileEntityBed) {
+			return tileEntity.instance.new Bed((TileEntityBed) te);
+		} else if (te instanceof TileEntityBrewingStand) {
+			return tileEntity.instance.new BrewingStand((TileEntityBrewingStand) te);
+		} else if (te instanceof TileEntityCommandBlock) {
+			return tileEntity.instance.new CommandBlock((TileEntityCommandBlock) te);
+		} else if (te instanceof TileEntityFlowerPot) {
+			return tileEntity.instance.new FlowerPot((TileEntityFlowerPot) te);
+		} else if (te instanceof TileEntityFurnace) {
+			return tileEntity.instance.new Furnace((TileEntityFurnace) te);
+		} else if (te instanceof TileEntityHopper) {
+			return tileEntity.instance.new Hopper((TileEntityHopper) te);
+		} else if (te instanceof TileEntityMobSpawner) {
+			return tileEntity.instance.new Spawner((TileEntityMobSpawner) te);
+		} else if (te instanceof TileEntityNote) {
+			return tileEntity.instance.new NoteBlock((TileEntityNote) te);
+		} else if (te instanceof TileEntitySign) {
+			return tileEntity.instance.new Sign((TileEntitySign) te);
+		} else if (te instanceof TileEntitySkull) {
+			return tileEntity.instance.new Skull((TileEntitySkull) te);
+		}
+
+		// More generic type:
+		else if (te instanceof TileEntityLockableLoot) {
+			return tileEntity.instance.new LockableLoot<TileEntityLockableLoot>((TileEntityLockableLoot) te);
+		} else if (te instanceof TileEntityLockable) {
+			return tileEntity.instance.new Lockable<TileEntityLockable>((TileEntityLockable) te);
+		} else {
+			return tileEntity.instance.new TileEntityBase<TileEntity>(te);
+		}
+	}
+	
 	@PythonClass
 	public class TileEntityBase<T extends TileEntity> extends PyObject {
-
-		private static final long serialVersionUID = -4299819910380054469L;
 
 		public T mcTileEntity;
 
@@ -87,12 +139,17 @@ public class tileEntity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the TileEntity's position as a tuple of (x, y, z).")
+		public PyTuple getPosition() {
+			return Util.makeTuple(this.getX(), this.getY(), this.getZ());
+		}
+
+		@PythonFunction
 		@PythonDocString("Returns the value of an nbt tag.  If the tag can't be found, None is returned.")
 		@Nullable
 		public Object getTag(String tagKey) {
-			NBTTagCompound nbttagcompound = this.mcTileEntity.writeToNBT(new NBTTagCompound());
-			NBTBase tag = nbttagcompound.getTag(tagKey);
-			return NbtHelper.nbtToObject(tag);
+			NBTTagCompound compound = this.mcTileEntity.writeToNBT(new NBTTagCompound());
+			return NbtHelper.readObjFromNbt(compound.getTag(tagKey));
 		}
 
 		@PythonFunction
@@ -134,23 +191,21 @@ public class tileEntity {
 	@PythonClass
 	public class Lockable<T extends TileEntityLockable & IInventory> extends TileEntityBase<T> {
 
-		private static final long serialVersionUID = 7494001262819308455L;
-
 		public Lockable(T tileEntity) {
 			super(tileEntity);
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns an empty string if there is no lock code.")
+		@PythonDocString("Returns the Lock Code for the TimeEntity.  An empty string is returned if there is no lock code.")
 		public PyString getLockCode() {
 			return new PyString(this.mcTileEntity.getLockCode().getLock());
 		}
 
 		@PythonFunction
-		@PythonDocString("Pass an empty string to remove the lock.")
+		@PythonDocString("Sets the Lock Code.  Pass None to remove the lock.")
 		public void setLockCode(String lock) {
 			if (lock == null) {
-				throw Py.ValueError("lock may not be None!");
+				lock = "";
 			}
 			this.mcTileEntity.setLockCode(new LockCode(lock));
 		}
@@ -162,7 +217,7 @@ public class tileEntity {
 			if (slot < 0 || slot > (i - 1)) {
 				throw Py.ValueError("Index must be between 0 and " + (i - 1));
 			}
-			return new itemStack(this.mcTileEntity.getStackInSlot(slot));
+			return itemStack.makeWrapper(this.mcTileEntity.getStackInSlot(slot));
 		}
 
 		@PythonFunction
@@ -319,12 +374,8 @@ public class tileEntity {
 		@PythonDocString("Returns the Pot's contents as an itemStack, or None if it is empty.")
 		@Nullable
 		public itemStack getPotContents() {
-			Item item = this.mcTileEntity.getFlowerPotItem();
-			if (item == null) {
-				return null;
-			} else {
-				return new itemStack(item, this.mcTileEntity.getFlowerPotData());
-			}
+			return itemStack.makeWrapper(
+					new ItemStack(this.mcTileEntity.getFlowerPotItem(), 1, this.mcTileEntity.getFlowerPotData()));
 		}
 
 		@PythonFunction
@@ -474,8 +525,8 @@ public class tileEntity {
 			}
 			byte oldNote = this.mcTileEntity.note;
 			this.mcTileEntity.note = (byte) note;
-			
-			// Call the Forge enent.
+
+			// Call the Forge event.
 			net.minecraftforge.common.ForgeHooks.onNoteChange(this.mcTileEntity, oldNote);
 		}
 	}
@@ -602,6 +653,7 @@ public class tileEntity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the skulls type as an int.")
 		public int getSkullType() {
 			return this.mcTileEntity.getSkullType();
 		}
@@ -610,11 +662,11 @@ public class tileEntity {
 		@PythonDocString("Takes an integer ID for skull type, or a player's name to represent.")
 		public void setSkullType(@PythonTypeExclude Object type) {
 			if (type instanceof String) {
-				String s = ((String)type);
-				if(StringUtils.isBlank(s)) {
+				String s = ((String) type);
+				if (StringUtils.isBlank(s)) {
 					throw Py.ValueError("type can not be empty or only whitespaces");
 				} else {
-					this.mcTileEntity.setPlayerProfile(new GameProfile((UUID) null, (String) type));					
+					this.mcTileEntity.setPlayerProfile(new GameProfile((UUID) null, (String) type));
 				}
 			} else if (type instanceof Integer) {
 				this.mcTileEntity.setType((int) type);

@@ -79,7 +79,7 @@ public class world {
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns a tuple of (blockName, meta).")
+		@PythonDocString("Returns a tuple of (blockName as a string, meta as an int).")
 		public PyTuple getBlockState(int x, int y, int z) {
 			BlockPos pos = new BlockPos(x, y, z);
 
@@ -94,7 +94,7 @@ public class world {
 		@PythonFunction
 		@PythonDocString("Sets a columns biomes.  See biomeList.py for biome id constants.")
 		public void setBiome(int biomeId, int x, int z) {
-			if (biomeId < 0 || biomeId > 255) { // TODO does forge remove or change the cap?
+			if (biomeId < 0 || biomeId > 255) { // TODO does Forge remove or change the cap?
 				throw Py.ValueError("biomeId can't be less than 0 or greater than 255.");
 			}
 			BlockPos pos = new BlockPos(x, 0, z);
@@ -122,7 +122,7 @@ public class world {
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the ID of the Biome at x, z.")
+		@PythonDocString("Returns the ID of the Biome at x and z as an int")
 		public int getBiome(int x, int z) {
 			BlockPos pos = new BlockPos(x, 0, z);
 
@@ -132,7 +132,7 @@ public class world {
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the light level at x, y, z.")
+		@PythonDocString("Returns the light level at x, y, z as an int.")
 		public int getLight(int x, int y, int z) {
 			BlockPos pos = new BlockPos(x, y, z);
 
@@ -142,29 +142,18 @@ public class world {
 		}
 
 		@PythonFunction
-		@PythonDocString("Spawns an Entity into the World and returns it.  Entity can be an instance of net.minecraft.entity.Entity, PyEntity or it's string name.")
-		public entity.Base<? extends Entity> spawnEntity(@PythonTypeExclude @Nonnull Object entityIdentifier, float x, float y, float z, String nbt) {
-			// Get a string identifier for the entity from the passed argument.
-			String entityStringName = null;
-			if (entityIdentifier instanceof Entity) {
-				entityStringName = this.entityToStringName((Entity) entityIdentifier);
-			} else if (entityIdentifier instanceof String) {
-				entityStringName = (String) entityIdentifier;
-			} else if (entityIdentifier instanceof entity.Base) {
-				entityStringName = this.entityToStringName(((entity.Base<?>) entityIdentifier).mcEntity);
-			}
-
-			BlockPos pos = new BlockPos(x, y, z);
-
-			this.tryThrowNotLoaded(pos, "Could not summon Entity!");
+		@PythonDocString("Spawns an Entity into the World and returns it.  nbtString can be None.")
+		public entity.Base<? extends Entity> spawnEntity(String entityIdentifier, float x, float y, float z, String nbtString) {
+			// Make sure the position is loaded.
+			this.tryThrowNotLoaded(new BlockPos(x, y, z), "Can't spawn Entity, position not loaded");
 
 			NBTTagCompound nbttagcompound = new NBTTagCompound();
-			boolean flag = false;
+			boolean hasNbtData = false;
 
-			if (!StringUtils.isNullOrEmpty(nbt)) { //args.length >= 5) {
+			if (!StringUtils.isNullOrEmpty(nbtString)) {
 				try {
-					nbttagcompound = JsonToNBT.getTagFromJson(nbt);
-					flag = true;
+					nbttagcompound = JsonToNBT.getTagFromJson(nbtString);
+					hasNbtData = true;
 				} catch (NBTException nbtexception) {
 					throw Py.ValueError(nbtexception.getMessage());
 				}
@@ -172,7 +161,7 @@ public class world {
 
 			// Hacky fix to stop items from being killed instantly because the stack field
 			// is null.
-			if (entityStringName.equals(entityList.ITEM) && flag == false) {
+			if (entityIdentifier.equals(entityList.ITEM) && hasNbtData == false) {
 				try {
 					nbttagcompound = JsonToNBT.getTagFromJson("{Item:{id:stone,Count:1,Damage:0}}");
 				} catch (NBTException e) {
@@ -180,31 +169,34 @@ public class world {
 				}
 			}
 
-			nbttagcompound.setString("id", entityStringName);
+			nbttagcompound.setString("id", entityIdentifier);
 			Entity javaEntity = AnvilChunkLoader.readWorldEntityPos(nbttagcompound, this.worldObj, x, y, z, true);
 
 			if (javaEntity == null) {
-				throw new PyException(new PyString("Could not summon Entity! (The identifier " + entityStringName + " was invalid!)"));
+				throw new PyException(new PyString("Could not summon Entity, the identifier " + entityIdentifier + " was invalid"));
 			} else {
 				javaEntity.setLocationAndAngles(x, y, z, javaEntity.rotationYaw, javaEntity.rotationPitch);
 
-				if (!flag && javaEntity instanceof EntityLiving) {
+				if (!hasNbtData && javaEntity instanceof EntityLiving) {
 					((EntityLiving) javaEntity).onInitialSpawn(
 							this.worldObj.getDifficultyForLocation(new BlockPos(javaEntity)), (IEntityLivingData) null);
 				}
 
-				return entity.getWrapperClassForEntity(javaEntity);
+				return entity.createWrapperClassForEntity(javaEntity);
 			}
 		}
 
 		@PythonFunction
 		@PythonDocString("Kills the passed Entity.")
 		public void killEntity(@Nonnull entity.Base<Entity> entity) {
+			if(entity == null) {
+				throw Py.ValueError("Can not pass None");
+			}
 			entity.mcEntity.onKillCommand();
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the closest Entity of type entityFilterName to (x, y, z) within the radius, or None if none are found.  Pass None for all entity types.")
+		@PythonDocString("Returns the closest Entity of type entityFilterName to (x, y, z) within the radius.  None is returned if no Entities that match can be found.  Pass None for all entity types.")
 		@Nullable
 		public entity.Base<? extends Entity> getClosestEntity(double x, double y, double z, float maxRadius,
 				@Nullable String entityFilterName) {			
@@ -224,12 +216,12 @@ public class world {
 			if (closestEntity == null) {
 				return null;
 			} else {
-				return entity.getWrapperClassForEntity(closestEntity);
+				return entity.createWrapperClassForEntity(closestEntity);
 			}
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns a list of all the Entities within the passes radius around (x, y, z) as a list.  Pass None for all entity types.")
+		@PythonDocString("Returns a list of all the Entities within the passed coordinates.  Pass None for all entity types.")
 		public PyList getAllEntites(float x1, float y1, float z1, float x2, float y2, float z2,
 				@Nullable String entityFilterName) {
 			List<Entity> list = this.worldObj.getEntitiesWithinAABB(Entity.class,
@@ -237,38 +229,39 @@ public class world {
 
 			PyList returnList = new PyList();
 			for (Entity temp : list) {
-
 				if (this.checkEntityType(temp, entityFilterName)) {
-					returnList.add(entity.getWrapperClassForEntity(temp));
+					returnList.add(entity.createWrapperClassForEntity(temp));
 				}
 			}
 			return returnList;
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the passed tileEntity at x, y, z, or None if there isn't any.")
+		@PythonDocString("Returns the passed tileEntity at x, y, z, or None if there isn't a tileEntity there.")
 		@Nullable
 		public tileEntity.TileEntityBase<? extends TileEntity> getTileEntity(int x, int y, int z) {
 			TileEntity te = this.worldObj.getTileEntity(new BlockPos(x, y, z));
 			if (te == null) {
 				return null;
 			} else {
-				return this.getWrapperClassForTileEntity(te);
+				return tileEntity.getWrapperClassForTileEntity(te);
 			}
 		}
 
 		@PythonFunction
+		@PythonDocString("Spawns a particle effect.  See particleType.py for a list of types.")
 		public void spawnParticle(String particleType, double x, double y, double z) {
 			this.spawnParticle(particleType, x, y, z, 1, 0, 0, 0, 0, 0);
 		}
 
 		@PythonFunction
+		@PythonDocString("Spawns a particle effect.  See particleType.py for a list of types.")
 		public void spawnParticle(String particleType, double x, double y, double z, int count) {
 			this.spawnParticle(particleType, x, y, z, count, 0, 0, 0, 0, 0);
 		}
 
 		@PythonFunction
-		@PythonDocString("Summons a particle effect")
+		@PythonDocString("Spawns a particle effect.  See particleType.py for a list of types.")
 		public void spawnParticle(String particleType, double x, double y, double z, int count, double areaSizeX,
 				double areaSizeY, double areaSizeZ, double speed, @Nullable int params) {
 
@@ -283,19 +276,19 @@ public class world {
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the World's dimension id.  0 for the Overworld, -1 for the Nether and 1 for the End.  Other values may be returned for custom dimensions.")
+		@PythonDocString("Returns this World's dimension id.  0 for the Overworld, -1 for the Nether and 1 for the End.  Other values may be returned for custom dimensions.")
 		public int getDimensionId() {
 			return this.worldObj.provider.getDimension();
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the world time.")
+		@PythonDocString("Returns the world time as an int.")
 		public long getWorldTime() {
 			return this.worldObj.getWorldTime();
 		}
 
 		@PythonFunction
-		@PythonDocString("Plays a sound.  categoryName if for what volume setting should be used.  See soundCategory.py for a list of sound categories.")
+		@PythonDocString("Plays a sound.  categoryName is for what volume setting should be used.  See soundCategory.py for a list of sound categories.")
 		public void playSound(String soundName, String categoryName, double x, double y, double z, float volume,
 				float pitch) {
 
@@ -309,48 +302,6 @@ public class world {
 			}
 
 			this.worldObj.playSound(null, x, y, z, soundEvent, category, volume, pitch);
-		}
-
-		private tileEntity.TileEntityBase<? extends TileEntity> getWrapperClassForTileEntity(@Nonnull TileEntity te) {
-			// Specific types:
-			if (te instanceof TileEntityBeacon) {
-				return tileEntity.instance.new Beacon((TileEntityBeacon) te);
-			} else if (te instanceof TileEntityBed) {
-				return tileEntity.instance.new Bed((TileEntityBed) te);
-			} else if (te instanceof TileEntityBrewingStand) {
-				return tileEntity.instance.new BrewingStand((TileEntityBrewingStand) te);
-			} else if (te instanceof TileEntityCommandBlock) {
-				return tileEntity.instance.new CommandBlock((TileEntityCommandBlock) te);
-			} else if (te instanceof TileEntityFlowerPot) {
-				return tileEntity.instance.new FlowerPot((TileEntityFlowerPot) te);
-			} else if (te instanceof TileEntityFurnace) {
-				return tileEntity.instance.new Furnace((TileEntityFurnace) te);
-			} else if (te instanceof TileEntityHopper) {
-				return tileEntity.instance.new Hopper((TileEntityHopper) te);
-			} else if (te instanceof TileEntityMobSpawner) {
-				return tileEntity.instance.new Spawner((TileEntityMobSpawner) te);
-			} else if (te instanceof TileEntityNote) {
-				return tileEntity.instance.new NoteBlock((TileEntityNote) te);
-			} else if (te instanceof TileEntitySign) {
-				return tileEntity.instance.new Sign((TileEntitySign) te);
-			} else if (te instanceof TileEntitySkull) {
-				return tileEntity.instance.new Skull((TileEntitySkull) te);
-			}
-
-			// More generic type:
-			else if (te instanceof TileEntityLockableLoot) {
-				return tileEntity.instance.new LockableLoot<TileEntityLockableLoot>((TileEntityLockableLoot) te);
-			} else if (te instanceof TileEntityLockable) {
-				return tileEntity.instance.new Lockable<TileEntityLockable>((TileEntityLockable) te);
-			} else {
-				return tileEntity.instance.new TileEntityBase<TileEntity>(te);
-			}
-		}
-
-
-		private String entityToStringName(Entity entity) {
-			ResourceLocation resourcelocation = EntityList.getKey(entity);
-			return (resourcelocation == null ? null : resourcelocation.toString());
 		}
 
 		/**

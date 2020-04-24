@@ -13,8 +13,8 @@ import org.python.core.PyString;
 import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.api.exception.MissingScriptException;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeExclude;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
+import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeExclude;
 import com.codeshaper.ms3.script.ScheduledScript;
 
 import net.minecraft.entity.Entity;
@@ -26,7 +26,8 @@ public class util {
 	/** Static list of all the scheduled scripts. */
 	public static final List<ScheduledScript> scheduledScripts = new ArrayList<>();
 
-	private util() { }
+	private util() {
+	}
 
 	@PythonFunction
 	@PythonDocString("Returns the Ms3 version as a string.")
@@ -59,13 +60,14 @@ public class util {
 
 		util.scheduledScripts.add(scheduledScript);
 	}
-	
+
 	/**
 	 * Checks if the RunnableScript refers to an actual file and is of type .py.
 	 * 
-	 * @throws exception.MissingScriptException
-	 *             If the script can't be found in the event of the file being
-	 *             moved/deleted or if the file is not in a valid format.
+	 * @throws exception.MissingScriptException If the script can't be found in the
+	 *                                          event of the file being
+	 *                                          moved/deleted or if the file is not
+	 *                                          in a valid format.
 	 */
 	private static void tryThrowMissingScript(ScheduledScript scheduledScript) throws exception.MissingScriptException {
 		if (!scheduledScript.exists()) {
@@ -81,11 +83,12 @@ public class util {
 		}
 	}
 
-	@PythonFunction
-	@PythonDocString("Checks if a variable is defined in the global scope.")
-	public static boolean isDefined(String variableName) {
-		return Ms3.getDefaultInterpreter().exists(variableName);
-	}
+	// Whats the point of this?
+//	@PythonFunction
+//	@PythonDocString("Checks if a variable is defined in the global scope.")
+//	public static boolean isDefined(String variableName) {
+//		return Ms3.getDefaultInterpreter().exists(variableName);
+//	}
 
 	@PythonFunction
 	@PythonDocString("Prints text directly to the console.")
@@ -100,7 +103,7 @@ public class util {
 	}
 
 	@PythonFunction
-	@PythonDocString("Executes a Minecraft command.  args is an array of strings or it can be None.")
+	@PythonDocString("Executes a Minecraft command.  args is an array of command arguments as strings or None can be passed for no arguments.")
 	public static void executeMcCommand(String commandName, executor.Executor executor, @Nullable String[] args) {
 		if (StringUtils.isBlank(commandName)) {
 			throw Py.ValueError("commandName may not be None or only whitespaces");
@@ -119,7 +122,7 @@ public class util {
 		FMLCommonHandler.instance().getMinecraftServerInstance().commandManager.executeCommand(executor.getSenderObj(),
 				commandName + sb.toString());
 	}
-	
+
 	@PythonFunction
 	@PythonDocString("Returns the path of the script data folder as a string.")
 	public static String getScriptDataFolder() {

@@ -13,6 +13,7 @@ public class nbt {
 	@PythonClass
 	public class NbtCompound extends PyObject {
 		
+		/** The internal NBTTagCompound object. */
 		private NBTTagCompound compound;
 		
 		public NbtCompound(NBTTagCompound compound) {
@@ -29,7 +30,14 @@ public class nbt {
 			this.compound.removeTag(key);
 		}
 		
+		@PythonFunction
+		public boolean hasTag(String key) {
+			return this.compound.hasKey(key);
+		}
 		
+		/////////////////
+		//   Setters   //
+		/////////////////
 		@PythonFunction
 		public void setByte(String key, byte value) {
 			this.compound.setByte(key, value);
@@ -55,7 +63,9 @@ public class nbt {
 			this.compound.setTag(key, value.compound);
 		}
 		
-		
+		/////////////////
+		//   Getters   //
+		/////////////////
 		@PythonFunction
 		public byte getByte(String key) {
 			return this.compound.getByte(key);

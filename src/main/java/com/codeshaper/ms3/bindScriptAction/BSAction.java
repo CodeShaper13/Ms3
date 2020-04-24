@@ -1,11 +1,10 @@
 package com.codeshaper.ms3.bindScriptAction;
 
 /**
- * 
- * 
  * @author CodeShaper
  */
 public enum BSAction {
+	
 	ADD(0),
 	REMOVE(1),
 	CHECK(2),

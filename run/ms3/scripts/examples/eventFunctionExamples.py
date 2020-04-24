@@ -1,4 +1,3 @@
-# Doc string is used to provide a help message for the script when /script help <name>.
 """ This script contains trace statements for all of the event functions used by Ms3."""
 
 # Import the api

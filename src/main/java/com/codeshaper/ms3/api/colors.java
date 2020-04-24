@@ -1,17 +1,14 @@
 package com.codeshaper.ms3.api;
 
 import org.python.core.PyList;
-import org.python.core.PyTuple;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonField;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
-import com.codeshaper.ms3.util.Util;
 
 @PythonClass
-@PythonDocString("Constants for the different colors in Minecraft.  The 16 colors in Minecraft are mapped to numeric ids in two different ways, depending on the situation.  Colored blocks, nbt tags dealing with color and most situations have the first color, white, mapped to 0, and the last color black, as 15.  Dye items meta dat is reversed, with black having a meta of 0, and white having a meta of 15.")
+@PythonDocString("Constants for the different color ids in Minecraft.  The 16 colors in Minecraft are mapped to numeric ids in two different ways, depending on the situation.  Colored blocks, nbt tags dealing with color and most situations have the first color, white, mapped to 0, and the last color black, as 15.  Dye items meta data is reversed, with black having a meta of 0, and white having a meta of 15.")
 public class colors {
 
 	private colors() {

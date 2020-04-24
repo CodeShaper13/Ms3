@@ -1,7 +1,11 @@
 """
 Spawns a Zombie Meat Trader that will trade meat for gold nuggets.
 
-Pass in three coordinates as arguments to spawn the Trader in a specific spot.
+Script Usage:
+    /script run examples/meatTrader.py [x] [y] [z]
+    
+    This will spawn a meat trader.  If the position is not passed,
+    the position of the command executor will be used.
 """
 
 import sys
@@ -83,7 +87,7 @@ class MeatTrader(ms3.BoundObject):
         
         # Set the entity to hold the item they want.
         zombie = self.getEntity()
-        zombie.setSlotContents(ms3.equipmentSlot.MAINHAND, ms3.itemStack(self.itemWanted))
+        zombie.setSlotContents(ms3.equipmentSlot.MAIN_HAND, ms3.itemStack(self.itemWanted))
         
 
 def execute(world, sender):

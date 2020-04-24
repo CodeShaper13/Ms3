@@ -22,6 +22,7 @@ import com.codeshaper.ms3.gui.GuiWarning;
 import com.codeshaper.ms3.interpreter.PyInterpreter;
 import com.codeshaper.ms3.script.RunnableScript;
 import com.codeshaper.ms3.script.ScheduledScript;
+import com.codeshaper.ms3.update.EnumCurrentStatus;
 import com.codeshaper.ms3.update.UpdateChecker;
 import com.codeshaper.ms3.update.Version;
 import com.codeshaper.ms3.util.Logger;
@@ -119,7 +120,8 @@ public class EventHandler {
 				mc.displayGuiScreen(new GuiWarning(event.getGui()));
 			} else if (!this.flag) {
 				try {
-					if (Ms3.updateChecker.isOutdated(new Version(Ms3.MOD_VERSION))) {
+					EnumCurrentStatus status = Ms3.updateChecker.isOutdated(new Version(Ms3.MOD_VERSION));
+					if (status == EnumCurrentStatus.OUTDATED) {
 						this.flag = true;
 						mc.displayGuiScreen(new GuiUpdate(event.getGui()));
 					}
@@ -249,7 +251,7 @@ public class EventHandler {
 		} else {
 			// Try to bind the script.
 			PyInterpreter interpreter = Ms3.getDefaultInterpreter();
-			ms3EntityData.addBoundScript(entity.getWrapperClassForEntity(clickedEntity), runnableScript);
+			ms3EntityData.addBoundScript(entity.createWrapperClassForEntity(clickedEntity), runnableScript);
 
 			/*
 			 * boolean flag = interpreter.runOnBind(runnableScript, player, clickedEntity);

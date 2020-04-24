@@ -19,8 +19,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 
+/**
+ * Event handler for the events related to drawing lines and graphics onto the
+ * screen.
+ * 
+ * @author CodeShaper
+ */
 public class EventHandlerDrawing {
 
+	/** Singleton for this Event Handler. */
 	private static EventHandlerDrawing instance;
 
 	private CopyOnWriteArrayList<DrawInstructions> instructions;
@@ -61,7 +68,7 @@ public class EventHandlerDrawing {
 			Iterator<DrawInstructions> iterator = this.instructions.iterator();
 			while (iterator.hasNext()) {
 				DrawInstructions instructions = iterator.next();
-			
+
 				GL11.glPushMatrix();
 				GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
 

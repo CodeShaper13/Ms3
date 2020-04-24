@@ -57,7 +57,7 @@ public abstract class ClassGeneratorBase {
 			}
 
 			br.write("@PythonClass\n");
-			br.write("@PythonDocString(\"A list of all the vanilla " + upperName + " names.\")\n");
+			br.write("@PythonDocString(\"String constants of all the " + upperName + " names.\")\n");
 			br.write("public class " + className + " {\n");
 			br.write("\n");
 			br.write("    private static PyList names = new PyList();\n");

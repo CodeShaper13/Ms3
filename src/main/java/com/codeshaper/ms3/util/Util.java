@@ -50,12 +50,15 @@ public class Util {
 	 *         not.
 	 */
 	public static boolean validEntityForMs3Data(Entity entity) {
-		return true; // !(entity instanceof EntityPlayer);
+		return true;
 	}
-
+	
 	/**
 	 * Takes in a String with an ampersands {&) for color codes and replaces each
 	 * occurrence with a {@link SECTION_SIGN}.
+	 * 
+	 * @param string The string to correct.
+	 * @return The corrected string.
 	 */
 	public static String correctColorCode(String string) {
 		return string.replace('&', SECTION_SIGN);
@@ -82,7 +85,7 @@ public class Util {
 
 	/**
 	 * Creates a {@link PyTuple} from the passed objects. Objects passed will be
-	 * converted to a Python time by {@link Util#primitiveToPyObject(Object)}.
+	 * converted to a Python type using {@link Util#primitiveToPyObject(Object)}.
 	 * 
 	 * @param obj
 	 * @return
@@ -91,92 +94,9 @@ public class Util {
 		int j = obj.length;
 		PyObject[] array = new PyObject[j];
 		for (int i = 0; i < j; i++) {
-			array[i] = Util.primitiveToPyObject(obj[i]);
+			array[i] = Parser.primitiveToPyObject(obj[i]);
 		}
 		return new PyTuple(array);
-	}
-
-	/**
-	 * Converts a primitive type to a Python type. If null is passed {@link Py.None}
-	 * is returned.
-	 * 
-	 * @param obj Primitive type or null.
-	 * @return The object as a Python type.
-	 * @throws IllegalArgumentException If the passed object is not a primitive type.
-	 */
-	public static PyObject primitiveToPyObject(@Nullable Object obj) throws IllegalArgumentException {
-		if (obj == null) {
-			return Py.None;
-		} else if (obj instanceof String) {
-			return new PyString(((String) obj));
-		} else if (obj instanceof Character) {
-			return new PyString(((Character) obj));
-		} else if (obj instanceof Integer || obj instanceof Short || obj instanceof Byte) {
-			return new PyInteger(((Integer) obj));
-		} else if (obj instanceof Long) {
-			return new PyLong(((Long) obj));
-		} else if (obj instanceof Float) {
-			return new PyFloat(((float) obj));
-		} else if (obj instanceof Double) {
-			return new PyFloat(((Double) obj).floatValue());
-		} else if (obj instanceof Boolean) {
-			return ((Boolean) obj) ? Py.True : Py.False;
-		} else {
-			throw new IllegalArgumentException(
-					"Parameter was of type " + obj.getClass().toString() + "!  It must be a primitive type or null");
-		}
-	}
-
-	/**
-	 * Takes in a {@link String} and returns it as a {@link PyObject}.
-	 * 
-	 * <li>"true" and "True" becomes {@link Py.True}.</li>
-	 * <li>"false" and "False" becomes {@link Py.False}.</li>
-	 * <li>Whole and floating point numbers become {@link PyInteger} and
-	 * {@link PyFloat} respectively.</li>
-	 * <li>Strings become {@link PyString}.</li>
-	 * 
-	 * @param string
-	 * @return
-	 */
-	public static PyObject stringToPyObject(String string) {
-		if (NumberUtils.isCreatable(string)) {
-			float f = NumberUtils.createFloat(string);
-			if (f == ((int) f)) {
-				return new PyInteger((int) f);
-			} else {
-				return new PyFloat(f);
-			}
-		} else if (StringUtils.capitalize(string).equals("True")) {
-			return Py.True;
-		} else if (StringUtils.capitalize(string).equals("False")) {
-			return Py.False;
-		} else {
-			return new PyString(string);
-		}
-	}
-
-	public static Vector4f tupleToColor(PyTuple color) {
-		float r = toFloat(color.get(0));
-		float g = toFloat(color.get(1));
-		float b = toFloat(color.get(2));
-		float a = color.__len__() == 4 ? toFloat(color.get(3)) : 1f;
-		return new Vector4f(r, g, b, a);
-	}
-	
-	public static Vector3f tupleToVertex(PyTuple vertex) {
-		float x = toFloat(vertex.get(0));
-		float y = toFloat(vertex.get(1));
-		float z = toFloat(vertex.get(2));
-		return new Vector3f(x, y, z);
-	}
-	
-	public static float toFloat(Object obj) {
-		if(obj instanceof Number) {
-			return ((Number)obj).floatValue();
-		} else {
-			return 0;
-		}
 	}
 	
 	/**

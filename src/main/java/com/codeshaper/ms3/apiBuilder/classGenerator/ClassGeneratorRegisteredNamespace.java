@@ -18,7 +18,7 @@ public class ClassGeneratorRegisteredNamespace extends ClassGeneratorBase {
 
 	@Override
 	public void addFields(String name) {
-		this.setGetAllDocString("Returns a list of all the vanilla " + WordUtils.capitalize(name) + ".");
+		this.setGetAllDocString("Returns a list of all the vanilla " + WordUtils.capitalize(name) + " names.");
 
 		String path, s1, upperPath;
 		for (ResourceLocation location : this.registryNamespace.getKeys()) {

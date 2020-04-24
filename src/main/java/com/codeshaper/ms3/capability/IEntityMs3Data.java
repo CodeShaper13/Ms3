@@ -1,10 +1,11 @@
 package com.codeshaper.ms3.capability;
 
 import java.util.HashMap;
+
 import javax.annotation.Nullable;
 
 import org.python.core.PyException;
-import org.python.core.PyList;
+
 import com.codeshaper.ms3.EnumCallbackType;
 import com.codeshaper.ms3.api.BoundObject;
 import com.codeshaper.ms3.api.entity;
@@ -19,19 +20,17 @@ import net.minecraft.entity.Entity;
 public interface IEntityMs3Data {
 
 	/**
-	 * Adds a script to the list of scripts.
+	 * Adds a Bound Script to the passed Entity. This performs all of the
+	 * initialization, including calling the {@link BoundObject#onConstruct()}
+	 * method.
 	 * 
+	 * @param entity
 	 * @param scriptPath
 	 * @param args
+	 * @return True if the script could be added, false if it couldn't (likely
+	 *         because the entity already has this script).
 	 * @throws PyException            If the arguments are not of a valid type.
 	 * @throws MissingScriptException If the script file can not be found.
-	 */
-	public boolean addBoundScript(entity.Base<? extends Entity> entity, String scriptPath, @Nullable PyList args)
-			throws PyException, MissingScriptException;
-
-	/**
-	 * Binds a script to the passed Entity. This performs all of the initialization,
-	 * including the {@link BoundObject#onConstruct()} method.
 	 */
 	public boolean addBoundScript(entity.Base<? extends Entity> entity, RunnableScript runnableScript);
 

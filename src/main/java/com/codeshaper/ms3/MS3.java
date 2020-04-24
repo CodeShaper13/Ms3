@@ -85,7 +85,7 @@ public class Ms3 {
 	 */
 	public static HashMap<UUID, BindScriptAction> players = new HashMap<>();
 
-	/** Single reference to the Python Interpreter.  This is null on the client side. */
+	/** Singleton reference to the Python Interpreter.  This is null on the client side. */
 	public PyInterpreterManager interpreterManager;
 
 	// Used to debug the update checker.

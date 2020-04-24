@@ -56,28 +56,45 @@ public class Assert {
 	 * all elements of the tuple must be numbers and the length must be 3 or 4.
 	 * 
 	 * @param color
+	 * @throws PyException If the tuple does not have exactly 3 or 4 elements or it
+	 *                     contains an object not of type {@link Number}
 	 */
 	public static void isColor(PyTuple color) throws PyException {
 		int length = color.__len__();
-		if(!(length == 3 || length == 4)) {
+		if (!(length == 3 || length == 4)) {
 			throw Py.ValueError("tuple must contain exactly 3 or 4 elements");
 		}
-		for(int i = 0; i < length; i++) {
+		for (int i = 0; i < length; i++) {
 			Object obj = color.get(i);
-			if(!(obj instanceof Number)) {
+			if (!(obj instanceof Number)) {
 				throw Py.ValueError("all elements must be number");
 			}
 		}
 	}
-		
+
+	/**
+	 * Checks if the passed tuple can be turned into coordinates. For it to be
+	 * valid, all elements must be numbers and the length of the tuple must be 3
+	 * elements.
+	 * 
+	 * @param coordinates
+	 * @throws PyException If the tuple does not have exactly 3 elements or it
+	 *                     contains an object not of type {@link Number}
+	 */
 	public static void isCoords(PyTuple coordinates) throws PyException {
-		if(coordinates.__len__() != 3) {
+		if (coordinates.__len__() != 3) {
 			throw Py.ValueError("tuple must contain exactly 3 elements");
 		}
-		for(int i = 0; i < 3; i++) {
-			if(!(coordinates.get(i) instanceof Number)) {
+		for (int i = 0; i < 3; i++) {
+			if (!(coordinates.get(i) instanceof Number)) {
 				throw Py.ValueError("all elements must be number");
 			}
+		}
+	}
+
+	public static void isInt(Object obj, String s) {
+		if(!(obj instanceof Integer)) {
+			throw Py.ValueError(s + " must be an integer!");
 		}
 	}
 }

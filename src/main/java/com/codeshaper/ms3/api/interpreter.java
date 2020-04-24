@@ -2,6 +2,7 @@ package com.codeshaper.ms3.api;
 
 import org.python.core.Py;
 
+import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 import com.codeshaper.ms3.interpreter.PyInterpreter;
@@ -27,7 +28,7 @@ public class interpreter {
 			throw Py.NameError("Interpreter names may only contain numbers and letters!");
 		}
 
-		return PyInterpreterManager.instance.newInterpreter(interpreterName, useMcForIn, useMcForOut, useMcForErr);
+		return Ms3.instance.interpreterManager.newInterpreter(interpreterName, useMcForIn, useMcForOut, useMcForErr);
 	}
 
 	@PythonFunction
@@ -36,18 +37,18 @@ public class interpreter {
 		if (interpreterName.equals(PyInterpreter.DEFAULT_NAME)) {
 			throw Py.ValueError("You can not delete the default interpreter \"" + PyInterpreter.DEFAULT_NAME);
 		}
-		return PyInterpreterManager.instance.deleteInterpreter(interpreterName);
+		return Ms3.instance.interpreterManager.deleteInterpreter(interpreterName);
 	}
 
 	@PythonFunction
 	@PythonDocString("Checks is a interpreter exists, returning true if it does.")
 	public static boolean exists(String interpreterName) {
-		return PyInterpreterManager.instance.exists(interpreterName);
+		return Ms3.instance.interpreterManager.interpreterExists(interpreterName);
 	}
 
 	@PythonFunction
 	public static void setStream(String interpreterName, int stream, boolean useMcChat) {
-		PyInterpreter interpreter = PyInterpreterManager.instance.getInterpreter(interpreterName);
+		PyInterpreter interpreter = Ms3.instance.interpreterManager.getInterpreter(interpreterName);
 		if (stream == 0) {
 			//interpreter.setStdIn(useMcChat);
 		} else if (stream == 1) {

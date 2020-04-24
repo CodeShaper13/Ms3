@@ -10,9 +10,7 @@ import com.codeshaper.ms3.script.RunnableScript;
  */
 public class BindScriptAction {
 
-	/**
-	 * This will be null if the action is to clear or check the current scripts.
-	 */
+	/** This will be null if the action is to clear or check the current scripts. */
 	@Nullable
 	private final RunnableScript runnableScript;
 	private final BSAction action;

@@ -9,7 +9,7 @@ import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 
 @PythonClass
-@PythonDocString("A list of all the vanilla Block names.")
+@PythonDocString("String constants for all of the vanilla Block names.")
 public class blocks {
 
     private static PyList names = new PyList();

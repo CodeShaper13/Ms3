@@ -16,7 +16,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class DirectoryManager {
 
 	private File dotMinecraftDir;
-
 	private File ms3Folder;
 	private File scriptFolder;
 	private File compiledScriptFolder;
@@ -25,6 +24,7 @@ public class DirectoryManager {
 	private File scriptDataFolder;
 
 	public DirectoryManager(FMLPreInitializationEvent event) {
+		// Reference to the folder.
 		this.dotMinecraftDir = event.getModConfigurationDirectory().getParentFile();
 
 		// Folders:
@@ -54,7 +54,11 @@ public class DirectoryManager {
 	}
 
 	/**
-	 * Helper method to make a folder
+	 * Helper method to make a folder if it doesn't already exist.
+	 * 
+	 * @param rootFolder The folder to place the new folder in.
+	 * @param folderName The folder name.
+	 * @return The (possibly new) folder.
 	 */
 	private File createFolder(File rootFolder, String folderName) {
 		File f = new File(rootFolder, "/" + folderName);
@@ -62,14 +66,23 @@ public class DirectoryManager {
 		return f;
 	}
 
+	/**
+	 * @return The .miencraft directory.
+	 */
 	public File getDotMinecraftDir() {
 		return this.dotMinecraftDir;
 	}
 
+	/**
+	 * @return The Ms3 folder within the .minecraft directory.
+	 */
 	public File getMs3Folder() {
 		return this.ms3Folder;
 	}
 
+	/**
+	 * @return The scripts folder that all of the scripts should be placed in.
+	 */
 	public File getScriptFolder() {
 		return this.scriptFolder;
 	}
@@ -78,10 +91,19 @@ public class DirectoryManager {
 		return this.compiledScriptFolder;
 	}
 
+	/**
+	 * @return The folder to place the generated Python API files in. The name of
+	 *         this folder contains the API version as specified in
+	 *         {@link Ms3#API_VERSION}.
+	 */
 	public File getApiFolder() {
 		return this.apiFolder;
 	}
 
+	/**
+	 * @return The internal folder that is intended for internal data only and not
+	 *         to be used by players.
+	 */
 	public File getInternalFolder() {
 		return this.internalFolder;
 	}

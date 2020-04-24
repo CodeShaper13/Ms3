@@ -10,13 +10,14 @@ import net.minecraft.block.Block;
 @PythonDocString("Utility features for blocks.")
 public class blockUtils {
 
-	private blockUtils() { }
-	
+	private blockUtils() {
+	}
+
 	@PythonFunction
 	@PythonDocString("Returns an instance of net.minecraft.block.Block corresponding from the passed registered name.  Advanced users only!")
 	public static Block getMcBlockFromName(String registryName) {
 		Block b = Block.getBlockFromName(registryName);
-		if(b == null) {
+		if (b == null) {
 			throw Py.ValueError("Block with name " + registryName + " could not be found");
 		}
 		return b;

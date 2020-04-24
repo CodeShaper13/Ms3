@@ -11,16 +11,16 @@ import com.codeshaper.ms3.util.Util;
 import net.minecraft.inventory.EntityEquipmentSlot;
 
 @PythonClass
-@PythonDocString("Constants for the different inventory slot IDs.")
+@PythonDocString("Numeric constants for the different inventory slot Ids.")
 public class equipmentSlot {
 
 	private equipmentSlot() {
 	}
 
 	@PythonFieldGenerated
-	public static final int MAINHAND = 0;
+	public static final int MAIN_HAND = 0;
 	@PythonFieldGenerated
-	public static final int OFFHAND = 1;
+	public static final int OFF_HAND = 1;
 	@PythonFieldGenerated
 	public static final int FEET = 2;
 	@PythonFieldGenerated
@@ -31,24 +31,30 @@ public class equipmentSlot {
 	public static final int HEAD = 5;
 
 	@PythonFieldGenerated
-	@PythonDocString("Indices of all the armor slots, feet, legs, chest and head.")
+	@PythonDocString("Indices of all the slots, MAIN_HAND, OFF_HAND, FEET, LEGS, CHEST and HEAD.")
+	public static PyTuple ALL_SLOTS = Util.makeTuple(MAIN_HAND, OFF_HAND, FEET, LEGS, CHEST, HEAD);
+	@PythonFieldGenerated
+	@PythonDocString("Indices of both the hand slots, MAIN_HAND and OFF_HAND.")
+	public static PyTuple HAND_SLOTS = Util.makeTuple(MAIN_HAND, OFF_HAND);
+	@PythonFieldGenerated
+	@PythonDocString("Indices of all the armor slots, FEET, LEGS, CHEST and HEAD.")
 	public static PyTuple ARMOR_SLOTS = Util.makeTuple(FEET, LEGS, CHEST, HEAD);
 
 	public static EntityEquipmentSlot indexToEnum(int index) {
-		if (index == 0) {
+		switch (index) {
+		case 0:
 			return EntityEquipmentSlot.MAINHAND;
-		} else if (index == 1) {
+		case 1:
 			return EntityEquipmentSlot.OFFHAND;
-		} else if (index == 2) {
+		case 2:
 			return EntityEquipmentSlot.FEET;
-		} else if (index == 3) {
+		case 3:
 			return EntityEquipmentSlot.LEGS;
-		} else if (index == 4) {
+		case 4:
 			return EntityEquipmentSlot.CHEST;
-		} else if (index == 5) {
+		case 5:
 			return EntityEquipmentSlot.HEAD;
-		} else {
-			throw Py.ValueError("Invalid slot index of " + index);
 		}
+		throw Py.ValueError("Invalid slot index of " + index);
 	}
 }

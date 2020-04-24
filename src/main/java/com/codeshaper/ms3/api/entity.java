@@ -1,8 +1,9 @@
 package com.codeshaper.ms3.api;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
@@ -83,6 +84,7 @@ import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.play.server.SPacketPlayerPosLook.EnumFlags;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.StringUtils;
 import net.minecraft.util.math.BlockPos;
@@ -97,7 +99,7 @@ public class entity {
 
 	public static final entity instance = new entity();
 
-	public static entity.Base<? extends Entity> getWrapperClassForEntity(@Nonnull Entity javaEntity) {
+	public static entity.Base<? extends Entity> createWrapperClassForEntity(@Nonnull Entity javaEntity) {
 		// Specific types:
 		if (javaEntity instanceof AbstractChestHorse) { // Donkey, mule and llama.
 			return entity.instance.new ChestHorse((AbstractChestHorse) javaEntity);
@@ -190,8 +192,6 @@ public class entity {
 	@PythonClass
 	public class Base<T extends Entity> extends PyObject {
 
-		private static final long serialVersionUID = 4773038377439473236L;
-
 		public T mcEntity;
 
 		public Base(T entity) {
@@ -236,6 +236,18 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the Entity's yaw.")
+		public double getYaw() {
+			return this.mcEntity.rotationYaw;
+		}
+
+		@PythonFunction
+		@PythonDocString("Returns the Entity's pitch.")
+		public double getPitch() {
+			return this.mcEntity.rotationPitch;
+		}
+
+		@PythonFunction
 		@PythonDocString("Returns the Entity's rotation as a tuple of (yaw, pitch).")
 		public PyTuple getRotation() {
 			return Util.makeTuple(this.mcEntity.rotationYaw, this.mcEntity.rotationPitch);
@@ -271,6 +283,55 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns True if the Entity is touching the ground.")
+		public boolean isOnGround() {
+			return this.mcEntity.onGround;
+		}
+
+		@PythonFunction
+		@PythonDocString("Returns True if the Entity is sneaking.")
+		public boolean isSneaking() {
+			return this.mcEntity.isSneaking();
+		}
+
+		@PythonFunction
+		@PythonDocString("Returns True if the Entity is sprinting.")
+		public boolean isSprinting() {
+			return this.mcEntity.isSprinting();
+		}
+
+		@PythonFunction
+		@PythonDocString("Sets how long the Entity is on fire in ticks.  Enchantments will effect this.")
+		public void setFire(int ticks) {
+			this.mcEntity.setFire(ticks * 20); // Method accepts seconds, not ticks.
+		}
+
+		@PythonFunction
+		@PythonDocString("Returns how much air the Entity has.  0 is no air left and drowning will happen.")
+		public int getAir() {
+			return this.mcEntity.getAir();
+		}
+
+		@PythonFunction
+		@PythonDocString("Sets how much air the Entity has. 300 is max, 0 is no air.")
+		public void setAir(int air) {
+			this.mcEntity.setAir(air);
+		}
+
+		// TODO fire getter, riding/passengers (TEST this one for sure)
+
+		@PythonFunction
+		@PythonDocString("Returns a list of all of the passengers riding this Entity.")
+		public PyList getPassengers() {
+			List<Entity> passengers = this.mcEntity.getPassengers();
+			PyList list = new PyList();
+			for (Entity e : passengers) {
+				list.add(entity.createWrapperClassForEntity(e));
+			}
+			return list;
+		}
+
+		@PythonFunction
 		public boolean isInvulnerable() {
 			return this.mcEntity.getIsInvulnerable();
 		}
@@ -286,6 +347,7 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("If True, the Entity will not make any noise.")
 		public void setSilent(boolean isSilent) {
 			this.mcEntity.setSilent(isSilent);
 		}
@@ -296,11 +358,13 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("If True, the Entity will not be affected by gravity.")
 		public void setNoGravity(boolean noGravity) {
 			this.mcEntity.setNoGravity(noGravity);
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the Entity's custom name as a string.")
 		public String getCustomName() {
 			return this.mcEntity.getCustomNameTag();
 		}
@@ -317,7 +381,7 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("If True, the Entity's name will always be visible, if False, the cursor must be on them to see their name.")
+		@PythonDocString("If True, the Entity's name will always be visible, if False, the cursor must be on the Entity to see the name.")
 		public void setCustomNameVisible(boolean alwaysRenderNameTag) {
 			this.mcEntity.setAlwaysRenderNameTag(alwaysRenderNameTag);
 		}
@@ -329,6 +393,7 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the Entity to be glowing.")
 		public void setGlowing(boolean isGlowing) {
 			this.mcEntity.setGlowing(isGlowing);
 		}
@@ -338,7 +403,7 @@ public class entity {
 		@Nullable
 		public Object getTag(String tagKey) {
 			NBTBase tag = CommandBase.entityToNBT(this.mcEntity).getTag(tagKey);
-			return NbtHelper.nbtToObject(tag);
+			return NbtHelper.readObjFromNbt(tag);
 		}
 
 		@PythonFunction
@@ -372,23 +437,26 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Binds a script to this Entity, so it will execute every tick.")
+		@PythonDocString("Binds a script to this Entity, so it will execute every tick.  scriptPath is the path from the /scripts folder.")
 		public void bindScript(String scriptPath) throws PyException, MissingScriptException {
 			this.bindScript(scriptPath, null);
 		}
 
 		@PythonFunction
-		@PythonDocString("Binds a script to this Entity, so it will execute every tick.")
+		@PythonDocString("Binds a script to this Entity, so it will execute every tick.  scriptPath is the path from the /scripts folder.")
 		public void bindScript(String scriptPath, @Nullable PyList args) throws PyException, MissingScriptException {
-			IEntityMs3Data entityData = this.getCapability();
-			boolean flag = entityData.addBoundScript(this, scriptPath, args);
-			if (!flag) {
-				throw Py.ValueError("Entity already has an object bound with the same type");
+			RunnableScript runnableScript = new RunnableScript(scriptPath, args);
+			if(!runnableScript.exists()) {
+				throw Py.ValueError("Can not bind script " + scriptPath + ", file does not exist");
+			}
+			boolean successfull = this.getCapability().addBoundScript(this, runnableScript);
+			if (!successfull) {
+				throw Py.ValueError("Entity already has a script bound with the same type");
 			}
 		}
 
 		@PythonFunction
-		@PythonDocString("Gets the bound object of the passed type on this Entity.  If the type has not been bound, None is returned.")
+		@PythonDocString("Gets a script that has been bound to the entity.  If the passed script has not been bound, None is returned.")
 		public BoundObject getBoundScript(String scriptPath) {
 			IEntityMs3Data ms3EntityData = this.getCapability();
 			AttachedScript as = ms3EntityData.getBoundScript(new RunnableScript(scriptPath));
@@ -402,8 +470,8 @@ public class entity {
 		@PythonFunction
 		@PythonDocString("Removes a specific script that has been bound to this Entity.")
 		public void removeBoundScript(String scriptPath) {
-			IEntityMs3Data ms3EntityData = this.getCapability();
-			ms3EntityData.removeBoundScript(new RunnableScript(scriptPath));
+			RunnableScript rs = new RunnableScript(scriptPath);
+			this.getCapability().removeBoundScript(rs);
 		}
 
 		@PythonFunction
@@ -423,7 +491,7 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Sets a custom property, overriding the previous one if it exists.  Pass None for value to remove the property.")
+		@PythonDocString("Sets a custom property, overwriting the previous one if it exists.  Pass None for the value argument to remove the property.")
 		public void setProperty(String propertyName, @PythonTypeExclude Object value) throws PyException {
 			this.validatePropertyName(propertyName);
 
@@ -450,7 +518,7 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("If true the Entity is still alive and isn't in the process of dying.")
+		@PythonDocString("If True, the Entity is still alive and isn't in the process of dying.")
 		public boolean isAlive() {
 			return this.mcEntity.isEntityAlive();
 		}
@@ -497,20 +565,26 @@ public class entity {
 	@PythonClass
 	public class LivingBase<T extends EntityLivingBase> extends Base<T> {
 
-		private static final long serialVersionUID = 6576870800969843533L;
-
 		public LivingBase(T entity) {
 			super(entity);
 		}
 
 		@PythonFunction
-		public float getHealth() {
-			return this.mcEntity.getHealth();
+		@PythonDocString("Returns the Entity's health as an int.")
+		public int getHealth() {
+			return (int) this.mcEntity.getHealth();
 		}
 
 		@PythonFunction
-		public void setHealth(float health) {
-			this.mcEntity.setHealth(health);
+		@PythonDocString("Sets the Entity's health.  Pass -1 to set it to their max health.")
+		public void setHealth(int health) {
+			this.mcEntity.setHealth(health == -1 ? this.mcEntity.getMaxHealth() : health);
+		}
+
+		@PythonFunction
+		@PythonDocString("Returns the Entity's maximum health that they can regenerate to.")
+		public int getMaxHealth() {
+			return (int) this.mcEntity.getMaxHealth();
 		}
 	}
 
@@ -519,8 +593,6 @@ public class entity {
 	 */
 	@PythonClass
 	public class Living<T extends EntityLiving> extends LivingBase<T> implements IHasEquipment {
-
-		private static final long serialVersionUID = -7574703220388172933L;
 
 		public Living(T entity) {
 			super(entity);
@@ -534,21 +606,25 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("If True, the Entity has no AI.")
 		public boolean isNoAi() {
 			return this.mcEntity.isAIDisabled();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets if the Entity has no AI.")
 		public void setNoAi(boolean noAi) {
 			this.mcEntity.setNoAI(noAi);
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns True if the Entity can pick up dropped items.")
 		public boolean getCanPickUpLoot() {
 			return this.mcEntity.canPickUpLoot();
 		}
 
 		@PythonFunction
+		@PythonDocString("Lets the Entity pick up dropped items.")
 		public void setCanPickUpLoot(boolean canPickUpLoot) {
 			this.mcEntity.setCanPickUpLoot(canPickUpLoot);
 		}
@@ -571,7 +647,7 @@ public class entity {
 		@Nullable
 		public itemStack getSlotContents(int slotIndex) {
 			Assert.isIndexInBounds(slotIndex, 6);
-			return itemStack.make(this.mcEntity.getItemStackFromSlot(equipmentSlot.indexToEnum(slotIndex)));
+			return itemStack.makeWrapper(this.mcEntity.getItemStackFromSlot(equipmentSlot.indexToEnum(slotIndex)));
 		}
 
 		@PythonFunction
@@ -595,8 +671,6 @@ public class entity {
 	@PythonClass
 	public class Animal<T extends EntityAnimal> extends Living<T> {
 
-		private static final long serialVersionUID = -7740390218861739942L;
-
 		public Animal(T entity) {
 			super(entity);
 		}
@@ -608,12 +682,10 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Sets the Entity's \\\"InLove\\\" tag to 600, causing it to try and breed for that many ticks.  entityPlayer is whoever set the entity into love, used for achievements and stats.  Pass an instance of entity.Player, net.minecraft.entity.player.EntityPlayer or None.")
-		public void setInLove(@Nullable @PythonTypeExclude Object entityPlayer) {
-			if (entityPlayer instanceof EntityPlayer) {
-				this.mcEntity.setInLove((EntityPlayer) entityPlayer);
-			} else if (entityPlayer instanceof Player) {
-				this.mcEntity.setInLove(((Player) entityPlayer).mcEntity);
+		@PythonDocString("Sets the Entity's \\\"InLove\\\" tag to 600, causing it to try and breed for that many ticks.  entityPlayer is whoever set the entity into love, used for achievements and stats.  entityPlayer can be an instance of entity.Player or None.")
+		public void setInLove(@Nullable entity.Player entityPlayer) {
+			if (entityPlayer instanceof entity.Player) {
+				this.mcEntity.setInLove(((entity.Player) entityPlayer).mcEntity);
 			} else {
 				this.mcEntity.setInLove(null);
 			}
@@ -636,8 +708,6 @@ public class entity {
 
 	@PythonClass
 	public class ArmorStand extends LivingBase<EntityArmorStand> {
-
-		private static final long serialVersionUID = 5645396411684790277L;
 
 		public ArmorStand(EntityArmorStand entity) {
 			super(entity);
@@ -665,8 +735,6 @@ public class entity {
 	@PythonClass
 	public class Bat extends Living<EntityBat> {
 
-		private static final long serialVersionUID = -4486350108913718292L;
-
 		public Bat(EntityBat entity) {
 			super(entity);
 		}
@@ -686,8 +754,6 @@ public class entity {
 
 	@PythonClass
 	public class Boat extends Base<EntityBoat> {
-
-		private static final long serialVersionUID = -9198241601349531102L;
 
 		@PythonFieldGenerated
 		public static final String TYPE_OAK = "oak";
@@ -713,7 +779,7 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the name identifier of the Boat's type.")
+		@PythonDocString("Returns the name identifier of the Boat's type as a string.")
 		public String getBoatType() {
 			return this.mcEntity.getBoatType().getName();
 		}
@@ -721,8 +787,6 @@ public class entity {
 
 	@PythonClass
 	public class Chicken extends Animal<EntityChicken> {
-
-		private static final long serialVersionUID = 1241156688676494683L;
 
 		public Chicken(EntityChicken entity) {
 			super(entity);
@@ -741,11 +805,13 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns True if the Chicken is a jockey.")
 		public boolean isChickenJockey() {
 			return this.mcEntity.isChickenJockey();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the IsChickenJockey flag.  This will not spawn a baby zombie, it only sets the flag.")
 		public void setChickenJockey(boolean isChickenJockey) {
 			this.mcEntity.setChickenJockey(isChickenJockey);
 		}
@@ -754,13 +820,12 @@ public class entity {
 	@PythonClass
 	public class Creeper extends Living<EntityCreeper> {
 
-		private static final long serialVersionUID = -7320650346138191612L;
-
 		public Creeper(EntityCreeper entity) {
 			super(entity);
 		}
 
 		@PythonFunction
+		@PythonDocString("If True, the Creeper is charged.")
 		public boolean isCharged() {
 			return this.mcEntity.getPowered();
 		}
@@ -772,6 +837,7 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the radius of the Creeper's explosion.")
 		public int getExplosionRadius() {
 			return (int) this.getTag("ExplosionRadius");
 		}
@@ -783,6 +849,7 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns True if the Creeper has been lit by Fint and Steel.")
 		public boolean isIgnited() {
 			return this.mcEntity.hasIgnited();
 		}
@@ -797,19 +864,20 @@ public class entity {
 	@PythonClass
 	public class EnderDragon extends Living<EntityDragon> {
 
-		private static final long serialVersionUID = -5955391820741486510L;
-
 		@PythonFieldGenerated
+		@PythonDocString("The Dragon is circling the island.")
 		public static final int PHASE_CIRCLING = 0;
 		@PythonFieldGenerated
 		@PythonDocString("The Dragon is about to shoot a fireball.")
 		public static final int PHASE_STRAFING_PLAYER = 1;
 		@PythonFieldGenerated
+		@PythonDocString("The Dragon is flying to the portal to land.  this is the transition to the landed state.")
 		public static final int PHASE_LANDING_APPROACH = 2;
 		@PythonFieldGenerated
 		@PythonDocString("The Dragon has landed on the portal.")
 		public static final int PHASE_LANDING = 3;
 		@PythonFieldGenerated
+		@PythonDocString("The Dragon is taking off from the portal.  This is the transition out of landed state.")
 		public static final int PHASE_TAKEOFF = 4;
 		@PythonFieldGenerated
 		public static final int PHASE_SITTING_FLAMING = 5;
@@ -847,8 +915,6 @@ public class entity {
 	@PythonClass
 	public class Enderman extends Living<EntityEnderman> {
 
-		private static final long serialVersionUID = 1688539848618858505L;
-
 		public Enderman(EntityEnderman entity) {
 			super(entity);
 		}
@@ -860,7 +926,7 @@ public class entity {
 			IBlockState state = this.mcEntity.getHeldBlockState();
 			if (state != null) {
 				Block block = state.getBlock();
-				return itemStack.make(new ItemStack(block, 1, block.getMetaFromState(state)));
+				return itemStack.makeWrapper(new ItemStack(block, 1, block.getMetaFromState(state)));
 			} else {
 				return null;
 			}
@@ -887,8 +953,6 @@ public class entity {
 	@PythonClass
 	public class Endermite extends Living<EntityEndermite> {
 
-		private static final long serialVersionUID = 8466553682345667521L;
-
 		public Endermite(EntityEndermite entity) {
 			super(entity);
 		}
@@ -911,8 +975,6 @@ public class entity {
 	@PythonClass
 	public class Ghast extends Living<EntityGhast> {
 
-		private static final long serialVersionUID = 2108228874635569063L;
-
 		public Ghast(EntityGhast entity) {
 			super(entity);
 		}
@@ -933,8 +995,6 @@ public class entity {
 	@PythonClass
 	public class ItemEntity extends Base<EntityItem> {
 
-		private static final long serialVersionUID = -6818003122558490506L;
-
 		public ItemEntity(EntityItem entity) {
 			super(entity);
 		}
@@ -948,7 +1008,7 @@ public class entity {
 		@PythonFunction
 		@PythonDocString("Returns an itemStack representing the stack.")
 		public itemStack getStack() {
-			return itemStack.make(this.mcEntity.getItem());
+			return itemStack.makeWrapper(this.mcEntity.getItem());
 		}
 
 		@PythonFunction
@@ -979,19 +1039,18 @@ public class entity {
 	@PythonClass
 	public class GenericHorse<T extends AbstractHorse> extends Animal<T> {
 
-		private static final long serialVersionUID = 1473603312420702937L;
-
 		public GenericHorse(T entity) {
 			super(entity);
 		}
 
 		@PythonFunction
-		public boolean isBreed() {
+		@PythonDocString("If True, the house is in love mode.")
+		public boolean isBreeding() {
 			return this.mcEntity.isBreeding();
 		}
 
 		@PythonFunction
-		public void setBreed(boolean breed) {
+		public void setBreeding(boolean breed) {
 			this.mcEntity.setBreeding(breed);
 		}
 
@@ -1051,8 +1110,6 @@ public class entity {
 	@PythonDocString("Class to represent Entities that hang on a wall.")
 	public class Hanging<T extends EntityHanging> extends Base<T> {
 
-		private static final long serialVersionUID = -8908455875060292148L;
-
 		public Hanging(T entity) {
 			super(entity);
 		}
@@ -1088,8 +1145,6 @@ public class entity {
 	 */
 	@PythonClass
 	public class Horse extends GenericHorse<EntityHorse> {
-
-		private static final long serialVersionUID = 7147534040184529530L;
 
 		@PythonFieldGenerated
 		public static final int COLOR_WHITE = 0;
@@ -1128,19 +1183,17 @@ public class entity {
 		}
 
 		@PythonFunction
-		@PythonDocString("Sets the Horse's variant.  Use computeVariantFlag to get a variant to pass in.")
+		@PythonDocString("Sets the Horse's variant.  Use the computeVariantFlag function to get a variant to pass in.")
 		public void setVariant(int variant) {
 			this.mcEntity.setHorseVariant(variant);
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns a variant from a color and marking.  Algorithm, (color | markings << 8)")
+		@PythonDocString("Returns a variant integer from a color and marking.  Algorithm is (color | markings << 8)")
 		public int computeVariantFlag(int color, int markings) {
 			int variant = color | markings << 8;
 			return variant;
 		}
-
-		// TODO method to get the variant and markings from the flag?
 
 		@PythonFunction
 		@PythonDocString("Sets the horses armor stack.")
@@ -1163,8 +1216,6 @@ public class entity {
 	@PythonClass
 	public class ChestHorse extends GenericHorse<AbstractChestHorse> {
 
-		private static final long serialVersionUID = 2212092842255803485L;
-
 		public ChestHorse(AbstractChestHorse entity) {
 			super(entity);
 		}
@@ -1184,8 +1235,6 @@ public class entity {
 
 	@PythonClass
 	public class SkeletonHorse extends GenericHorse<EntitySkeletonHorse> {
-
-		private static final long serialVersionUID = 1221084166010555928L;
 
 		public SkeletonHorse(EntitySkeletonHorse entity) {
 			super(entity);
@@ -1211,11 +1260,13 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("If True, the Iron Golem was created by a player.")
 		public boolean isPlayerCreated() {
 			return this.mcEntity.isPlayerCreated();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets if the Iron Golem was created by a player.")
 		public void setPlayerCreated(boolean playerCreated) {
 			this.mcEntity.setPlayerCreated(playerCreated);
 		}
@@ -1224,12 +1275,10 @@ public class entity {
 	@PythonClass
 	public class Ocelot extends Tameable<EntityOcelot> {
 
-		private static final long serialVersionUID = -3752886054446835931L;
-
 		@PythonFieldGenerated
 		public static final int TYPE_WILD = 0;
 		@PythonFieldGenerated
-		public static final int TYPE_TUXEDO = 01;
+		public static final int TYPE_TUXEDO = 1;
 		@PythonFieldGenerated
 		public static final int TYPE_TABBY = 2;
 		@PythonFieldGenerated
@@ -1254,8 +1303,6 @@ public class entity {
 
 	@PythonClass
 	public class Painting extends Hanging<EntityPainting> {
-
-		private static final long serialVersionUID = 7791696705579553157L;
 
 		@PythonFieldGenerated
 		public static final String KEBAB = "Kebab";
@@ -1336,8 +1383,6 @@ public class entity {
 	@PythonClass
 	public class Parrot extends Tameable<EntityParrot> {
 
-		private static final long serialVersionUID = -8273033504720739347L;
-
 		@PythonFieldGenerated
 		public static final int COLOR_RED = 0;
 		@PythonFieldGenerated
@@ -1347,14 +1392,14 @@ public class entity {
 		@PythonFieldGenerated
 		public static final int COLOR_CYAN = 3;
 		@PythonFieldGenerated
-		public static final int COLOR_SILVEr = 4;
+		public static final int COLOR_SILVER = 4;
 
 		public Parrot(EntityParrot entity) {
 			super(entity);
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the Parrots variant as in int.")
+		@PythonDocString("Returns the Parrots variant as an int.")
 		public int getVariant() {
 			return this.mcEntity.getVariant();
 		}
@@ -1369,14 +1414,12 @@ public class entity {
 	@PythonClass
 	public class Pig extends Animal<EntityPig> {
 
-		private static final long serialVersionUID = 8368727781457142488L;
-
 		public Pig(EntityPig entity) {
 			super(entity);
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns True if the Pig is saddled, False if it isn't.")
+		@PythonDocString("Returns True if the Pig is saddled, False if it is not.")
 		public boolean isSaddled() {
 			return this.mcEntity.getSaddled();
 		}
@@ -1388,15 +1431,33 @@ public class entity {
 		}
 	}
 
-	// Pillager
-
 	@PythonClass
 	public class Player extends LivingBase<EntityPlayerMP> implements IHasEquipment {
 
-		private static final long serialVersionUID = -8557759903366434251L;
-
 		public Player(EntityPlayerMP entity) {
 			super(entity);
+		}
+
+		// Override the set position and set rotation functions.
+		@PythonFunction
+		@Override
+		public void setPosition(double x, double y, double z) {
+			Set<EnumFlags> set = EnumSet.<EnumFlags>noneOf(EnumFlags.class);
+			set.add(EnumFlags.X_ROT);
+			set.add(EnumFlags.Y_ROT);
+
+			((EntityPlayerMP) this.mcEntity).connection.setPlayerLocation(x, y, z, 0, 0, set);
+		}
+
+		@PythonFunction
+		@Override
+		public void setRotation(float yaw, float pitch) {
+			Set<EnumFlags> set = EnumSet.<EnumFlags>noneOf(EnumFlags.class);
+			set.add(EnumFlags.X);
+			set.add(EnumFlags.Y);
+			set.add(EnumFlags.Z);
+
+			((EntityPlayerMP) this.mcEntity).connection.setPlayerLocation(0, 0, 0, yaw, pitch, set);
 		}
 
 		@PythonFunction
@@ -1408,7 +1469,7 @@ public class entity {
 		@PythonFunction
 		@PythonDocString("Returns the held item of the player as an itemStack, or None if they're not holding anything.  Same as getSlotContents with a slotIndex of 0")
 		public itemStack getHeldStack() {
-			return itemStack.make(this.mcEntity.inventory.getCurrentItem());
+			return itemStack.makeWrapper(this.mcEntity.inventory.getCurrentItem());
 		}
 
 		@PythonFunction
@@ -1416,7 +1477,7 @@ public class entity {
 		@Override
 		public itemStack getSlotContents(int slotIndex) {
 			Assert.isIndexInBounds(slotIndex, 6);
-			return itemStack.make(this.mcEntity.getItemStackFromSlot(equipmentSlot.indexToEnum(slotIndex)));
+			return itemStack.makeWrapper(this.mcEntity.getItemStackFromSlot(equipmentSlot.indexToEnum(slotIndex)));
 		}
 
 		@PythonFunction
@@ -1424,7 +1485,8 @@ public class entity {
 		@Override
 		public void setSlotContents(int slotIndex, itemStack stack) {
 			Assert.isIndexInBounds(slotIndex, 6);
-			this.mcEntity.setItemStackToSlot(equipmentSlot.indexToEnum(slotIndex), stack.getMcStack());
+			this.mcEntity.setItemStackToSlot(equipmentSlot.indexToEnum(slotIndex),
+					stack == null ? ItemStack.EMPTY : stack.getMcStack());
 			this.mcEntity.inventoryContainer.detectAndSendChanges();
 		}
 
@@ -1432,28 +1494,28 @@ public class entity {
 		@PythonDocString("Returns an itemStack in the player's main inventory.  slotIndex is 0-35 inclusive.")
 		public itemStack getInventoryStack(int slotIndex) {
 			Assert.isIndexInBounds(slotIndex, 36);
-			return itemStack.make(this.mcEntity.inventory.mainInventory.get(slotIndex));
+			return itemStack.makeWrapper(this.mcEntity.inventory.mainInventory.get(slotIndex));
 		}
 
 		@PythonFunction
 		@PythonDocString("Sets an itemStack in the player's main inventory.  slotIndex is 0-35 inclusive.")
 		public void setInventoryStack(int slotIndex, itemStack stack) {
 			Assert.isIndexInBounds(slotIndex, 36);
-			this.mcEntity.inventory.mainInventory.set(slotIndex, stack.getMcStack());
+			this.mcEntity.inventory.mainInventory.set(slotIndex, stack == null ? ItemStack.EMPTY : stack.getMcStack());
 			this.mcEntity.inventoryContainer.detectAndSendChanges();
 		}
 
 		@PythonFunction
 		@PythonDocString("Adds an itemStack to the player's main inventory.  Returns the leftover items that couldn't be added, or None if all the items were added.")
 		public itemStack addItemStack(itemStack stack) {
-			this.mcEntity.inventory.addItemStackToInventory(stack.getMcStack());
+			this.mcEntity.inventory.addItemStackToInventory(stack == null ? ItemStack.EMPTY : stack.getMcStack());
 			return stack;
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns true if the passed itemStack is in the player's main inventory.")
+		@PythonDocString("Returns True if the passed itemStack is in the player's main inventory.")
 		public boolean hasItemStack(itemStack stack) {
-			return this.mcEntity.inventory.hasItemStack(stack.getMcStack());
+			return this.mcEntity.inventory.hasItemStack(stack == null ? ItemStack.EMPTY : stack.getMcStack());
 		}
 
 		@PythonFunction
@@ -1483,12 +1545,16 @@ public class entity {
 			}
 			this.mcEntity.setGameType(GameType.getByID(gamemode));
 		}
+
+		@PythonFunction
+		@PythonDocString("Closes the container that the Player currently has open, if any.")
+		public void closeContainer() {
+			this.mcEntity.closeContainer();
+		}
 	}
 
 	@PythonClass
 	public class Rabbit extends Animal<EntityRabbit> {
-
-		private static final long serialVersionUID = 7640215810890520120L;
 
 		@PythonFieldGenerated
 		public static final int TYPE_BROWN = 0;
@@ -1522,23 +1588,21 @@ public class entity {
 		}
 	}
 
-	// Ravager
-
 	@PythonClass
 	public class Sheep extends Animal<EntitySheep> {
-
-		private static final long serialVersionUID = 3270857116516304734L;
 
 		public Sheep(EntitySheep entity) {
 			super(entity);
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the color of the Sheep as an int.  See color.py for the color constants.")
 		public int getColor() {
 			return this.mcEntity.getFleeceColor().getMetadata();
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the color of the Sheep.  See color.py for the color constants.")
 		public void setColor(int color) {
 			this.mcEntity.setFleeceColor(EnumDyeColor.byDyeDamage(color));
 		}
@@ -1559,20 +1623,18 @@ public class entity {
 	@PythonClass
 	public class Shulker extends Living<EntityShulker> {
 
-		private static final long serialVersionUID = -3505352210734560534L;
-
 		public Shulker(EntityShulker entity) {
 			super(entity);
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the color ID of the Shulker.")
+		@PythonDocString("Returns the color ID of the Shulker.  See color.py for the color constants.")
 		public int getColor() {
 			return this.mcEntity.getColor().getMetadata();
 		}
 
 		@PythonFunction
-		@PythonDocString("Sets the color ID of the Shulker.")
+		@PythonDocString("Sets the color of the Shulker from an id.  See color.py for the color constants.")
 		public void setColor(int color) {
 			this.setTag("Color", color);
 		}
@@ -1581,20 +1643,18 @@ public class entity {
 	@PythonClass
 	public class Slime extends Living<EntitySlime> {
 
-		private static final long serialVersionUID = 8553917442304661280L;
-
 		public Slime(EntitySlime entity) {
 			super(entity);
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the slime's size.")
+		@PythonDocString("Returns the Slime's size as an int.")
 		public int getSize() {
 			return this.mcEntity.getSlimeSize();
 		}
 
 		@PythonFunction
-		@PythonDocString("Sets the slime's size. 0, 1 and 3 are the default sizes.")
+		@PythonDocString("Sets the Slime's size. 0, 1 and 3 are the default sizes.")
 		public void setSize(int size) {
 			this.setTag("Size", size);
 		}
@@ -1602,8 +1662,6 @@ public class entity {
 
 	@PythonClass
 	public class Snowman extends Living<EntitySnowman> {
-
-		private static final long serialVersionUID = -6550695206594909228L;
 
 		public Snowman(EntitySnowman entity) {
 			super(entity);
@@ -1625,14 +1683,12 @@ public class entity {
 	@PythonClass
 	public class Tameable<T extends EntityTameable> extends Animal<T> {
 
-		private static final long serialVersionUID = -5756209361574406506L;
-
 		public Tameable(T entity) {
 			super(entity);
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns True if the Entity is sitting, false if it is not.")
+		@PythonDocString("Returns True if the Entity is sitting, False if it is not.")
 		public boolean isSitting() {
 			return this.mcEntity.isSitting();
 		}
@@ -1660,8 +1716,6 @@ public class entity {
 	@PythonClass
 	public class Tnt extends Base<EntityTNTPrimed> {
 
-		private static final long serialVersionUID = 1L;
-
 		public Tnt(EntityTNTPrimed entity) {
 			super(entity);
 		}
@@ -1679,54 +1733,48 @@ public class entity {
 		}
 	}
 
-	// Turtle
-
-	// Vex
-
 	@PythonClass
 	public class Villager extends Living<EntityVillager> {
-
-		private static final long serialVersionUID = 6785232030225149328L;
 
 		private Field field;
 
 		@PythonFieldGenerated
-		public static final int PROFESSION_FARMER = 0;
+		public static final int PROFESSION_FARMER_ID = 0;
 		@PythonFieldGenerated
-		public static final int PROFESSION_LIBRARIAN = 1;
+		public static final int PROFESSION_LIBRARIAN_ID = 1;
 		@PythonFieldGenerated
-		public static final int PROFESSION_PRIEST = 2;
+		public static final int PROFESSION_PRIEST_ID = 2;
 		@PythonFieldGenerated
-		public static final int PROFESSION_BLACKSMITH = 3;
+		public static final int PROFESSION_BLACKSMITH_ID = 3;
 		@PythonFieldGenerated
-		public static final int PROFESSION_BUTCHER = 4;
+		public static final int PROFESSION_BUTCHER_ID = 4;
 		@PythonFieldGenerated
-		public static final int PROFESSION_NITWIT = 5;
+		public static final int PROFESSION_NITWIT_ID = 5;
 
 		@PythonFieldGenerated
-		public static final int CAREER_FARMER = 1;
+		public static final int CAREER_FARMER_ID = 1;
 		@PythonFieldGenerated
-		public static final int CAREER_FISHERMAN = 2;
+		public static final int CAREER_FISHERMAN_ID = 2;
 		@PythonFieldGenerated
-		public static final int CAREER_SHEPHERD = 3;
+		public static final int CAREER_SHEPHERD_ID = 3;
 		@PythonFieldGenerated
-		public static final int CAREER_FLETCHER = 4;
+		public static final int CAREER_FLETCHER_ID = 4;
 		@PythonFieldGenerated
-		public static final int CAREER_LIBRARIAN = 1;
+		public static final int CAREER_LIBRARIAN_ID = 1;
 		@PythonFieldGenerated
-		public static final int CAREER_CARTOGRAPHER = 2;
+		public static final int CAREER_CARTOGRAPHER_ID = 2;
 		@PythonFieldGenerated
-		public static final int CAREER_CLERIC = 1;
+		public static final int CAREER_CLERIC_ID = 1;
 		@PythonFieldGenerated
-		public static final int CAREER_ARMORER = 1;
+		public static final int CAREER_ARMORER_ID = 1;
 		@PythonFieldGenerated
-		public static final int CAREER_WEAPON_SMITH = 2;
+		public static final int CAREER_WEAPON_SMITH_ID = 2;
 		@PythonFieldGenerated
-		public static final int CAREER_TOOL_SMITH = 3;
+		public static final int CAREER_TOOL_SMITH_ID = 3;
 		@PythonFieldGenerated
-		public static final int CAREER_BUTCHER = 1;
+		public static final int CAREER_BUTCHER_ID = 1;
 		@PythonFieldGenerated
-		public static final int CAREER_LEATHERWORKER = 2;
+		public static final int CAREER_LEATHERWORKER_ID = 2;
 		@PythonFieldGenerated
 		public static final int CAREER_NITWIT = 1;
 
@@ -1736,26 +1784,26 @@ public class entity {
 
 		@PythonFunction
 		@PythonDocString("Returns the ID of the Villager's profession.")
-		public int getProfession() {
+		public int getProfessionId() {
 			return this.mcEntity.getProfession();
 		}
 
 		@PythonFunction
-		@PythonDocString("Sets the Villager's profession.")
-		public void setProfession(int professionId) {
+		@PythonDocString("Sets the Villager's profession..")
+		public void setProfessionId(int professionId) {
 			this.mcEntity.setProfession(professionId);
 		}
 
 		@PythonFunction
 		@PythonDocString("Returns the ID of the Villager's career.")
-		public int getCareer() {
+		public int getCareerId() {
 			return (int) this.getTag("Career");
 		}
 
 		@PythonFunction
 		@PythonDocString("Sets the Villager's career.")
-		public void setCareer(int career) {
-			this.setTag("Career", career);
+		public void setCareerId(int careerId) {
+			this.setTag("Career", careerId);
 			this.addNewTrade(null, null);
 		}
 
@@ -1844,11 +1892,13 @@ public class entity {
 		}
 
 		@PythonFunction
+		@PythonDocString("Sets the Johnny flag.  Vindicators with the Johnny flag enabled will attack most mobs.")
 		public void setJohnny(boolean flag) {
 			ReflectionHelper.setPrivateValue(EntityVindicator.class, this.mcEntity, flag, NAMES);
 		}
 
 		@PythonFunction
+		@PythonDocString("Returns the Johnny flag.")
 		public boolean getJohnny() {
 			return ReflectionHelper.getPrivateValue(EntityVindicator.class, this.mcEntity, NAMES);
 		}
@@ -1857,20 +1907,18 @@ public class entity {
 	@PythonClass
 	public class Wolf extends Tameable<EntityWolf> {
 
-		private static final long serialVersionUID = -5259915680673182799L;
-
 		public Wolf(EntityWolf entity) {
 			super(entity);
 		}
 
 		@PythonFunction
-		@PythonDocString("Returns the Wolf's collar color.  Uses dye meta scheme.")
+		@PythonDocString("Returns the Wolf's collar color.  Uses dye meta ordering.")
 		public int getCollarColor() {
 			return this.mcEntity.getCollarColor().getDyeDamage();
 		}
 
 		@PythonFunction
-		@PythonDocString("Sets the Wolf's collar color.  Uses dye meta scheme.  Default is 1 for red.")
+		@PythonDocString("Sets the Wolf's collar color.  Uses dye meta ordering.  Default is 1 for red.")
 		public void setCollarColor(int dyeColor) {
 			this.mcEntity.setCollarColor(EnumDyeColor.byDyeDamage(dyeColor));
 		}
@@ -1890,8 +1938,6 @@ public class entity {
 
 	@PythonClass
 	public class Zombie<T extends EntityZombie> extends Living<T> {
-
-		private static final long serialVersionUID = 361288394972301593L;
 
 		public Zombie(T entity) {
 			super(entity);
@@ -1924,8 +1970,6 @@ public class entity {
 
 	@PythonClass
 	public class ZombieVillager extends Zombie<EntityZombieVillager> {
-
-		private static final long serialVersionUID = 4714016270839795244L;
 
 		public ZombieVillager(EntityZombieVillager entity) {
 			super(entity);

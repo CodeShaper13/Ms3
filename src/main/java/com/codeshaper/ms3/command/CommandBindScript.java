@@ -60,7 +60,11 @@ public class CommandBindScript extends CommandScript { // Only extends to get th
 		if (!(cmdSender instanceof EntityPlayer)) {
 			throw new CommandException("commands.bindScript.onlyByPlayer");
 		}
-
+		
+		if(args.length == 0) {
+			throw new WrongUsageException("commands.bindScript.usage");
+		}
+		
 		boolean checkArg = args[0].equals("check");
 		boolean clearArg = args[0].equals("clear");
 

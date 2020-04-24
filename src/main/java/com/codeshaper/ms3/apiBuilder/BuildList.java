@@ -18,7 +18,6 @@ import com.codeshaper.ms3.api.formattingCode;
 import com.codeshaper.ms3.api.itemStack;
 import com.codeshaper.ms3.api.itemUtils;
 import com.codeshaper.ms3.api.items;
-import com.codeshaper.ms3.api.obfuscationHelper;
 import com.codeshaper.ms3.api.particleType;
 import com.codeshaper.ms3.api.soundCategories;
 import com.codeshaper.ms3.api.sounds;
@@ -27,6 +26,7 @@ import com.codeshaper.ms3.api.tileEntityList;
 import com.codeshaper.ms3.api.translations;
 import com.codeshaper.ms3.api.util;
 import com.codeshaper.ms3.api.world;
+import com.codeshaper.ms3.api.worldBorder;
 
 /**
  * A list of classes to build into Python modules. Moved to a different class so
@@ -40,43 +40,21 @@ public class BuildList {
 	public Class<?>[] classList;
 
 	public BuildList() {
-		this.classList = new Class[] {
-				biomes.class,
-				blockUtils.class,
-				BoundObject.class,
-				blocks.class,
-				colors.class,
-				drawer.class,
-				effectList.class,
-				enchantments.class,
-				entity.class,
-				entityList.class,
-				equipmentSlot.class,
-				exception.class,
-				executor.class,
-				formattingCode.class,
-				// interpreter.class,
-				itemUtils.class,
-				items.class,
-				itemStack.class,
-				obfuscationHelper.class,
-				particleType.class,
-				soundCategories.class,
-				sounds.class, 
-				util.class,
-				tileEntity.class,
-				tileEntityList.class,
-				translations.class,
-				util.class,
-				world.class,
-				// worldBorder.class,
-		};
+		this.classList = new Class[] { biomes.class, blocks.class, blockUtils.class, BoundObject.class, colors.class,
+				drawer.class, effectList.class, enchantments.class, entity.class, entityList.class, equipmentSlot.class,
+				exception.class, executor.class, formattingCode.class,
+				// interpreter.class, // Deprecated
+				items.class, itemStack.class, itemUtils.class,
+				// nbt.class, // Not finished
+				// obfuscationHelper.class, // Not finished
+				particleType.class, soundCategories.class, sounds.class, util.class, tileEntity.class,
+				tileEntityList.class, translations.class, util.class, world.class, worldBorder.class, };
 
 		this.validateList();
 	}
 
 	/**
-	 * Checks that no outside classer were added to the list.
+	 * Checks that no outside classes were added to the list.
 	 * 
 	 * @throws Error If an outside class was added.
 	 */
@@ -84,7 +62,7 @@ public class BuildList {
 		for (Class<?> clazz : this.classList) {
 			String s = clazz.getCanonicalName();
 			if (!s.startsWith("com." + Ms3.AUTHOR + "." + Ms3.MOD_ID)) {
-				throw new Error("The module build list should not contain classes from external jars and it contains "
+				throw new Error("The module build list should not contain classes from external jars, but it contains "
 						+ s + "!");
 			}
 		}

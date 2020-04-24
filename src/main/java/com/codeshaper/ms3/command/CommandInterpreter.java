@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.codeshaper.ms3.Ms3;
 import com.codeshaper.ms3.interpreter.PyInterpreter;
 import com.codeshaper.ms3.interpreter.PyInterpreterManager;
 
@@ -45,9 +46,11 @@ public class CommandInterpreter extends CommandBase {
     @Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
     	if(args.length > 1) {
+    		PyInterpreterManager interpreterManager = Ms3.instance.interpreterManager;
+    		
     		if(args[2].equals("create")) {
     			if(args.length >= 2) {
-    				boolean created = PyInterpreterManager.instance.newInterpreter(args[0]);
+    				boolean created = interpreterManager.newInterpreter(args[0]);
     				if(created) {
     					CommandBase.notifyCommandListener(sender, this, "commands.interpreter.createdOk", new Object[] {args[0]});
             		} else {
@@ -59,7 +62,7 @@ public class CommandInterpreter extends CommandBase {
     				if(args[0].equals("default")) {
     					throw new CommandException("commands.interpreter.deleteDefaultError", PyInterpreter.DEFAULT_NAME);
     				}
-    				boolean flag = PyInterpreterManager.instance.deleteInterpreter(args[0]);
+    				boolean flag = interpreterManager.deleteInterpreter(args[0]);
     				if(flag) {
     					CommandBase.notifyCommandListener(sender, this, "commands.interpreter.deletedOk", new Object[] {args[0]});
     				} else {
@@ -69,7 +72,7 @@ public class CommandInterpreter extends CommandBase {
     		} else if(args[2].equals("config")) {
     			// Validate args.
     			if((args.length == 4) && (args[2].equals("stdin") || args[2].equals("stdout") || args[2].equals("stderr")) && (args[3].equals("console") || args[3].equals("mcChat"))) {
-					PyInterpreter i = PyInterpreterManager.instance.getInterpreter(args[1]);
+					PyInterpreter i = interpreterManager.getInterpreter(args[1]);
 					if(i != null) {
 						boolean useMcChat = args[3].equals("mcChat");
 						//if(args[2].equals("stdin")) {
@@ -98,7 +101,7 @@ public class CommandInterpreter extends CommandBase {
     @Override
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
     	if(args.length == 1) {
-    		return CommandBase.getListOfStringsMatchingLastWord(args, PyInterpreterManager.instance.getAllInterpreterNames());
+    		return CommandBase.getListOfStringsMatchingLastWord(args, Ms3.instance.interpreterManager.getAllInterpreterNames());
     	}
     	else if(args.length == 2) {
     		return CommandBase.getListOfStringsMatchingLastWord(args, new String[] {"create", "delete", "config"});

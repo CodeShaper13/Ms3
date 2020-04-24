@@ -69,7 +69,6 @@ public class ApiBuilder {
 		new ClassGeneratorRegisteredNamespace(SoundEvent.REGISTRY).generateClass("sound", outputFolder);
 	}
 
-	@SuppressWarnings("unused")
 	public ApiBuilder(File apiFolder) {
 		this.buildList = new BuildList();
 		this.apiFolder = apiFolder;

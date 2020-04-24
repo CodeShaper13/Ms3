@@ -1,133 +1,123 @@
 package com.codeshaper.ms3.api;
 
-import javax.annotation.Nullable;
-
+import org.apache.commons.lang3.StringUtils;
 import org.python.core.Py;
-import org.python.core.PyException;
-import org.python.core.PyObject;
-import org.python.core.PyTuple;
 
 import com.codeshaper.ms3.apiBuilder.annotation.PythonClass;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonDocString;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFieldGenerated;
 import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
-import com.codeshaper.ms3.apiBuilder.annotation.PythonTypeExclude;
-import com.codeshaper.ms3.util.Util;
 
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.init.Enchantments;
+import net.minecraft.util.ResourceLocation;
 
 @PythonClass
-@PythonDocString("Constants of all the enchantments as tuples.  1st index is the numeric id, 2nd is the string identifier.")
+@PythonDocString("String constants of all the enchantments names.  Several helper methods also exist for dealing with enchantments.")
 public class enchantments {
 
 	private enchantments() {
 	}
 
 	@PythonFieldGenerated
-	public static final PyTuple PROTECTION = Util.makeTuple(0, "protection");
+	public static final String PROTECTION = getRegName(Enchantments.PROTECTION);
 	@PythonFieldGenerated
-	public static final PyTuple FIRE_PROTECTION = Util.makeTuple(1, "fire_protection");
+	public static final String FIRE_PROTECTION = getRegName(Enchantments.FIRE_PROTECTION);
 	@PythonFieldGenerated
-	public static final PyTuple FEATHER_FALLING = Util.makeTuple(2, "feather_falling");
+	public static final String FEATHER_FALLING = getRegName(Enchantments.FEATHER_FALLING);
 	@PythonFieldGenerated
-	public static final PyTuple BLAST_PROTECTION = Util.makeTuple(3, "blast_protection");
+	public static final String BLAST_PROTECTION = getRegName(Enchantments.BLAST_PROTECTION);
 	@PythonFieldGenerated
-	public static final PyTuple PROJECTILE_PROTECTION = Util.makeTuple(4, "projectile_protection");
+	public static final String PROJECTILE_PROTECTION = getRegName(Enchantments.PROJECTILE_PROTECTION);
 	@PythonFieldGenerated
-	public static final PyTuple RESPIRATION = Util.makeTuple(5, "respiration");
+	public static final String RESPIRATION = getRegName(Enchantments.RESPIRATION);
 	@PythonFieldGenerated
-	public static final PyTuple AQUA_INFINITY = Util.makeTuple(6, "aqua_affinity");
+	public static final String AQUA_INFINITY = getRegName(Enchantments.AQUA_AFFINITY);
 	@PythonFieldGenerated
-	public static final PyTuple THORNS = Util.makeTuple(7, "thorns");
+	public static final String THORNS = getRegName(Enchantments.THORNS);
 	@PythonFieldGenerated
-	public static final PyTuple DEPTH_STRIDER = Util.makeTuple(8, "depth_strider");
+	public static final String DEPTH_STRIDER = getRegName(Enchantments.DEPTH_STRIDER);
 	@PythonFieldGenerated
-	public static final PyTuple FROST_WALKER = Util.makeTuple(9, "frost_walker");
+	public static final String FROST_WALKER = getRegName(Enchantments.FROST_WALKER);
 	@PythonFieldGenerated
-	public static final PyTuple BINDING_CURSE = Util.makeTuple(10, "binding_curse");
+	public static final String BINDING_CURSE = getRegName(Enchantments.BINDING_CURSE);
 	@PythonFieldGenerated
-	public static final PyTuple SHARPNESS = Util.makeTuple(16, "sharpness");
+	public static final String SHARPNESS = getRegName(Enchantments.SHARPNESS);
 	@PythonFieldGenerated
-	public static final PyTuple SMITE = Util.makeTuple(17, "smite");
+	public static final String SMITE = getRegName(Enchantments.SMITE);
 	@PythonFieldGenerated
-	public static final PyTuple BANE_OF_ARTHROPODS = Util.makeTuple(18, "bane_of_arthropods");
+	public static final String BANE_OF_ARTHROPODS = getRegName(Enchantments.BANE_OF_ARTHROPODS);
 	@PythonFieldGenerated
-	public static final PyTuple KNOCKBACK = Util.makeTuple(19, "knockback");
+	public static final String KNOCKBACK = getRegName(Enchantments.KNOCKBACK);
 	@PythonFieldGenerated
-	public static final PyTuple FIRE_ASPECT = Util.makeTuple(20, "fire_aspect");
+	public static final String FIRE_ASPECT = getRegName(Enchantments.FIRE_ASPECT);
 	@PythonFieldGenerated
-	public static final PyTuple LOOTING = Util.makeTuple(21, "looting");
+	public static final String LOOTING = getRegName(Enchantments.LOOTING);
 	@PythonFieldGenerated
-	public static final PyTuple SWEEPING = Util.makeTuple(22, "sweeping");
+	public static final String SWEEPING = getRegName(Enchantments.SWEEPING);
 	@PythonFieldGenerated
-	public static final PyTuple EFFICIENCY = Util.makeTuple(32, "efficiency");
+	public static final String EFFICIENCY = getRegName(Enchantments.EFFICIENCY);
 	@PythonFieldGenerated
-	public static final PyTuple SILK_TOUCH = Util.makeTuple(33, "silk_touch");
+	public static final String SILK_TOUCH = getRegName(Enchantments.SILK_TOUCH);
 	@PythonFieldGenerated
-	public static final PyTuple UNBREAKING = Util.makeTuple(34, "unbreaking");
+	public static final String UNBREAKING = getRegName(Enchantments.UNBREAKING);
 	@PythonFieldGenerated
-	public static final PyTuple FORTUNE = Util.makeTuple(35, "fortune");
+	public static final String FORTUNE = getRegName(Enchantments.FORTUNE);
 	@PythonFieldGenerated
-	public static final PyTuple POWER = Util.makeTuple(48, "power");
+	public static final String POWER = getRegName(Enchantments.POWER);
 	@PythonFieldGenerated
-	public static final PyTuple PUNCH = Util.makeTuple(49, "punch");
+	public static final String PUNCH = getRegName(Enchantments.PUNCH);
 	@PythonFieldGenerated
-	public static final PyTuple FLAME = Util.makeTuple(50, "flame");
+	public static final String FLAME = getRegName(Enchantments.FLAME);
 	@PythonFieldGenerated
-	public static final PyTuple INFINITY = Util.makeTuple(51, "infinity");
+	public static final String INFINITY = getRegName(Enchantments.INFINITY);
 	@PythonFieldGenerated
-	public static final PyTuple LUCK_OF_THE_SEA = Util.makeTuple(61, "luck_of_the_sea");
+	public static final String LUCK_OF_THE_SEA = getRegName(Enchantments.LUCK_OF_THE_SEA);
 	@PythonFieldGenerated
-	public static final PyTuple LURE = Util.makeTuple(62, "lure");
+	public static final String LURE = getRegName(Enchantments.LURE);
 	@PythonFieldGenerated
-	public static final PyTuple MENDING = Util.makeTuple(70, "mending");
+	public static final String MENDING = getRegName(Enchantments.MENDING);
 	@PythonFieldGenerated
-	public static final PyTuple VANISHING_CURSE = Util.makeTuple(71, "vanishing_curse");
+	public static final String VANISHING_CURSE = getRegName(Enchantments.VANISHING_CURSE);
 
 	@PythonFunction
-	@PythonDocString("Checks if the passed identifier points to a valid enchantment.")
-	public static boolean isValidIdentifer(@PythonTypeExclude Object enchantmentIdentifier) {	
-		return getMcEnchantmentObj(enchantmentIdentifier) != null;
+	@PythonDocString("Returns the max level the enchantment can go to.")
+	public static int getMaxLevel(String enchantment) {
+		return func(enchantment, "enchantment").getMaxLevel();
 	}
 
 	@PythonFunction
-	@PythonDocString("Returns a tuple representing an enchantment, or None if the enchantmentIdentifier doen't point to any enchantment.")
-	public static PyObject getEnchantment(@PythonTypeExclude Object enchantmentIdentifier) throws PyException {
-		Enchantment e = getMcEnchantmentObj(enchantmentIdentifier);
-		
-		if(e != null) {
-			return Util.makeTuple(Enchantment.getEnchantmentID(e), e.getName());	
-		} else {
-			return Py.None;
-		}
+	@PythonDocString("Returns True if the enchantment is a curse, False if it is not.")
+	public static boolean isCurseEnchantment(String enchantment) {
+		return func(enchantment, "enchantment").isCurse();
 	}
-	
-	@Nullable
-	public static Enchantment getMcEnchantmentObj(@PythonTypeExclude Object enchantmentIdentifier) {
-		if (enchantmentIdentifier instanceof String) {
-			return Enchantment.getEnchantmentByLocation((String) enchantmentIdentifier);
-		} else if (enchantmentIdentifier instanceof Number) {
-			return Enchantment.getEnchantmentByID(((Number) enchantmentIdentifier).intValue());
-		} else {
-			throw Py.ValueError("Wrong type for enchantmentIdentifier, " + enchantmentIdentifier.getClass() + ".  It must be a string or number");
-		}
+
+	@PythonFunction
+	@PythonDocString("Returns True if the enchantment is a treasure, False if it is not.")
+	public static boolean isTreasureEnchantment(String enchantment) {
+		return func(enchantment, "enchantment").isTreasureEnchantment();
 	}
-	
-	/*
-	 * @PythonClass public class Enchantment {
-	 * 
-	 * private final int id; private final String name;
-	 * 
-	 * public Enchantment(int id, String name) { this.id = id; this.name = name; }
-	 * 
-	 * @PythonFunction
-	 * 
-	 * @PythonDocString("Returns the ID of the enchantment.") public int getId() {
-	 * return id; }
-	 * 
-	 * @PythonFunction
-	 * 
-	 * @PythonDocString("Returns the name of the enchantment.") public String
-	 * getName() { return name; } }
-	 */
+
+	@PythonFunction
+	@PythonDocString("Returns True if enchantments are compatible with each other, False if they are not.")
+	public static boolean isCompatibleWith(String enchantment1, String enchantment2) {
+		Enchantment e1 = func(enchantment1, "enchantment1");
+		Enchantment e2 = func(enchantment2, "enchantment2");
+		return e1.isCompatibleWith(e2);
+	}
+
+	private static Enchantment func(String enchantment, String paramName) {
+		if (StringUtils.isEmpty(enchantment)) {
+			throw Py.ValueError(paramName + " can not be None or an empty string");
+		}
+		Enchantment e = Enchantment.REGISTRY.getObject(new ResourceLocation(enchantment));
+		if (e == null) {
+			throw Py.ValueError("Enchantment with identifier " + enchantment + " couldn't be found");
+		}
+		return e;
+	}
+
+	public static String getRegName(Enchantment e) {
+		return e.getRegistryName().toString();
+	}
 }

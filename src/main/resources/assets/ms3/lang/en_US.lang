@@ -11,7 +11,7 @@ commands.script.usageReload=/script reload [scriptName]
 # "about" arg for /script
 commands.script.about0=File name: %s
 commands.script.about1=File path: %s
-commands.script.about2=File size: %s
+commands.script.about2=File size: %s bytes
 commands.script.about3=File creation time: %s
 commands.script.about4=File modified time: %s
 commands.script.aboutError=Couldn't find information about "%s"!
@@ -29,6 +29,9 @@ commands.script.noExecuteFunction=No function with the name "execute" could be f
 # "help" arg for /script
 commands.script.noHelpText=No doc string found
 commands.script.helpTextHeader=Doc string:
+
+# Argument auto complete
+commands.script.noScriptNothingToHint=Nothing to hint, as Script "%s" could not be found
 
 # /bindscript command:
 commands.bindScript.usage=/bindscript <add|remove|check|clear> [scriptName] [args...]
@@ -69,7 +72,7 @@ ms3.warning.line3=Do not allow players onto your game you do not trust, as they 
 ms3.warning.line4=your operating system via the /exec command, allowing file access and deleting.
 ms3.warning.notAgain=You will not see this again.
 
-ms3.update.newUpdate=New Update Available
+ms3.update.newUpdate=New Update Available for MS3
 ms3.update.downloadNow=Download Now
 ms3.update.titleScreen=Title Screen
 

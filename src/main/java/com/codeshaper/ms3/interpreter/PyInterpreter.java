@@ -48,9 +48,7 @@ import net.minecraft.world.WorldServer;
 
 public class PyInterpreter {
 
-	/**
-	 * The name of the default interpreter.
-	 */
+	/** The name of the default interpreter. */
 	public static final String DEFAULT_NAME = "default";
 
 	// Save the original streams in case we want to go back to using them.
@@ -58,6 +56,7 @@ public class PyInterpreter {
 	private PyObject consoleStdOut;
 	private PyObject consoleStdErr;
 
+	/** The name of the interpreter. */
 	private String interpreterName;
 	private PythonInterpreter pythonInterpreter;
 
@@ -91,7 +90,7 @@ public class PyInterpreter {
 		// If no Python path is specified, then nothing is added and no big deal.
 		// This is only if you want to reference libraries such a pygame.
 		String pythonPath = Ms3.configManager.getPythonPath();
-		if (!StringUtils.isBlank(pythonPath)) {
+		if (pythonPath != null) {
 			systemState.path.add(pythonPath + "\\Lib\\site-packages");
 		}
 	}
@@ -104,78 +103,20 @@ public class PyInterpreter {
 	}
 
 	/**
-	 * Calls the onBind function, if the passed runnableScript has one.
-	 *
-	 * @param runnableScript
-	 * @param sender
-	 * @param e
-	 * @return true if there was no error, otherwise false.
-	 */
-	public boolean runOnBind(RunnableScript runnableScript, ICommandSender sender, Entity e) {
-		try {
-			this.primeScript(runnableScript);
-			this.callFunction("onBind", new world.World((WorldServer) sender.getEntityWorld()),
-					entity.getWrapperClassForEntity(e));
-			return true;
-		} catch (PyException exception) {
-			MessageUtil.sendErrorMessage(sender, "Error calling onBind()", exception);
-			return false;
-		}
-	}
-
-	// This seems to try to get a class in a script with the same name as the file.
-	// Unused, moved to AttachedScript.java
-	public PyObject func(RunnableScript runnableScript, ICommandSender sender) {
-		try {
-			this.primeScript(runnableScript);
-			String targetTypeName = StringUtils.capitalize(runnableScript.getScriptName());
-			PyObject type = this.getVariable(targetTypeName);
-
-			if (type != null && (type instanceof PyType || type instanceof PyClass)) {
-				return type;
-			} else {
-				return null;
-			}
-		} catch (PyException exception) {
-			MessageUtil.sendErrorMessage(sender, "Error running func", exception);
-			return null;
-		}
-	}
-
-	/**
-	 * 
-	 * @param runnableScript
-	 * @param entity
-	 * @param player
-	 */
-	public void runOnClick(RunnableScript runnableScript, Entity entity, EntityPlayer player) {
-		try {
-			this.primeScript(runnableScript);
-			this.callFunction("onClick", new world.World((WorldServer) player.getEntityWorld()),
-					com.codeshaper.ms3.api.entity.getWrapperClassForEntity(entity),
-					com.codeshaper.ms3.api.entity.getWrapperClassForEntity(player));
-		} catch (PyException exception) {
-			MessageUtil.sendErrorMessage(player, "Error calling onClick()", exception);
-		}
-	}
-
-	/**
-	 * Calls a function within the global namespace.
+	 * Calls a function within the global namespace. No checks are in place if this
+	 * function actually exists.
 	 *
 	 * @param functionName The name of the function.
-	 * @param args
-	 * @return True if the function was found and called, false if it can't be
-	 *         found.
+	 * @param args         The arguments to pass into the functions.
+	 * @return The object the function returns, or None if it returns nothing.
 	 */
-	public boolean callFunction(String functionName, @Nullable PyObject... args) {
+	public PyObject callFunction(String functionName, @Nullable PyObject... args) {
 		PyObject function = this.getVariable(functionName);
-		if (function != null) {
-			PyObject returnValue = function.__call__(args != null ? args : new PyObject[0]);
-			// TODO send the return value to the calling method.
-			return true;
-		} else {
-			return false;
+		if (function != null) { // Prevent null pointer exception.
+			PyObject returnedValue = function.__call__(args != null ? args : new PyObject[0]);
+			return returnedValue;
 		}
+		return Py.None;
 	}
 
 	/**
@@ -188,22 +129,42 @@ public class PyInterpreter {
 	}
 
 	/**
+	 * Check if a function is defined in the global scope. This will return false if
+	 * a variable with the passed name exists, but is not callable.
+	 * 
+	 * @param name The name of the functions.
+	 * @return True if the function exists, false if it doesn't.
+	 */
+	public boolean functionExists(String name) {
+		return this.getVariable(name).isCallable();
+	}
+
+	/**
 	 * Gets a variable from the global namespace and returns it.
+	 * 
+	 * @param name The variables name.
 	 */
 	@Nullable
 	public PyObject getVariable(String name) {
 		return this.pythonInterpreter.get(name);
 	}
 
+	/**
+	 * Sets the value of a variable in the global scope.
+	 * 
+	 * @param name The name of the variable.
+	 * @param value The value of the variable.
+	 */
 	public void setVariable(String name, PyObject value) {
-		this.pythonInterpreter.set(name, Py.None);
+		this.pythonInterpreter.set(name, value);
 	}
 
 	/**
 	 * Deletes a variable from the global scope.
 	 *
 	 * @param name Name of the variable.
-	 * @return True if the variable was found and deleted, false if it couldn't be found.
+	 * @return True if the variable was found and deleted, false if it couldn't be
+	 *         found.
 	 */
 	public boolean delIfExists(String name) {
 		if (this.exists(name)) {
@@ -247,7 +208,8 @@ public class PyInterpreter {
 	}
 
 	/**
-	 * Runs a script on the interpreter to load the functions into the namespace.
+	 * Runs a script on the interpreter to load it's functions into the namespace.
+	 * This is called before running the event functions like execute()
 	 *
 	 * @param runnableScript
 	 * @throws PyException if there was an error running the script, including a
@@ -255,9 +217,7 @@ public class PyInterpreter {
 	 */
 	public void primeScript(RunnableScript runnableScript) throws PyException {
 		// Cleanup the old functions.
-		this.delIfExists("onBind");
 		this.delIfExists("execute");
-		this.delIfExists("onClick");
 		this.delIfExists("getArgs");
 
 		// Sets sys.argv to the arguments to pass in.
@@ -267,6 +227,7 @@ public class PyInterpreter {
 		args.removeAll(Collections.singleton(""));
 		this.pythonInterpreter.getSystemState().argv = args;
 
+		//TODO should i follow this https://stackoverflow.com/questions/51715687/passing-parameters-from-java-to-python-using-jython
 		this.pythonInterpreter.execfile(runnableScript.getFile().getAbsolutePath());
 	}
 }

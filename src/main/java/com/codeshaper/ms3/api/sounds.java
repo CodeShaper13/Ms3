@@ -12,7 +12,7 @@ import com.codeshaper.ms3.apiBuilder.annotation.PythonFunction;
 @PythonDocString("A list of all the vanilla Sound names.")
 public class sounds {
 
-    private static PyList names = new PyList();
+    private static PyList allSoundNames = new PyList();
 
     private sounds() { }
 
@@ -1118,11 +1118,11 @@ public class sounds {
     @PythonFunction
     @PythonDocString("Returns a list of all the vanilla Sounds.")
     public static PyList getAllSounds() {
-        return names;
+        return sounds.allSoundNames;
     }
 
     private static String func(String s) {
-        names.add(new PyString(s));
+        sounds.allSoundNames.add(new PyString(s));
         return s;
     }
 }
