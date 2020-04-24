@@ -4,16 +4,12 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.lwjgl.opengl.GL11;
-import org.python.core.PyObject;
-
 import com.codeshaper.ms3.api.BoundObject;
 import com.codeshaper.ms3.api.entity;
 import com.codeshaper.ms3.api.executor;
 import com.codeshaper.ms3.api.util;
 import com.codeshaper.ms3.bindScriptAction.BSAction;
 import com.codeshaper.ms3.bindScriptAction.BindScriptAction;
-import com.codeshaper.ms3.capability.AttachedScript;
 import com.codeshaper.ms3.capability.AttachedScriptList;
 import com.codeshaper.ms3.capability.EntityMs3DataProvider;
 import com.codeshaper.ms3.capability.IEntityMs3Data;
@@ -23,7 +19,6 @@ import com.codeshaper.ms3.interpreter.PyInterpreter;
 import com.codeshaper.ms3.script.RunnableScript;
 import com.codeshaper.ms3.script.ScheduledScript;
 import com.codeshaper.ms3.update.EnumCurrentStatus;
-import com.codeshaper.ms3.update.UpdateChecker;
 import com.codeshaper.ms3.update.Version;
 import com.codeshaper.ms3.util.Logger;
 import com.codeshaper.ms3.util.MessageUtil;
@@ -33,7 +28,6 @@ import com.codeshaper.ms3.util.textBuilder.TextBuilderTrans;
 import com.google.gson.stream.MalformedJsonException;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -42,16 +36,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
@@ -191,11 +181,11 @@ public class EventHandler {
 		this.func(world.loadedEntityList, type);
 		this.func(world.playerEntities, type);
 	}
-	
+
 	private void func(List list, EnumCallbackType type) {
 		IEntityMs3Data ms3Data;
 		for (Object obj : list) {
-			Entity entity = (Entity)obj;
+			Entity entity = (Entity) obj;
 			if (Util.validEntityForMs3Data(entity)) {
 				ms3Data = entity.getCapability(EntityMs3DataProvider.ENTITY_MS3_DATA_CAP, null);
 				if (ms3Data != null) {
@@ -247,30 +237,13 @@ public class EventHandler {
 			RunnableScript runnableScript, Entity clickedEntity) {
 		// Make sure the entity doesn't already have the same script bound to it.
 		if (ms3EntityData.getScriptList().containsScript(runnableScript)) {
-			MessageUtil.sendMessage(player, new TextBuilder("ms3.stick.cantAddDuplicate").color(TextFormatting.RED));
+			MessageUtil.sendMessage(player, new TextBuilderTrans("ms3.stick.cantAddDuplicate").color(TextFormatting.RED));
 		} else {
 			// Try to bind the script.
 			PyInterpreter interpreter = Ms3.getDefaultInterpreter();
 			ms3EntityData.addBoundScript(entity.createWrapperClassForEntity(clickedEntity), runnableScript);
 
-			/*
-			 * boolean flag = interpreter.runOnBind(runnableScript, player, clickedEntity);
-			 * if (flag) { PyObject obj = Ms3.getDefaultInterpreter().func(runnableScript,
-			 * player); if (obj != null) { ms3EntityData.addBoundObject(obj,
-			 * entity.getWrapperClassForEntity(clickedEntity));
-			 * MessageUtil.sendMessage(player, new
-			 * TextBuilderTrans("ms3.stick.successfulBind").color(TextFormatting.GREEN)); }
-			 * else { MessageUtil.sendMessage(player, new
-			 * TextBuilder("Script must define a class with the same name as the script file."
-			 * ).color(TextFormatting.GREEN)); }
-			 * 
-			 * 
-			 * } else { // More code because it must be in bold. ITextComponent itc = new
-			 * TextComponentTranslation("ms3.stick.bindingError");
-			 * itc.getStyle().setBold(true).setColor(TextFormatting.RED);
-			 * 
-			 * MessageUtil.sendMessage(player, itc); }
-			 */
+			MessageUtil.sendMessage(player, new TextBuilderTrans("ms3.stick.successfulBind").color(TextFormatting.GREEN));
 		}
 	}
 
@@ -287,6 +260,7 @@ public class EventHandler {
 		AttachedScriptList list = capabilityData.getScriptList();
 		if (list.containsScript(runnableScript)) {
 			list.remove(runnableScript);
+			MessageUtil.sendMessage(player, new TextBuilderTrans("ms3.stick.successfulRemove").color(TextFormatting.GREEN));
 		} else {
 			MessageUtil.sendMessage(player, new TextBuilder("ms3.stick.noScriptOnEntity").color(TextFormatting.RED));
 		}
